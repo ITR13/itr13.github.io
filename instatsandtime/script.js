@@ -176,7 +176,7 @@ function generateHtml(data) {
         }
     });
 
-
+    html = html.replace(/\d+/g, '<span style="color: yellow;">$&</span>');
 
     return html;
 }

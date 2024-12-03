@@ -163,7 +163,7 @@ function generateHtml(data) {
         { label: `You fished ${data.TimesFished} times.`, value: data.TimesFished },
         { label: `You saw ${data.GhostsSeen} ghosts.`, value: data.GhostsSeen },
         { label: `You picked up the KeyKnife ${data.FoundWeaponAgain} times.`, value: data.FoundWeaponAgain },
-        { label: `You shaped the KeyKnife ${data.KeyKnife} times.`, value: data.KeyKnife },
+        { label: `You sharpened the KeyKnife ${data.KeyKnife} times.`, value: data.KeyKnife },
         { label: `You bumped into a table ${data.BumpIntoTable} times.`, value: data.BumpIntoTable },
         { label: `You got ${data.HumanQuota} human quota.`, value: data.HumanQuota },
         { label: `You gifted loop a flower ${data.LoopFlower} times.`, value: data.LoopFlower },
@@ -175,6 +175,8 @@ function generateHtml(data) {
             html += `<p>${stat.label}</p>`;
         }
     });
+
+
 
     return html;
 }

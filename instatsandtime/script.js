@@ -88,22 +88,26 @@ function extractData(content) {
 function generateHtml(data) {
     let html = `<h1>Your Stats</h1>`;
 
-    let playtime = Math.floor(data.Playtime / 1000);
+    let playtime = Math.floor((data.Playtime || 0) / 1000);
     let hours = Math.floor(playtime / 3600);
     let minutes = Math.floor((playtime % 3600) / 60);
     let seconds = playtime % 60;
     let playtimeFormatted = `${hours}h ${minutes}m ${seconds}s`;
     html += `<p>You made it to act ${data.Act} in ${playtimeFormatted}</p>`;
 
-    html += `<p>You chose to loop ${data.Loop} times, but Siffrin experienced ${data.FakeLoop} loops!</p>`;
+    if (data.Loop > 0) {
+        html += `<p>You chose to loop ${data.Loop} times, but Siffrin experienced ${data.FakeLoop} loops!</p>`;
+    }
 
     if (data.TimesFastForwarded > 1000) {
         html += `<p>You zoned out ${data.TimesFastForwarded} times... You really don't care about what your friends say, huh?</p>`;
     } else {
-        html += `<p>You zoned out ${data.TimesFastForwarded} times!</p>`;
+        html += `<p>You zoned out ${data.TimesFastForwarded || 0} times!</p>`;
     }
 
-    html += `<p>You got to the end ${data.GotToEnd} times.</p>`;
+    if (data.GotToEnd > 0) {
+        html += `<p>You got to the end ${data.GotToEnd} times.</p>`;
+    }
 
     let saveComment = "";
     if (data.SaveCount == 0) {

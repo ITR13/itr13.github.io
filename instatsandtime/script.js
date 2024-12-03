@@ -110,7 +110,7 @@ function generateHtml(data) {
     }
 
     let saveComment = "";
-    if (data.SaveCount == 0) {
+    if (data.SaveCount <= 0) {
         saveComment = " WOW!";
     } else if (data.SaveCount > data.Loop) {
         saveComment = " You like playing it safe!";

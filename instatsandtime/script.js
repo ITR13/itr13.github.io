@@ -157,7 +157,7 @@ function generateHtml(data) {
 
     html += `<h2>Quests and Stats</h2>`;
 
-    html += `<p><img src="siffrin.png" alt="Siffrin"> Lvl ${data.SifLevel} <img src="mira.png" alt="Mirabelle"> Lvl ${data.MiraLevel} <img src="isa.png" alt="Isabeau"> Lvl ${data.IsaLevel} <img src="odile.png" alt="Odile"> Lvl ${data.OdileLevel} <img src="bonnie.png" alt="Bonnie"> Lvl ${data.BonnieLevel}</p>`;
+    html += `<p><img src="siffrin.png" alt="Siffrin"> Lvl ${data.SifLevel} <img src="mira.png" alt="Mirabelle"> Lvl ${data.MiraLevel} <img src="isa.png" alt="Isabeau"> Lvl ${data.IsaLevel} <img src="odile.png" alt="Odile"> Lvl ${data.OdileLevel} <img src="bonnie.png" alt="Bonnie"> Lvl ${data.BonnieLevel}\n</p>`;
 
     const stats = [
         { label: `You had ${data.LoopConvos} unique conversations with loop.`, value: data.LoopConvos },
@@ -181,6 +181,7 @@ function generateHtml(data) {
     });
 
     html = html.replace(/\b\d+\b/g, '<span style="color: cyan;"><b>$&</b></span>');
+    html = html.replace(/<\/p>\s*<p>/g, '\n');
 
     return html;
 }

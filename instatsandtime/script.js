@@ -155,7 +155,6 @@ function generateHtml(data) {
 
     html += `<p><img src="siffrin.png" alt="Siffrin"> Lvl ${data.SifLevel} <img src="mira.png" alt="Mirabelle"> Lvl ${data.MiraLevel} <img src="isa.png" alt="Isabeau"> Lvl ${data.IsaLevel} <img src="odile.png" alt="Odile"> Lvl ${data.OdileLevel} <img src="bonnie.png" alt="Bonnie"> Lvl ${data.BonnieLevel}</p>`;
 
-    // Stats with conditions
     const stats = [
         { label: `You had ${data.LoopConvos} unique conversations with loop.`, value: data.LoopConvos },
         { label: `You called Loop ${data.CalledLoop} times.`, value: data.CalledLoop },
@@ -168,7 +167,7 @@ function generateHtml(data) {
         { label: `You bumped into a table ${data.BumpIntoTable} times.`, value: data.BumpIntoTable },
         { label: `You got ${data.HumanQuota} human quota.`, value: data.HumanQuota },
         { label: `You gifted loop a flower ${data.LoopFlower} times.`, value: data.LoopFlower },
-        { label: `You tried to say the name of the country ${data.CountrySaidIt} times, and refused ${data.CountryDidntSayIt} times.`, value: data.CountrySaidIt }
+        { label: `You tried to say the name of the country ${data.CountrySaidIt || 0} times, and refused ${data.CountryDidntSayIt || 0} times.`, value: (data.CountrySaidIt || 0) + (data.CountryDidntSayIt || 0) }
     ];
 
     stats.forEach(stat => {
@@ -177,7 +176,6 @@ function generateHtml(data) {
         }
     });
 
-    // Return the HTML content
     return html;
 }
 

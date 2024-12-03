@@ -180,7 +180,7 @@ function generateHtml(data) {
         }
     });
 
-    html = html.replace(/\d+/g, '<span style="color: yellow;">$&</span>');
+    html = html.replace(/\b\d+\b/g, '<span style="color: cyan;"><b>$&</b></span>');
 
     return html;
 }

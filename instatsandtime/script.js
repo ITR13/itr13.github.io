@@ -121,7 +121,7 @@ function generateHtml(data) {
     html += `<h2>Battles and Deaths</h2>`;
 
     // One battle isn't counted by the game. Not sure which one.
-    const battleCount = data.battleCount + 1;
+    const battleCount = data.BattleCount + 1;
     let battleComment = "";
     if (battleCount < data.WinCount + data.EscapeCount) {
         battleComment = " Wait, that doesn't add up...";

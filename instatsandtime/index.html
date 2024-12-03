@@ -1,70 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>In Stats and Time</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-            margin: 10px 0;
-            border-radius: 5px;
-        }
-        .file-selector {
-            margin: 20px 0;
-        }
-        .output {
-            margin-top: 20px;
-            padding: 15px;
-            background: #e8f5e9;
-            border-left: 4px solid #4caf50;
-            border-radius: 5px;
-        }
-        table {
-            border-spacing: 10px 2px;
-            border-collapse: separate;
-        }
-        th, td {
-            padding: 5px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>In Stats And Time! (by ITR)</h1>
-        <p>Follow these steps to locate your <strong>save</strong> folder for <em>In Stars And Time</em>:</p>
-        <ol>
-            <li>Go to your Steam Library and find <strong>In Stars And Time</strong>.</li>
-            <li>Right-click the game and select <strong>Manage</strong>, and click <strong>Browse Local Files</strong>.</li>
-            <li>Navigate to the <code>www/save</code> folder and select File1.rpgsave (or whichever number you have).</li>
-        </ol>
-        <img src="steam-library.png" alt="Steam Library Screenshot">
+---
+layout: default
+---
+<div class="container">
+    <h1>In Stats And Time! (by ITR)</h1>
+    <p>Follow these steps to locate your <strong>save</strong> folder for <em>In Stars And Time</em>:</p>
+    <ol>
+        <li>Go to your Steam Library and find <strong>In Stars And Time</strong>.</li>
+        <li>Right-click the game and select <strong>Manage</strong>, and click <strong>Browse Local Files</strong>.</li>
+        <li>Navigate to the <code>www/save</code> folder and select File1.rpgsave (or whichever number you have).</li>
+    </ol>
+    <img src="steam-library.png" alt="Steam Library Screenshot">
 
-        <div class="file-selector">
-            <label for="fileInput">Select a file from the save folder:</label><br>
-            <input type="file" id="fileInput" accept=".rpgsave">
-        </div>
-
-        <pre id="output"></pre>
+    <div class="file-selector">
+        <label for="fileInput">Select a file from the save folder:</label><br>
+        <input type="file" id="fileInput" accept=".rpgsave">
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/lz-string/libs/lz-string.min.js"></script>
-    <script type="module" src="script.js"></script>
-</body>
-</html>
+    <pre id="output"></pre>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/lz-string/libs/lz-string.min.js"></script>
+<script type="module" src="script.js"></script>

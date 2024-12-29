@@ -98,7 +98,7 @@ function init() {
     TOTAL_LOADING = LOADING
 
     level = {}
-    quickmode = true;
+    quickmode = false;
 
     button_positions = [];
     for (var i = 0; i < 3; i++) {
@@ -362,12 +362,12 @@ function setState(newState) {
     stateTimer = 0;
     stateCounter = 0;
 
-
     switch (newState) {
         case S_Searching:
             break;
         case S_Loading:
-        case S_Loading:
+        case S_Menu:
+        case S_Settings:
             current_level = 0;
             break;
         case S_NextStage:
@@ -389,7 +389,7 @@ function setState(newState) {
             });
             break;
         case S_GameOver:
-            gameSettings.highscores.push(current_level-1);
+            gameSettings.highscores.push(current_level - 1);
             gameSettings.highscores.sort((a, b) => b - a);
             gameSettings.highscores = gameSettings.highscores.slice(0, 10);
             localStorage.setItem("settings", JSON.stringify(gameSettings));

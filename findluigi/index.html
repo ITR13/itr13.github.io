@@ -3,18 +3,38 @@ layout: default
 ---
 <div id="canvas-container">
     <iframe id="gameFrame" src="game.html" width="256" height="384"></iframe>
-    <button class="fullscreen-btn" onclick="toggleFullscreen()">Full Screen</button>
 </div>
+<button class="fullscreen-btn" onclick="toggleFullscreen()">Full Screen</button>
 
-<script>
-    function toggleFullscreen() {
-        const iframe = document.getElementById('gameFrame');
-        if (!document.fullscreenElement) {
-            iframe.requestFullscreen().catch(err => {
-                alert(`Error attempting to enable full-screen mode: ${err.message}`);
-            });
-        } else {
-            document.exitFullscreen();
+<p>
+<h1>Find Luigi!</h1>
+<p>A recreation of the game "Wanted" from Super Mario 64 DS.</p>
+
+<h3>Credits:</h2>
+<ul>
+    <li>Original Idea: <a href="https://en.wikipedia.org/wiki/Super_Mario_64">Somebody who worked on Super Mario 64</a>
+    </li>
+    <li>Implementation: ITR</li>
+    <li>Game Engine: <a href="https://github.com/litecanvas">Litecanvas</a></li>
+    <li>Asset Rips:
+        <ul>
+            <li>ITR</li>
+            <li><a href="https://www.spriters-resource.com/submitter/TJ+the+Kid/">TJ the Kid</a></li>
+            <li><a href="https://www.spriters-resource.com/submitter/Feever1999/">Feever1999</a></li>
+        </ul>
+    </li>
+    </p>
+
+
+    <script>
+        function toggleFullscreen() {
+            const iframe = document.getElementById('gameFrame');
+            if (!document.fullscreenElement) {
+                iframe.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable full-screen mode: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
         }
-    }
-</script>
+    </script>

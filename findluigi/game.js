@@ -81,9 +81,9 @@ function init() {
         images_original.numbers = splitFrames(image, 17, 17, 0, 0)
         images_converted.numbers = images_original.numbers.map(convertColors)
     })
-    loadImage("assets/star.png", (image, { convertColors, splitFrames }) => {
-        images_original.star = image
-        images_converted.star = convertColors(images_original.star)
+    loadImage("assets/stars.png", (image, { convertColors, splitFrames }) => {
+        images_original.stars = splitFrames(image, 28, 28, 0, 0)
+        images_converted.stars = images_original.stars.map(convertColors)
     })
     loadImage("assets/level.png", (image, { convertColors, splitFrames }) => {
         images_original.level = image
@@ -123,7 +123,7 @@ function update(dt) {
         case S_Settings:
             break;
         case S_NextStage:
-            let nextStageEndTime = level.longIntro ? 3.4 : 1.2;
+            let nextStageEndTime = level.longIntro ? 1.7 : 0.6;
             if (stateTimer >= nextStageEndTime) setState(S_Searching);
             break;
         case S_Searching:
@@ -210,7 +210,7 @@ function drawInfo() {
             push()
             const region = path();
 
-            let time = stateTimer / 1.1;
+            let time = stateTimer / 0.55;
             if (level.longIntro && time < 3) {
                 time = 1 - abs((time % 2) - 1);
             }
@@ -219,8 +219,9 @@ function drawInfo() {
             region.arc(x, SCREEN_HEIGHT / 2, 75, 0, TWO_PI);
             region.arc(SCREEN_WIDTH - x, SCREEN_HEIGHT / 2, 75, 0, TWO_PI);
             clip(region);
-            drawPosterAndStars();
+            drawPosters();
             pop();
+            drawStars();
             break;
         }
         case S_Searching: {
@@ -228,8 +229,9 @@ function drawInfo() {
             const region = path();
             region.arc(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 75, 0, TWO_PI);
             clip(region);
-            drawPosterAndStars();
+            drawPosters();
             pop();
+            drawStars();
             break;
         }
         case S_Victory:
@@ -240,28 +242,58 @@ function drawInfo() {
                 let radius = lerp(85, 160, stateTimer / 0.85);
                 region.arc(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, radius, 0, TWO_PI);
                 clip(region);
-                drawPosterAndStars();
+                drawPosters();
                 pop();
             } else {
-                drawPosterAndStars();
+                drawPosters();
             }
+            drawStars();
             break;
     }
 }
 
-function drawPosterAndStars() {
+function drawPosters() {
     image(0, 0, images.posters[level.poster])
-    let stars = current_level + (state == S_Victory ? stateCounter % 2 : 0) - 1;
-    if (stars > 0) {
-        image(SCREEN_WIDTH - 30, SCREEN_HEIGHT - 42, images.star);
-        let starText = stars.toString();
+}
+
+function drawStars() {
+    let stars = current_level - 1;
+    let bigStars = floor(stars / 5);
+    stars -= bigStars * 5;
+    let smallStarDistance = 16;
+    if (state == S_NextStage && stars == 0 && bigStars > 0 && stateTimer < 0.5) {
+        bigStars -= 1;
+        stars += 5;
+        smallStarDistance = lerp(16, -1, stateTimer / 0.5);
+    }
+
+    let stack = []
+
+    let starY = SCREEN_HEIGHT - 38;
+    if (bigStars > 0) {
+        let starText = (bigStars * 5).toString();
 
         let startX = SCREEN_WIDTH - 30 + 9 - starText.length * 4;
-        let startY = SCREEN_HEIGHT - 42 + 4;
+        let startY = SCREEN_HEIGHT - 38 + 4;
         for (let i = 0; i < starText.length; i++) {
             let digit = parseInt(starText.charAt(i));
-            image(startX + i * 8, startY, images.numbers[10 + digit]);
-        }
+            stack.push([startX + i * 8, startY, images.numbers[10 + digit]]);
+        } 
+
+        stack.push([SCREEN_WIDTH - 30, starY, images.stars[0]]);
+        starY -= smallStarDistance;
+    }
+
+    if (state == S_Victory && (stateCounter % 2) == 1) stars += 1;
+
+    for (let i = 0; i < stars; i++) {
+        stack.push([SCREEN_WIDTH - 30, starY, images.stars[1]]);
+        starY -= smallStarDistance;
+    }
+
+    for (let i = stack.length - 1; i >= 0; i--) {
+        let val = stack[i];
+        image(val[0], val[1], val[2]);
     }
 }
 

@@ -50,6 +50,7 @@ litecanvas({
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT * 2,
     pixelart: gameSettings.pixelart,
+    pauseOnBlur: false,
 })
 
 
@@ -102,7 +103,7 @@ function init() {
     quickmode = false;
 
     button_positions = [];
-    for (var i = 0; i < 3; i++) {
+    for (let i = 0; i < 3; i++) {
         let x = SCREEN_WIDTH / 4;
         let y = SCREEN_HEIGHT + SCREEN_HEIGHT * (i + 1) / 4;
         button_positions.push({ x: x, y: y });
@@ -122,7 +123,8 @@ function update(dt) {
         case S_Settings:
             break;
         case S_NextStage:
-            setState(S_Searching);
+            let nextStageEndTime = level.longIntro ? 3.4 : 1.2;
+            if (stateTimer >= nextStageEndTime) setState(S_Searching);
             break;
         case S_Searching:
             level.heads.forEach(head => {
@@ -184,7 +186,12 @@ function draw() {
             break;
     }
 
+    push()
+    const bottomRegion = path();
+    bottomRegion.rect(0, SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT);
+    clip(bottomRegion);
     drawBoard()
+    pop()
     drawInfo()
 }
 
@@ -195,44 +202,81 @@ function drawInfo() {
             textsize(12);
             textalign("center", "top");
             text(SCREEN_WIDTH / 2, 8, "Highscores", 0);
-            for (var i = 0; i < gameSettings.highscores.length; i++) {
+            for (let i = 0; i < gameSettings.highscores.length; i++) {
                 text(SCREEN_WIDTH / 2, 8 + (i + 1) * 12, gameSettings.highscores[i], 0);
             }
             break;
-        case S_NextStage:
+        case S_NextStage: {
+            push()
+            const region = path();
+
+            let time = stateTimer / 1.1;
+            if (level.longIntro && time < 3) {
+                time = 1 - abs((time % 2) - 1);
+            }
+
+            let x = lerp(-75, SCREEN_WIDTH / 2, clamp(time, 0, 1));
+            region.arc(x, SCREEN_HEIGHT / 2, 75, 0, TWO_PI);
+            region.arc(SCREEN_WIDTH - x, SCREEN_HEIGHT / 2, 75, 0, TWO_PI);
+            clip(region);
+            drawPosterAndStars();
+            pop();
             break;
-        case S_Searching:
+        }
+        case S_Searching: {
+            push()
+            const region = path();
+            region.arc(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 75, 0, TWO_PI);
+            clip(region);
+            drawPosterAndStars();
+            pop();
+            break;
+        }
         case S_Victory:
         case S_GameOver:
-            image(0, 0, images.posters[level.poster])
-            let stars = current_level + (state == S_Victory ? stateCounter % 2 : 0) - 1;
-            if (stars > 0) {
-                image(SCREEN_WIDTH - 30, SCREEN_HEIGHT - 42, images.star);
-                let starText = stars.toString();
-
-                let startX = SCREEN_WIDTH - 30 + 9 - starText.length * 4;
-                let startY = SCREEN_HEIGHT - 42 + 4;
-                for (let i = 0; i < starText.length; i++) {
-                    let digit = parseInt(starText.charAt(i));
-                    image(startX + i * 8, startY, images.numbers[10 + digit]);
-                }
+            if (stateTimer <= 0.85) {
+                push()
+                const region = path();
+                let radius = lerp(85, 160, stateTimer / 0.85);
+                region.arc(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, radius, 0, TWO_PI);
+                clip(region);
+                drawPosterAndStars();
+                pop();
+            } else {
+                drawPosterAndStars();
             }
             break;
+    }
+}
+
+function drawPosterAndStars() {
+    image(0, 0, images.posters[level.poster])
+    let stars = current_level + (state == S_Victory ? stateCounter % 2 : 0) - 1;
+    if (stars > 0) {
+        image(SCREEN_WIDTH - 30, SCREEN_HEIGHT - 42, images.star);
+        let starText = stars.toString();
+
+        let startX = SCREEN_WIDTH - 30 + 9 - starText.length * 4;
+        let startY = SCREEN_HEIGHT - 42 + 4;
+        for (let i = 0; i < starText.length; i++) {
+            let digit = parseInt(starText.charAt(i));
+            image(startX + i * 8, startY, images.numbers[10 + digit]);
+        }
     }
 }
 
 function drawBoard() {
     switch (state) {
         case S_Menu:
-            for (var i = 0; i < button_positions.length; i++) {
+            for (let i = 0; i < button_positions.length; i++) {
                 let pos = button_positions[i];
                 image(pos.x, pos.y, images.menu_buttons[i]);
             }
             break;
         case S_Settings:
-            for (var i = 0; i < button_positions.length; i++) {
+            for (let i = 0; i < button_positions.length; i++) {
                 let pos = button_positions[i];
-                var index = i * 2;
+                let index = i * 2;
                 switch (i) {
                     case 0:
                         if (gameSettings.pixelart) index++;
@@ -271,7 +315,7 @@ function tap(x, y, tapId) {
 
     switch (state) {
         case S_Menu:
-            for (var i = 0; i < button_positions.length; i++) {
+            for (let i = 0; i < button_positions.length; i++) {
                 let pos = button_positions[i];
                 if (x < pos.x - 2 || x >= pos.x + 130 || y < pos.y - 2 || y >= pos.y + 40) continue;
                 switch (i) {
@@ -291,7 +335,7 @@ function tap(x, y, tapId) {
             }
             break;
         case S_Settings:
-            for (var i = 0; i < button_positions.length; i++) {
+            for (let i = 0; i < button_positions.length; i++) {
                 let pos = button_positions[i];
                 if (x < pos.x - 2 || x >= pos.x + 130 || y < pos.y - 2 || y >= pos.y + 40) continue;
                 switch (i) {
@@ -343,7 +387,7 @@ function findTappedHead(x, y) {
         }
     }
 
-    for (var i = level.heads.length - 1; i >= 0; i--) {
+    for (let i = level.heads.length - 1; i >= 0; i--) {
         let head = level.heads[i];
         let pos = head.getPosition ? head.getPosition(stateTimer) : head;
         let dx = x - pos.x;
@@ -406,14 +450,10 @@ function setState(newState) {
 }
 
 function generateLevel(current_level) {
-    if (current_level < 100) {
-        let level = generateLevelInner(current_level);
-        level.timescale = 1;
-        return level;
-    }
+    let level = generateLevelInner(current_level);
 
-    let level = generateLevelInner(current_level % 100);
-    level.timescale = floor(current_level / 100) * 0.25 + 1;
+    level.timescale = floor((current_level - 1) / 100) * 0.25 + 1;
+    level.longIntro = current_level <= 51 ? (current_level % 10) == 1 : (current_level % 50) == 1;
     return level;
 }
 
@@ -658,7 +698,7 @@ function generateHiddenLine(speed, tightness, variance) {
     for (let i = 0; i < legalPositions.length; i++) {
         let direction = i < inner.length ? 1 : -1;
         let pos = legalPositions[i];
-        var y = pos.y;
+        let y = pos.y;
         if (i < inner.length && variance > 0) {
             y += randi(-variance, variance);
         }

@@ -13,6 +13,8 @@ const SCREEN_WIDTH = 255;
 const HEAD_CENTER = 16;
 
 const MAX_CLICK_DISTANCE_SQ = 20 * 20;
+const FLASHLIGHT_SIZE_SMALL = 64.5
+const FLASHLIGHT_SIZE_LARGE = 160
 
 // Dumb stuff
 function isOnPhone() {
@@ -60,8 +62,7 @@ function init() {
     forceStage = null;
     stateTimer = 0;
     stateCounter = 0;
-    current_level = 0;
-    level_timescale = 1;
+    clearGame();
 
     setState(S_Loading)
 
@@ -71,19 +72,19 @@ function init() {
 
     loadImage("assets/posters.png", (image, { convertColors, splitFrames }) => {
         images_original.posters = splitFrames(image, 256, 192, 0, 0)
-        images_converted.posters = images_original.posters.map(convertColors)
+        images_converted.posters = splitFrames(convertColors(image), 256, 192, 0, 0)
     })
     loadImage("assets/heads.png", (image, { convertColors, splitFrames }) => {
         images_original.heads = splitFrames(image, 32, 32, 0, 0)
-        images_converted.heads = images_original.heads.map(convertColors)
+        images_converted.heads = splitFrames(convertColors(image), 32, 32, 0, 0)
     })
     loadImage("assets/numbers.png", (image, { convertColors, splitFrames }) => {
         images_original.numbers = splitFrames(image, 17, 17, 0, 0)
-        images_converted.numbers = images_original.numbers.map(convertColors)
+        images_converted.numbers = splitFrames(convertColors(image), 17, 17, 0, 0)
     })
     loadImage("assets/stars.png", (image, { convertColors, splitFrames }) => {
         images_original.stars = splitFrames(image, 28, 28, 0, 0)
-        images_converted.stars = images_original.stars.map(convertColors)
+        images_converted.stars = splitFrames(convertColors(image), 28, 28, 0, 0)
     })
     loadImage("assets/level.png", (image, { convertColors, splitFrames }) => {
         images_original.level = image
@@ -91,15 +92,22 @@ function init() {
     })
     loadImage("assets/menu.png", (image, { convertColors, splitFrames }) => {
         images_original.menu_buttons = splitFrames(image, 128, 38, 0, 0)
-        images_converted.menu_buttons = images_original.menu_buttons.map(convertColors)
+        images_converted.menu_buttons = splitFrames(convertColors(image), 128, 38, 0, 0)
     })
     loadImage("assets/settings.png", (image, { convertColors, splitFrames }) => {
         images_original.settings_buttons = splitFrames(image, 128, 38, 0, 0)
-        images_converted.settings_buttons = images_original.settings_buttons.map(convertColors)
+        images_converted.settings_buttons = splitFrames(convertColors(image), 128, 38, 0, 0)
+    })
+    loadImage("assets/timer.png", (image, { convertColors, splitFrames }) => {
+        images_original.timer = splitFrames(image, 32, 32, 0, 0)
+        images_converted.timer = splitFrames(convertColors(image), 32, 32, 0, 0)
+    })
+    loadImage("assets/time.png", (image, { convertColors, splitFrames }) => {
+        images_original.time = image
+        images_converted.time = convertColors(image)
     })
     TOTAL_LOADING = LOADING
 
-    level = {}
     quickmode = false;
 
     button_positions = [];
@@ -107,6 +115,16 @@ function init() {
         let x = SCREEN_WIDTH / 4;
         let y = SCREEN_HEIGHT + SCREEN_HEIGHT * (i + 1) / 4;
         button_positions.push({ x: x, y: y });
+    }
+}
+
+function clearGame(forceStage = null) {
+    game = {
+        currentLevel: 0,
+        countdownTimer: 10.99,
+        smoothTimer: 10.99,
+        level: {},
+        forceStage: forceStage,
     }
 }
 
@@ -123,15 +141,29 @@ function update(dt) {
         case S_Settings:
             break;
         case S_NextStage:
-            let nextStageEndTime = level.longIntro ? 1.7 : 0.6;
+            let nextStageEndTime = game.level.longIntro ? 1.7 : 0.6;
             if (stateTimer >= nextStageEndTime) setState(S_Searching);
             break;
-        case S_Searching:
-            level.heads.forEach(head => {
+        case S_Searching: {
+            let unscaledDeltaTime = dt / game.level.timescale;
+            game.countdownTimer -= unscaledDeltaTime;
+            let deltaTimer = game.countdownTimer - game.smoothTimer;
+            game.smoothTimer += min(abs(deltaTimer), 10 * unscaledDeltaTime) * sign(deltaTimer);
+
+            if (game.countdownTimer < 0) {
+                setState(S_GameOver);
+                return
+            }
+            game.level.heads.forEach(head => {
                 if (head.onMove) head.onMove(dt);
             });
+        }
             break;
         case S_Victory:
+            if (stateCounter >= 1) {
+                let deltaTimer = game.countdownTimer - game.smoothTimer;
+                game.smoothTimer += min(abs(deltaTimer), 10 * dt) * sign(deltaTimer);
+            }
             animateLevelEnd(S_NextStage);
             break;
         case S_GameOver:
@@ -211,13 +243,13 @@ function drawInfo() {
             const region = path();
 
             let time = stateTimer / 0.55;
-            if (level.longIntro && time < 3) {
+            if (game.level.longIntro && time < 3) {
                 time = 1 - abs((time % 2) - 1);
             }
 
-            let x = lerp(-75, SCREEN_WIDTH / 2, clamp(time, 0, 1));
-            region.arc(x, SCREEN_HEIGHT / 2, 75, 0, TWO_PI);
-            region.arc(SCREEN_WIDTH - x, SCREEN_HEIGHT / 2, 75, 0, TWO_PI);
+            let x = lerp(-FLASHLIGHT_SIZE_SMALL, SCREEN_WIDTH / 2, clamp(time, 0, 1));
+            region.arc(x, SCREEN_HEIGHT / 2, FLASHLIGHT_SIZE_SMALL, 0, TWO_PI);
+            region.arc(SCREEN_WIDTH - x, SCREEN_HEIGHT / 2, FLASHLIGHT_SIZE_SMALL, 0, TWO_PI);
             clip(region);
             drawPosters();
             pop();
@@ -227,11 +259,12 @@ function drawInfo() {
         case S_Searching: {
             push()
             const region = path();
-            region.arc(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 75, 0, TWO_PI);
+            region.arc(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, FLASHLIGHT_SIZE_SMALL, 0, TWO_PI);
             clip(region);
             drawPosters();
             pop();
             drawStars();
+            drawTimer();
             break;
         }
         case S_Victory:
@@ -239,7 +272,7 @@ function drawInfo() {
             if (stateTimer <= 0.85) {
                 push()
                 const region = path();
-                let radius = lerp(85, 160, stateTimer / 0.85);
+                let radius = lerp(FLASHLIGHT_SIZE_SMALL, FLASHLIGHT_SIZE_LARGE, stateTimer / 0.85);
                 region.arc(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, radius, 0, TWO_PI);
                 clip(region);
                 drawPosters();
@@ -248,16 +281,17 @@ function drawInfo() {
                 drawPosters();
             }
             drawStars();
+            drawTimer();
             break;
     }
 }
 
 function drawPosters() {
-    image(0, 0, images.posters[level.poster])
+    image(0, 0, images.posters[game.level.poster])
 }
 
 function drawStars() {
-    let stars = current_level - 1;
+    let stars = game.currentLevel - 1;
     let bigStars = floor(stars / 5);
     stars -= bigStars * 5;
     let smallStarDistance = 16;
@@ -278,7 +312,7 @@ function drawStars() {
         for (let i = 0; i < starText.length; i++) {
             let digit = parseInt(starText.charAt(i));
             stack.push([startX + i * 8, startY, images.numbers[10 + digit]]);
-        } 
+        }
 
         stack.push([SCREEN_WIDTH - 30, starY, images.stars[0]]);
         starY -= smallStarDistance;
@@ -294,6 +328,21 @@ function drawStars() {
     for (let i = stack.length - 1; i >= 0; i--) {
         let val = stack[i];
         image(val[0], val[1], val[2]);
+    }
+}
+
+function drawTimer() {
+    let centerX = SCREEN_WIDTH / 2;
+    let y = 23;
+
+    image(centerX - 16, y - 12, images.time);
+
+    let text = floor(clamp(game.smoothTimer, 0, 50)).toString();
+    let startX = centerX - text.length * 16;
+    for (var i = 0; i < text.length; i++) {
+        let x = startX + 32 * i;
+        let digit = parseInt(text.charAt(i));
+        image(x, y, images.timer[digit])
     }
 }
 
@@ -323,7 +372,7 @@ function drawBoard() {
         case S_NextStage:
             break;
         case S_Searching:
-            level.heads.forEach(head => {
+            game.level.heads.forEach(head => {
                 let pos = head.getPosition ? head.getPosition(stateTimer) : head;
 
                 let x = floor(pos.x - HEAD_CENTER);
@@ -333,7 +382,7 @@ function drawBoard() {
             break;
         case S_Victory:
         case S_GameOver:
-            let head = level.target_head;
+            let head = game.level.targetHead;
 
             let x = floor(head.x - HEAD_CENTER);
             let y = floor(head.y - HEAD_CENTER + SCREEN_HEIGHT);
@@ -352,15 +401,16 @@ function tap(x, y, tapId) {
                 if (x < pos.x - 2 || x >= pos.x + 130 || y < pos.y - 2 || y >= pos.y + 40) continue;
                 switch (i) {
                     case 0:
-                        forceStage = null;
+                        clearGame();
                         setState(S_NextStage);
                         return;
                     case 1:
                         setState(S_Settings);
                         return;
                     case 2:
-                        forceStage = getUserNumber();
+                        let forceStage = getUserNumber();
                         if (forceStage == null) return;
+                        clearGame(forceStage);
                         setState(S_NextStage);
                         return;
                 }
@@ -392,13 +442,15 @@ function tap(x, y, tapId) {
 
             let tappedHead = findTappedHead(x, y);
             if (tappedHead == -1) return;
-            if (tappedHead == -2 || level.heads[tappedHead].isTarget) {
+            if (tappedHead == -2 || game.level.heads[tappedHead].isTarget) {
+                game.countdownTimer += 5;
+                game.countdownTimer = clamp(game.countdownTimer, 0, 50.99);
                 if (quickmode) setState(S_NextStage);
                 else setState(S_Victory);
             } else if (tappedHead >= 0) {
-                level.heads.splice(tappedHead, 1);
-                level.lives--;
-                if (level.lives <= 0) setState(S_GameOver);
+                game.countdownTimer -= 10;
+                game.smoothTimer -= 10;
+                game.level.heads.splice(tappedHead, 1);
             }
             return;
     }
@@ -409,7 +461,7 @@ function findTappedHead(x, y) {
     let closest = -1;
 
     {
-        let head = level.target_head;
+        let head = game.level.targetHead;
         let pos = head.getPosition ? head.getPosition(stateTimer) : head;
         let dx = x - pos.x;
         let dy = y - pos.y;
@@ -419,8 +471,8 @@ function findTappedHead(x, y) {
         }
     }
 
-    for (let i = level.heads.length - 1; i >= 0; i--) {
-        let head = level.heads[i];
+    for (let i = game.level.heads.length - 1; i >= 0; i--) {
+        let head = game.level.heads[i];
         let pos = head.getPosition ? head.getPosition(stateTimer) : head;
         let dx = x - pos.x;
         let dy = y - pos.y;
@@ -449,20 +501,16 @@ function setState(newState) {
         case S_Loading:
         case S_Menu:
         case S_Settings:
-            current_level = 0;
+            clearGame();
             break;
         case S_NextStage:
-            current_level++;
-            if (forceStage != null) current_level = forceStage;
-
-            level = generateLevel(current_level);
-            timescale(level.timescale);
-            // Temp until time is implemented
-            level.lives = 3;
+            game.currentLevel++;
+            game.level = generateLevel(game.forceStage != null ? game.forceStage : game.currentLevel);
+            timescale(game.level.timescale);
             break;
 
         case S_Victory:
-            level.heads.forEach(head => {
+            game.level.heads.forEach(head => {
                 if (head.getPosition) {
                     pos = head.getPosition(oldStateTimer);
                     head.x = pos.x;
@@ -472,7 +520,7 @@ function setState(newState) {
             break;
         case S_GameOver:
             if (forceStage == null) {
-                gameSettings.highscores.push(current_level - 1);
+                gameSettings.highscores.push(game.currentLevel - 1);
                 gameSettings.highscores.sort((a, b) => b - a);
                 gameSettings.highscores = gameSettings.highscores.slice(0, 10);
                 localStorage.setItem("settings", JSON.stringify(gameSettings));
@@ -481,17 +529,17 @@ function setState(newState) {
     }
 }
 
-function generateLevel(current_level) {
-    let level = generateLevelInner(current_level);
+function generateLevel(currentLevel) {
+    let level = generateLevelInner(currentLevel);
 
-    level.timescale = floor((current_level - 1) / 100) * 0.25 + 1;
-    level.longIntro = current_level <= 51 ? (current_level % 10) == 1 : (current_level % 50) == 1;
+    level.timescale = floor((currentLevel - 1) / 100) * 0.25 + 1;
+    level.longIntro = currentLevel <= 51 ? (currentLevel % 10) == 1 : (currentLevel % 50) == 1;
     return level;
 }
 
-function generateLevelInner(current_level) {
+function generateLevelInner(currentLevel) {
     // Single level overrides
-    switch (current_level) {
+    switch (currentLevel) {
         case 1:
             return generate2x2();
         case 2:
@@ -524,11 +572,11 @@ function generateLevelInner(current_level) {
     }
 
     // Level range overrides
-    if (current_level < 10) {
+    if (currentLevel < 10) {
         return generateFill(120);
-    } else if (current_level < 20) {
+    } else if (currentLevel < 20) {
         let level = generateFill(100);
-        switch (current_level % 3) {
+        switch (currentLevel % 3) {
             case 1:
                 setVerticalMovementPerType(level, -48, 48);
                 setPerTypeOffset(level, 16, 4, 0);
@@ -539,9 +587,9 @@ function generateLevelInner(current_level) {
                 return level;
         }
         return level;
-    } else if (current_level < 30) {
+    } else if (currentLevel < 30) {
         let level = generateFill(120);
-        switch (current_level % 3) {
+        switch (currentLevel % 3) {
             case 0:
                 setVerticalMovementPerType(level, -96, 96);
                 setPerTypeOffset(level, 16, 4, 0);
@@ -553,8 +601,8 @@ function generateLevelInner(current_level) {
                 setPerTypeOffset(level, 16, 4, 0);
                 return level;
         }
-    } else if (current_level < 40) {
-        switch (current_level % 3) {
+    } else if (currentLevel < 40) {
+        switch (currentLevel % 3) {
             case 0: {
                 let level = generateFill(200, false, true);
                 setBouncyMovement(level, 32);
@@ -575,8 +623,8 @@ function generateLevelInner(current_level) {
             case 2:
                 return generateFill(140);
         }
-    } else if (current_level < 50) {
-        switch (current_level % 4) {
+    } else if (currentLevel < 50) {
+        switch (currentLevel % 4) {
             case 0: {
                 let level = generateSquare(8, 2);
                 level.heads.forEach(head => head.y = head.y < SCREEN_HEIGHT / 2 ? -8 : SCREEN_HEIGHT + 8);
@@ -598,7 +646,7 @@ function generateLevelInner(current_level) {
                 return level;
             }
         }
-    } else if (current_level < 100) {
+    } else if (currentLevel < 100) {
         return generateLevel(randi(1, 50), 1.001);
     }
 }
@@ -621,7 +669,7 @@ function generate2x2() {
         };
         level.heads.push(head);
         if (head.isTarget) {
-            level.target_head = head;
+            level.targetHead = head;
         }
     }
 
@@ -647,9 +695,9 @@ function generateSquare(width, height) {
     }
 
     let targetIndex = randi(0, level.heads.length - 1);
-    level.target_head = level.heads[targetIndex];
-    level.target_head.isTarget = true;
-    level.target_head.sprite = level.lookingFor;
+    level.targetHead = level.heads[targetIndex];
+    level.targetHead.isTarget = true;
+    level.targetHead.sprite = level.lookingFor;
 
     return level;
 }
@@ -694,9 +742,9 @@ function generateFill(count, forceTop = false, diagonals = false, overFillX = 0,
     }
 
     let targetIndex = forceTop ? level.heads.length - 1 : randi(0, floor(level.heads.length / 4));
-    level.target_head = level.heads[targetIndex];
-    level.target_head.isTarget = true;
-    level.target_head.sprite = level.lookingFor;
+    level.targetHead = level.heads[targetIndex];
+    level.targetHead.isTarget = true;
+    level.targetHead.sprite = level.lookingFor;
 
     return level;
 }
@@ -750,9 +798,9 @@ function generateHiddenLine(speed, tightness, variance) {
     }
 
     let targetIndex = randi(0, inner.length - 1);
-    level.target_head = level.heads[targetIndex];
-    level.target_head.isTarget = true;
-    level.target_head.sprite = level.lookingFor;
+    level.targetHead = level.heads[targetIndex];
+    level.targetHead.isTarget = true;
+    level.targetHead.sprite = level.lookingFor;
 
     return level;
 }

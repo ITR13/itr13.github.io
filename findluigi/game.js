@@ -25,7 +25,7 @@ function getUserNumber() {
     const userInput = prompt("Select a level (1-9999):");
     if (userInput === null) return null;
     const number = parseInt(userInput.trim());
-    if (isNaN(number) || level < 1 || level > 9999) {
+    if (isNaN(number) || number < 1 || number > 9999) {
         alert("Invalid level number.");
         return null;
     }
@@ -497,6 +497,7 @@ function setState(newState) {
 
     switch (newState) {
         case S_Searching:
+            timescale(game.level.timescale);
             break;
         case S_Loading:
         case S_Menu:
@@ -506,7 +507,6 @@ function setState(newState) {
         case S_NextStage:
             game.currentLevel++;
             game.level = generateLevel(game.forceStage != null ? game.forceStage : game.currentLevel);
-            timescale(game.level.timescale);
             break;
 
         case S_Victory:
@@ -530,7 +530,7 @@ function setState(newState) {
 }
 
 function generateLevel(currentLevel) {
-    let level = generateLevelInner(currentLevel);
+    let level = generateLevelInner((currentLevel - 1) % 100 + 1);
 
     level.timescale = floor((currentLevel - 1) / 100) * 0.25 + 1;
     level.longIntro = currentLevel <= 51 ? (currentLevel % 10) == 1 : (currentLevel % 50) == 1;
@@ -646,7 +646,7 @@ function generateLevelInner(currentLevel) {
                 return level;
             }
         }
-    } else if (currentLevel < 100) {
+    } else if (currentLevel <= 100) {
         return generateLevel(randi(1, 50), 1.001);
     }
 }

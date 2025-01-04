@@ -60,6 +60,7 @@ function init() {
     stateTimer = 0;
     stateCounter = 0;
     current_level = 0;
+    level_timescale = 1;
 
     setState(S_Loading)
 
@@ -333,18 +334,20 @@ function findTappedHead(x, y) {
 
     {
         let head = level.target_head;
-        let dx = x - head.x;
-        let dy = y - head.y;
+        let pos = head.getPosition ? head.getPosition(stateTimer) : head;
+        let dx = x - pos.x;
+        let dy = y - pos.y;
         let dist = dx * dx + dy * dy
-        if (dist < shortestDistance) {
+        if (dist <= shortestDistance) {
             return -2;
         }
     }
 
     for (var i = level.heads.length - 1; i >= 0; i--) {
         let head = level.heads[i];
-        let dx = x - head.x;
-        let dy = y - head.y;
+        let pos = head.getPosition ? head.getPosition(stateTimer) : head;
+        let dx = x - pos.x;
+        let dy = y - pos.y;
         let dist = dx * dx + dy * dy;
         if (dist < shortestDistance) {
             closest = i;
@@ -362,6 +365,8 @@ function setState(newState) {
     stateTimer = 0;
     stateCounter = 0;
 
+    timescale(1);
+
     switch (newState) {
         case S_Searching:
             break;
@@ -375,6 +380,7 @@ function setState(newState) {
             if (forceStage != null) current_level = forceStage;
 
             level = generateLevel(current_level);
+            timescale(level.timescale);
             // Temp until time is implemented
             level.lives = 3;
             break;
@@ -389,15 +395,29 @@ function setState(newState) {
             });
             break;
         case S_GameOver:
-            gameSettings.highscores.push(current_level - 1);
-            gameSettings.highscores.sort((a, b) => b - a);
-            gameSettings.highscores = gameSettings.highscores.slice(0, 10);
-            localStorage.setItem("settings", JSON.stringify(gameSettings));
-            break;
+            if (forceStage == null) {
+                gameSettings.highscores.push(current_level - 1);
+                gameSettings.highscores.sort((a, b) => b - a);
+                gameSettings.highscores = gameSettings.highscores.slice(0, 10);
+                localStorage.setItem("settings", JSON.stringify(gameSettings));
+                break;
+            }
     }
 }
 
 function generateLevel(current_level) {
+    if (current_level < 100) {
+        let level = generateLevelInner(current_level);
+        level.timescale = 1;
+        return level;
+    }
+
+    let level = generateLevelInner(current_level % 100);
+    level.timescale = floor(current_level / 100) * 0.25 + 1;
+    return level;
+}
+
+function generateLevelInner(current_level) {
     // Single level overrides
     switch (current_level) {
         case 1:
@@ -420,27 +440,94 @@ function generateLevel(current_level) {
             level.heads.forEach(head => head.y = -4);
             return level;
         }
+        case 20:
+            return generateHiddenLine(64, 8, 8);
+        case 30:
+            return generateHiddenLine(64, 17, 0);
+        case 40: {
+            let level = generateSquare(8, 1);
+            level.heads.forEach(head => head.y = -10);
+            return level;
+        }
     }
 
     // Level range overrides
     if (current_level < 10) {
-        return generateFill(100);
-    } else /* if (current_level < 20) */ {
-
-        let speedup = max((current_level - 10) / 10, 1);
-
+        return generateFill(120);
+    } else if (current_level < 20) {
         let level = generateFill(100);
         switch (current_level % 3) {
             case 1:
-                setVerticalMovement(level, -48 * speedup, 48 * speedup);
-                setPerTypeOffset(level, 16, 4 * speedup, 0);
+                setVerticalMovementPerType(level, -48, 48);
+                setPerTypeOffset(level, 16, 4, 0);
                 return level;
             case 2:
-                setPerTypeMovement(level, 32 * speedup);
-                setPerTypeOffset(level, 8, 0.2 * speedup, 0);
+                setPerTypeMovement(level, 32);
+                setPerTypeOffset(level, 8, 0.2, 0);
                 return level;
         }
         return level;
+    } else if (current_level < 30) {
+        let level = generateFill(120);
+        switch (current_level % 3) {
+            case 0:
+                setVerticalMovementPerType(level, -96, 96);
+                setPerTypeOffset(level, 16, 4, 0);
+                return level;
+            case 1:
+                return generateHiddenLine(64, 12, 8);
+            case 2:
+                setVerticalMovement(level, -96, 96);
+                setPerTypeOffset(level, 16, 4, 0);
+                return level;
+        }
+    } else if (current_level < 40) {
+        switch (current_level % 3) {
+            case 0: {
+                let level = generateFill(200, false, true);
+                setBouncyMovement(level, 32);
+                setCircularOffset(level, 32, 0.2);
+                return level;
+            }
+            case 1: {
+                let level = generateFill(200, false, false, 2, 2);
+                level.heads.forEach(head => head.onMove = (dt) => {
+                    head.x += 32 * dt;
+                    head.y += 32 * dt;
+                    if (head.y > SCREEN_HEIGHT + 40) head.y -= SCREEN_HEIGHT + 40 * 2;
+                    if (head.x > SCREEN_WIDTH + 40) head.x -= SCREEN_WIDTH + 40 * 2;
+                });
+                setPerTypeOffset(level, 8, 4, 45);
+                return level;
+            }
+            case 2:
+                return generateFill(140);
+        }
+    } else if (current_level < 50) {
+        switch (current_level % 4) {
+            case 0: {
+                let level = generateSquare(8, 2);
+                level.heads.forEach(head => head.y = head.y < SCREEN_HEIGHT / 2 ? -8 : SCREEN_HEIGHT + 8);
+                return level;
+            }
+            case 1: {
+                let level = generateFill(140, false);
+                setBouncyMovement(level, 64);
+                return level;
+            }
+            case 2: {
+                let level = generateSquare(2, 6);
+                level.heads.forEach(head => head.x = head.x < SCREEN_WIDTH / 2 ? -8 : SCREEN_WIDTH + 8);
+                return level;
+            }
+            case 3: {
+                let level = generateFill(200, false, true);
+                setBouncyMovement(level, 64);
+                return level;
+            }
+        }
+    } else if (current_level < 100) {
+        return generateLevel(randi(1, 50), 1.001);
     }
 }
 
@@ -495,22 +582,31 @@ function generateSquare(width, height) {
     return level;
 }
 
-function generateFill(count, forceTop = false) {
+function generateFill(count, forceTop = false, diagonals = false, overFillX = 0, overFillY = 0) {
     let level = {};
     level.lookingFor = randi(0, 3);
     level.heads = [];
     level.poster = level.lookingFor;
 
+    let yStart = -overFillY;
+    let yEnd = 10 + overFillY;
+    let xStart = -overFillX;
+    let xEnd = 14 + overFillX;
+
     const xPadding = 8;
     const yPadding = 8;
     let legalPositions = [];
-    for (let xi = 0; xi < 14; xi++) {
+    for (let xi = xStart; xi < xEnd; xi++) {
         let x = xi * (SCREEN_WIDTH - xPadding * 2) / 13 + xPadding;
-        for (let yi = 0; yi < 10; yi++) {
+        for (let yi = yStart; yi < yEnd; yi++) {
             let y = yi * (SCREEN_HEIGHT - yPadding * 2) / 9 + yPadding;
             legalPositions.push({ x, y });
+            if (diagonals) {
+                legalPositions.push({ x: x + 16, y: y + 16 });
+            }
         }
     }
+
     shuffle(legalPositions);
     if (count > legalPositions.length) count = legalPositions.length;
 
@@ -525,7 +621,7 @@ function generateFill(count, forceTop = false) {
         level.heads.push(head);
     }
 
-    let targetIndex = forceTop ? level.heads.length - 1 : randi(0, floor(level.heads.length * 2 / 4));
+    let targetIndex = forceTop ? level.heads.length - 1 : randi(0, floor(level.heads.length / 4));
     level.target_head = level.heads[targetIndex];
     level.target_head.isTarget = true;
     level.target_head.sprite = level.lookingFor;
@@ -533,18 +629,74 @@ function generateFill(count, forceTop = false) {
     return level;
 }
 
-function setVerticalMovement(level, upSpeed, downSpeed) {
-    let wrapHeight = SCREEN_HEIGHT + 16;
-    let wrapLowth = -16;
+function generateHiddenLine(speed, tightness, variance) {
+    let level = {};
+    level.lookingFor = randi(0, 3);
+    level.heads = [];
+    level.poster = level.lookingFor;
+
+    // Luigi needs a little more spacing
+    let outerCount = level.lookingFor == 1 ? 20 : 24;
+
+    const xPadding = -32;
+    const yPadding = 48 + tightness;
+    let outer = [];
+    let inner = [];
+    for (let yi = 0; yi < 5; yi++) {
+        let y = yi * (SCREEN_HEIGHT - yPadding * 2) / 4 + yPadding;
+        let inRow = yi % 2 == 0 ? outerCount : 8;
+        for (let xi = 0; xi < inRow; xi++) {
+            let x = xi * (SCREEN_WIDTH - xPadding * 2) / inRow + xPadding;
+            if (yi % 2 == 0) outer.push({ x, y });
+            else inner.push({ x, y });
+        }
+    }
+
+    shuffle(inner);
+    shuffle(outer);
+    let legalPositions = inner.concat(outer);
+    for (let i = 0; i < legalPositions.length; i++) {
+        let direction = i < inner.length ? 1 : -1;
+        let pos = legalPositions[i];
+        var y = pos.y;
+        if (i < inner.length && variance > 0) {
+            y += randi(-variance, variance);
+        }
+
+        let head = {
+            x: pos.x + randi(-2, 2),
+            y: y,
+            sprite: (randi(1, 3) + level.lookingFor) % 4,
+            isTarget: false,
+            onMove: (dt) => {
+                head.x += speed * dt * direction;
+                if (head.x < -32) head.x += SCREEN_WIDTH + 64;
+                if (head.x >= SCREEN_WIDTH + 32) head.x -= SCREEN_WIDTH + 64;
+            },
+        };
+        level.heads.push(head);
+    }
+
+    let targetIndex = randi(0, inner.length - 1);
+    level.target_head = level.heads[targetIndex];
+    level.target_head.isTarget = true;
+    level.target_head.sprite = level.lookingFor;
+
+    return level;
+}
+
+function setVerticalMovement(level, upSpeed, downSpeed, padding = 16) {
+    let wrapHeight = SCREEN_HEIGHT + padding;
+    let wrapLowth = -padding;
 
     let columns = [];
-    for (let i = 0; i < SCREEN_WIDTH / 32; i++) {
+    for (let i = 0; i < SCREEN_WIDTH / 16; i++) {
         columns.push(randi(0, 1) == 0 ? upSpeed : downSpeed);
     }
 
     level.heads.forEach(head => {
         head.onMove = (dt) => {
-            let speed = columns[floor(head.x / 32)]
+            let speed = columns[floor(head.x / 16) % columns.length];
             head.y += speed * dt;
             if (head.y < wrapLowth) head.y += wrapHeight - wrapLowth;
             if (head.y >= wrapHeight) head.y -= wrapHeight - wrapLowth;
@@ -571,7 +723,7 @@ function setVerticalMovementPerType(level, upSpeed, downSpeed) {
     });
 }
 
-function setPerTypeMovement(level, speed) {
+function setPerTypeMovement(level, speed, padding = 16) {
     let headSpeeds = [];
     for (let i = 0; i < 4; i++) {
         let angle = deg2rad(rand(0, 360));
@@ -581,9 +733,9 @@ function setPerTypeMovement(level, speed) {
         });
     }
 
-    let wrapHeight = SCREEN_HEIGHT + 16;
-    let wrapWidth = SCREEN_WIDTH + 16;
-    let wrapLowth = -16;
+    let wrapHeight = SCREEN_HEIGHT + padding;
+    let wrapWidth = SCREEN_WIDTH + padding;
+    let wrapLowth = -padding;
 
     level.heads.forEach(head => {
         head.onMove = (dt) => {
@@ -594,6 +746,36 @@ function setPerTypeMovement(level, speed) {
             if (head.y >= wrapHeight) head.y -= wrapHeight - wrapLowth;
             if (head.x < wrapLowth) head.x += wrapWidth - wrapLowth;
             if (head.x >= wrapWidth) head.x -= wrapWidth - wrapLowth;
+        }
+    });
+}
+
+function setBouncyMovement(level, speed, padding = 8) {
+    level.heads.forEach(head => {
+        let angle = deg2rad(rand(0, 360));
+        let speedX = cos(angle) * speed;
+        let speedY = sin(angle) * speed;
+
+        head.onMove = (dt) => {
+            head.y += speedY * dt;
+            head.x += speedX * dt;
+
+            if (head.y < padding) {
+                head.y = 2 * padding - head.y;
+                speedY = -speedY;
+            }
+            if (head.y >= SCREEN_HEIGHT - padding) {
+                head.y = 2 * (SCREEN_HEIGHT - padding) - head.y;
+                speedY = -speedY;
+            }
+            if (head.x < padding) {
+                head.x = 2 * padding - head.x;
+                speedX = -speedX;
+            }
+            if (head.x >= SCREEN_WIDTH - padding) {
+                head.x = 2 * (SCREEN_WIDTH - padding) - head.x;
+                speedX = -speedX;
+            }
         }
     });
 }
@@ -621,6 +803,18 @@ function setPerTypeOffset(level, maxOffset, frequency, forceAngle = null) {
     });
 }
 
+function setCircularOffset(level, radius, frequency) {
+    let anglePerTime = deg2rad(360) * frequency;
+    level.heads.forEach(head => {
+        let angle = deg2rad(rand(0, 360));
+        head.getPosition = (stateTimer) => {
+            return {
+                x: head.x + cos(angle + anglePerTime * stateTimer) * radius,
+                y: head.y + sin(angle + anglePerTime * stateTimer) * radius,
+            };
+        }
+    });
+}
 
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {

@@ -1,9 +1,11 @@
 // States
 const S_Loading = 0;
-const S_Idle = 1;
-const S_NextStage = 2;
-const S_Searching = 3;
-const S_Victory = 4;
+const S_Menu = 1;
+const S_Settings = 2;
+const S_NextStage = 3;
+const S_Searching = 4;
+const S_Victory = 5;
+const S_GameOver = 6;
 
 // Other constants
 const SCREEN_HEIGHT = 192; // NB: Two screens!
@@ -12,6 +14,34 @@ const HEAD_CENTER = 16;
 
 const MAX_CLICK_DISTANCE_SQ = 20 * 20;
 
+// Dumb stuff
+function isOnPhone() {
+    return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+function getUserNumber() {
+    const userInput = prompt("Select a level (1-9999):");
+    if (userInput === null) return null;
+    const number = parseInt(userInput.trim());
+    if (isNaN(number) || level < 1 || level > 9999) {
+        alert("Invalid level number.");
+        return null;
+    }
+    return number;
+}
+
+let gameSettings = {
+    pixelart: !isOnPhone(),
+    canvasColors: false,
+    highscores: [],
+}
+{
+    const storedSettings = localStorage.getItem("settings");
+    if (storedSettings) {
+        gameSettings = Object.assign(gameSettings, JSON.parse(storedSettings));
+    }
+}
+
 litecanvas({
     loop: {
         init, update, draw,
@@ -19,20 +49,23 @@ litecanvas({
     },
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT * 2,
-    pixelart: true,
+    pixelart: gameSettings.pixelart,
 })
 
 
 use(pluginAssetLoader)
 
 function init() {
+    forceStage = null;
     stateTimer = 0;
     stateCounter = 0;
+    current_level = 0;
+
     setState(S_Loading)
 
     images_converted = {}
     images_original = {}
-    images = images_original
+    images = gameSettings.canvasColors ? images_converted : images_original;
 
     loadImage("assets/posters.png", (image, { convertColors, splitFrames }) => {
         images_original.posters = splitFrames(image, 256, 192, 0, 0)
@@ -54,10 +87,25 @@ function init() {
         images_original.level = image
         images_converted.level = convertColors(image)
     })
+    loadImage("assets/menu.png", (image, { convertColors, splitFrames }) => {
+        images_original.menu_buttons = splitFrames(image, 128, 38, 0, 0)
+        images_converted.menu_buttons = images_original.menu_buttons.map(convertColors)
+    })
+    loadImage("assets/settings.png", (image, { convertColors, splitFrames }) => {
+        images_original.settings_buttons = splitFrames(image, 128, 38, 0, 0)
+        images_converted.settings_buttons = images_original.settings_buttons.map(convertColors)
+    })
     TOTAL_LOADING = LOADING
 
     level = {}
-    quickmode = false;
+    quickmode = true;
+
+    button_positions = [];
+    for (var i = 0; i < 3; i++) {
+        let x = SCREEN_WIDTH / 4;
+        let y = SCREEN_HEIGHT + SCREEN_HEIGHT * (i + 1) / 4;
+        button_positions.push({ x: x, y: y });
+    }
 }
 
 function update(dt) {
@@ -65,8 +113,12 @@ function update(dt) {
 
     switch (state) {
         case S_Loading:
+            if (LOADING == 0) {
+                setState(quickmode ? S_NextStage : S_Menu);
+            }
             break;
-        case S_Idle:
+        case S_Menu:
+        case S_Settings:
             break;
         case S_NextStage:
             setState(S_Searching);
@@ -77,16 +129,19 @@ function update(dt) {
             });
             break;
         case S_Victory:
-            animateVictory();
+            animateLevelEnd(S_NextStage);
+            break;
+        case S_GameOver:
+            animateLevelEnd(S_Menu);
             break;
     }
 }
 
-function animateVictory() {
+function animateLevelEnd(nextState) {
     if (stateTimer < 1.38333333 + stateCounter * 0.5) return;
     stateCounter++;
     if (stateCounter == 4) {
-        setState(S_NextStage);
+        setState(nextState);
         return;
     }
 }
@@ -110,15 +165,15 @@ function draw() {
                 0,
                 16 - inset
             )
-
-            if (LOADING == 0) {
-                setState(S_NextStage);
-            }
             return;
-        case S_Idle:
+        case S_Menu:
+            cls(5);
+            break;
+        case S_Settings:
             cls(5);
             break;
         case S_Victory:
+        case S_GameOver:
             if (stateTimer < 0.833333333) cls(0);
             else cls(5);
             break;
@@ -134,20 +189,59 @@ function draw() {
 
 function drawInfo() {
     switch (state) {
-        case S_Idle:
+        case S_Menu:
+            if (gameSettings.highscores.length <= 0) return;
+            textsize(12);
+            textalign("center", "top");
+            text(SCREEN_WIDTH / 2, 8, "Highscores", 0);
+            for (var i = 0; i < gameSettings.highscores.length; i++) {
+                text(SCREEN_WIDTH / 2, 8 + (i + 1) * 12, gameSettings.highscores[i], 0);
+            }
             break;
         case S_NextStage:
             break;
         case S_Searching:
         case S_Victory:
+        case S_GameOver:
             image(0, 0, images.posters[level.poster])
+            let stars = current_level + (state == S_Victory ? stateCounter % 2 : 0) - 1;
+            if (stars > 0) {
+                image(SCREEN_WIDTH - 30, SCREEN_HEIGHT - 42, images.star);
+                let starText = stars.toString();
+
+                let startX = SCREEN_WIDTH - 30 + 9 - starText.length * 4;
+                let startY = SCREEN_HEIGHT - 42 + 4;
+                for (let i = 0; i < starText.length; i++) {
+                    let digit = parseInt(starText.charAt(i));
+                    image(startX + i * 8, startY, images.numbers[10 + digit]);
+                }
+            }
             break;
     }
 }
 
 function drawBoard() {
     switch (state) {
-        case S_Idle:
+        case S_Menu:
+            for (var i = 0; i < button_positions.length; i++) {
+                let pos = button_positions[i];
+                image(pos.x, pos.y, images.menu_buttons[i]);
+            }
+            break;
+        case S_Settings:
+            for (var i = 0; i < button_positions.length; i++) {
+                let pos = button_positions[i];
+                var index = i * 2;
+                switch (i) {
+                    case 0:
+                        if (gameSettings.pixelart) index++;
+                        break;
+                    case 1:
+                        if (gameSettings.canvasColors) index++;
+                        break;
+                }
+                image(pos.x, pos.y, images.settings_buttons[index]);
+            }
             break;
         case S_NextStage:
             break;
@@ -161,6 +255,7 @@ function drawBoard() {
             });
             break;
         case S_Victory:
+        case S_GameOver:
             let head = level.target_head;
 
             let x = floor(head.x - HEAD_CENTER);
@@ -172,16 +267,61 @@ function drawBoard() {
 
 function tap(x, y, tapId) {
     if (x < 0 || x >= SCREEN_WIDTH || y < SCREEN_HEIGHT || y >= SCREEN_HEIGHT * 2) return;
-    y -= SCREEN_HEIGHT;
 
     switch (state) {
+        case S_Menu:
+            for (var i = 0; i < button_positions.length; i++) {
+                let pos = button_positions[i];
+                if (x < pos.x - 2 || x >= pos.x + 130 || y < pos.y - 2 || y >= pos.y + 40) continue;
+                switch (i) {
+                    case 0:
+                        forceStage = null;
+                        setState(S_NextStage);
+                        return;
+                    case 1:
+                        setState(S_Settings);
+                        return;
+                    case 2:
+                        forceStage = getUserNumber();
+                        if (forceStage == null) return;
+                        setState(S_NextStage);
+                        return;
+                }
+            }
+            break;
+        case S_Settings:
+            for (var i = 0; i < button_positions.length; i++) {
+                let pos = button_positions[i];
+                if (x < pos.x - 2 || x >= pos.x + 130 || y < pos.y - 2 || y >= pos.y + 40) continue;
+                switch (i) {
+                    case 0:
+                        gameSettings.pixelart = !gameSettings.pixelart;
+                        localStorage.setItem("settings", JSON.stringify(gameSettings));
+                        // Restart browser to apply changes
+                        location.reload();
+                        return;
+                    case 1:
+                        images = images == images_original ? images_converted : images_original;
+                        gameSettings.canvasColors = images == images_converted;
+                        localStorage.setItem("settings", JSON.stringify(gameSettings));
+                        return;
+                    case 2:
+                        setState(S_Menu);
+                        return;
+                }
+            }
         case S_Searching:
+            y -= SCREEN_HEIGHT;
+
             let tappedHead = findTappedHead(x, y);
+            if (tappedHead == -1) return;
             if (tappedHead == -2 || level.heads[tappedHead].isTarget) {
                 if (quickmode) setState(S_NextStage);
                 else setState(S_Victory);
-            } else if (tappedHead > 0) {
+            } else if (tappedHead >= 0) {
                 level.heads.splice(tappedHead, 1);
+                level.lives--;
+                if (level.lives <= 0) setState(S_GameOver);
             }
             return;
     }
@@ -232,7 +372,11 @@ function setState(newState) {
             break;
         case S_NextStage:
             current_level++;
+            if (forceStage != null) current_level = forceStage;
+
             level = generateLevel(current_level);
+            // Temp until time is implemented
+            level.lives = 3;
             break;
 
         case S_Victory:
@@ -243,6 +387,12 @@ function setState(newState) {
                     head.y = pos.y;
                 }
             });
+            break;
+        case S_GameOver:
+            gameSettings.highscores.push(current_level-1);
+            gameSettings.highscores.sort((a, b) => b - a);
+            gameSettings.highscores = gameSettings.highscores.slice(0, 10);
+            localStorage.setItem("settings", JSON.stringify(gameSettings));
             break;
     }
 }
@@ -276,15 +426,18 @@ function generateLevel(current_level) {
     if (current_level < 10) {
         return generateFill(100);
     } else /* if (current_level < 20) */ {
+
+        let speedup = max((current_level - 10) / 10, 1);
+
         let level = generateFill(100);
         switch (current_level % 3) {
             case 1:
-                setVerticalMovement(level, -48, 48);
-                setPerTypeOffset(level, 16, 4, 0);
+                setVerticalMovement(level, -48 * speedup, 48 * speedup);
+                setPerTypeOffset(level, 16, 4 * speedup, 0);
                 return level;
             case 2:
-                setPerTypeMovement(level, 32);
-                setPerTypeOffset(level, 8, 0.2, 0);
+                setPerTypeMovement(level, 32 * speedup);
+                setPerTypeOffset(level, 8, 0.2 * speedup, 0);
                 return level;
         }
         return level;

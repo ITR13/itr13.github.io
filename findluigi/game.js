@@ -16,6 +16,8 @@ const MAX_CLICK_DISTANCE_SQ = 20 * 20;
 const FLASHLIGHT_SIZE_SMALL = 64.5
 const FLASHLIGHT_SIZE_LARGE = 160
 
+const HEAD_ORDER = ['mario', 'luigi', 'wario', 'yoshi'];
+
 // Dumb stuff
 function isOnPhone() {
     return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -66,6 +68,12 @@ function init() {
 
     setState(S_Loading)
 
+    sound_effects = {
+        'mario': [],
+        'luigi': [],
+        'wario': [],
+        'yoshi': [],
+    }
     images_converted = {}
     images_original = {}
     images = gameSettings.canvasColors ? images_converted : images_original;
@@ -106,6 +114,26 @@ function init() {
         images_original.time = image
         images_converted.time = convertColors(image)
     })
+
+    let soundsPerHead = [
+        4,
+        5,
+        2,
+        4,
+    ]
+
+    for (let head = 0; head < 4; head++) {
+        let headName = HEAD_ORDER[head];
+        for (let i = 0; i < soundsPerHead[head]; i++) {
+            loadSound(
+                "assets/audio/" + headName + "/" + i + ".wav",
+                (sound) => {
+                    sound_effects[headName].push(sound)
+                }
+            )
+        }
+    }
+
     TOTAL_LOADING = LOADING
 
     quickmode = false;
@@ -141,7 +169,7 @@ function update(dt) {
         case S_Settings:
             break;
         case S_NextStage:
-            if(quickmode) timescale(5);
+            if (quickmode) timescale(5);
             let nextStageEndTime = game.level.longIntro ? 1.7 : 0.6;
             if (stateTimer >= nextStageEndTime) setState(S_Searching);
             break;
@@ -512,8 +540,16 @@ function setState(newState) {
             game.level = generateLevel(game.forceStage != null ? game.forceStage : game.currentLevel);
             document.title = "Find Luigi - Level " + game.currentLevel;
             break;
-
+        case S_GameOver:
+            if (forceStage == null) {
+                gameSettings.highscores.push(game.currentLevel - 1);
+                gameSettings.highscores.sort((a, b) => b - a);
+                gameSettings.highscores = gameSettings.highscores.slice(0, 10);
+                localStorage.setItem("settings", JSON.stringify(gameSettings));
+            }
+        // fallthrough
         case S_Victory:
+            playHeadSound(game.level.lookingFor);
             game.level.heads.forEach(head => {
                 if (head.getPosition) {
                     pos = head.getPosition(oldStateTimer);
@@ -522,15 +558,13 @@ function setState(newState) {
                 }
             });
             break;
-        case S_GameOver:
-            if (forceStage == null) {
-                gameSettings.highscores.push(game.currentLevel - 1);
-                gameSettings.highscores.sort((a, b) => b - a);
-                gameSettings.highscores = gameSettings.highscores.slice(0, 10);
-                localStorage.setItem("settings", JSON.stringify(gameSettings));
-                break;
-            }
     }
+}
+
+function playHeadSound(head) {
+    let sounds = sound_effects[HEAD_ORDER[head]];
+    let sound = sounds[randi(0, sounds.length - 1)];
+    sound.play();
 }
 
 function generateLevel(currentLevel) {

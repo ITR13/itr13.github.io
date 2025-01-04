@@ -141,6 +141,7 @@ function update(dt) {
         case S_Settings:
             break;
         case S_NextStage:
+            if(quickmode) timescale(5);
             let nextStageEndTime = game.level.longIntro ? 1.7 : 0.6;
             if (stateTimer >= nextStageEndTime) setState(S_Searching);
             break;
@@ -497,16 +498,19 @@ function setState(newState) {
 
     switch (newState) {
         case S_Searching:
+            document.title = "Find Luigi - Level " + game.currentLevel;
             timescale(game.level.timescale);
             break;
         case S_Loading:
         case S_Menu:
         case S_Settings:
+            document.title = "Find Luigi"
             clearGame();
             break;
         case S_NextStage:
             game.currentLevel++;
             game.level = generateLevel(game.forceStage != null ? game.forceStage : game.currentLevel);
+            document.title = "Find Luigi - Level " + game.currentLevel;
             break;
 
         case S_Victory:

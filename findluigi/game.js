@@ -20,7 +20,7 @@ const HEAD_ORDER = ['mario', 'luigi', 'wario', 'yoshi'];
 // Color picked from the original minigame....
 // We only use 000 and FBE341, so the rest could just be null lol
 const COLORS = [
-    '#000', 
+    '#000',
     '#303030',
     '#929292',
     '#FBFBE3',
@@ -73,7 +73,7 @@ instance = litecanvas({
     pixelart: gameSettings.pixelart,
     pauseOnBlur: false,
 })
-instance.getcolor = index=>COLORS[~~index%COLORS.length];
+instance.getcolor = index => COLORS[~~index % COLORS.length];
 
 
 use(pluginAssetLoader)
@@ -87,12 +87,9 @@ function init() {
 
     setState(S_Loading)
 
-    sound_effects = {
-        'mario': [],
-        'luigi': [],
-        'wario': [],
-        'yoshi': [],
-    }
+    sound_effects = {}
+    HEAD_ORDER.forEach(head => sound_effects[head] = {'fail': [], 'win': []});
+
     images_converted = {}
     images_original = {}
     images = gameSettings.canvasColors ? images_converted : images_original;
@@ -134,20 +131,24 @@ function init() {
         images_converted.time = convertColors(image)
     })
 
-    let soundsPerHead = [
-        4,
-        5,
-        3,
-        4,
-    ]
+    let failSoundsPerHead = [4,5,3,4]
+    let winSoundsPerHead = [4,2,1,3]
 
     for (let head = 0; head < 4; head++) {
         let headName = HEAD_ORDER[head];
-        for (let i = 0; i < soundsPerHead[head]; i++) {
+        for (let i = 0; i < failSoundsPerHead[head]; i++) {
             loadSound(
-                "assets/audio/" + headName + "/" + i + ".wav",
+                "assets/audio/" + headName + "/fail" + i + ".wav",
                 (sound) => {
-                    sound_effects[headName].push(sound);
+                    sound_effects[headName]['fail'].push(sound);
+                }
+            )
+        }
+        for (let i = 0; i < winSoundsPerHead[head]; i++) {
+            loadSound(
+                "assets/audio/" + headName + "/win" + i + ".wav",
+                (sound) => {
+                    sound_effects[headName]['win'].push(sound);
                 }
             )
         }
@@ -537,13 +538,13 @@ function tap(x, y, tapId) {
             let tappedHead = findTappedHead(x, y);
             if (tappedHead == -1) return;
             if (tappedHead == -2 || game.level.heads[tappedHead].isTarget) {
+                playHeadSound(game.level.lookingFor, true);
                 game.countdownTimer += 5;
                 game.countdownTimer = clamp(game.countdownTimer, 0, 50.99);
-                playHeadSound(game.level.targetHead.sprite % 4);
                 if (quickmode) setState(S_NextStage);
                 else setState(S_Victory);
             } else if (tappedHead >= 0) {
-                playHeadSound(game.level.heads[tappedHead].sprite % 4);
+                playHeadSound(game.level.lookingFor, false);
                 game.countdownTimer -= 10;
                 game.smoothTimer -= 10;
                 game.level.heads.splice(tappedHead, 1);
@@ -640,8 +641,8 @@ function setState(newState) {
     }
 }
 
-function playHeadSound(head) {
-    let sounds = sound_effects[HEAD_ORDER[head]];
+function playHeadSound(head, wasCaught) {
+    let sounds = sound_effects[HEAD_ORDER[head]][wasCaught ? 'fail' : 'win'];
     let sound = sounds[randi(0, sounds.length - 1)];
     sound.play();
 }

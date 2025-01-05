@@ -62,6 +62,7 @@ use(pluginAssetLoader)
 
 function init() {
     forceStage = null;
+    current_bgm = null;
     stateTimer = 0;
     stateCounter = 0;
     clearGame();
@@ -78,39 +79,39 @@ function init() {
     images_original = {}
     images = gameSettings.canvasColors ? images_converted : images_original;
 
-    loadImage("assets/posters.png", (image, { convertColors, splitFrames }) => {
+    loadImage("assets/sprites/posters.png", (image, { convertColors, splitFrames }) => {
         images_original.posters = splitFrames(image, 256, 192, 0, 0)
         images_converted.posters = splitFrames(convertColors(image), 256, 192, 0, 0)
     })
-    loadImage("assets/heads.png", (image, { convertColors, splitFrames }) => {
+    loadImage("assets/sprites/heads.png", (image, { convertColors, splitFrames }) => {
         images_original.heads = splitFrames(image, 32, 32, 0, 0)
         images_converted.heads = splitFrames(convertColors(image), 32, 32, 0, 0)
     })
-    loadImage("assets/numbers.png", (image, { convertColors, splitFrames }) => {
+    loadImage("assets/sprites/numbers.png", (image, { convertColors, splitFrames }) => {
         images_original.numbers = splitFrames(image, 17, 17, 0, 0)
         images_converted.numbers = splitFrames(convertColors(image), 17, 17, 0, 0)
     })
-    loadImage("assets/stars.png", (image, { convertColors, splitFrames }) => {
+    loadImage("assets/sprites/stars.png", (image, { convertColors, splitFrames }) => {
         images_original.stars = splitFrames(image, 28, 28, 0, 0)
         images_converted.stars = splitFrames(convertColors(image), 28, 28, 0, 0)
     })
-    loadImage("assets/level.png", (image, { convertColors, splitFrames }) => {
+    loadImage("assets/sprites/level.png", (image, { convertColors, splitFrames }) => {
         images_original.level = image
         images_converted.level = convertColors(image)
     })
-    loadImage("assets/menu.png", (image, { convertColors, splitFrames }) => {
+    loadImage("assets/sprites/menu.png", (image, { convertColors, splitFrames }) => {
         images_original.menu_buttons = splitFrames(image, 128, 38, 0, 0)
         images_converted.menu_buttons = splitFrames(convertColors(image), 128, 38, 0, 0)
     })
-    loadImage("assets/settings.png", (image, { convertColors, splitFrames }) => {
+    loadImage("assets/sprites/settings.png", (image, { convertColors, splitFrames }) => {
         images_original.settings_buttons = splitFrames(image, 128, 38, 0, 0)
         images_converted.settings_buttons = splitFrames(convertColors(image), 128, 38, 0, 0)
     })
-    loadImage("assets/timer.png", (image, { convertColors, splitFrames }) => {
+    loadImage("assets/sprites/timer.png", (image, { convertColors, splitFrames }) => {
         images_original.timer = splitFrames(image, 32, 32, 0, 0)
         images_converted.timer = splitFrames(convertColors(image), 32, 32, 0, 0)
     })
-    loadImage("assets/time.png", (image, { convertColors, splitFrames }) => {
+    loadImage("assets/sprites/time.png", (image, { convertColors, splitFrames }) => {
         images_original.time = image
         images_converted.time = convertColors(image)
     })
@@ -118,7 +119,7 @@ function init() {
     let soundsPerHead = [
         4,
         5,
-        2,
+        3,
         4,
     ]
 
@@ -128,11 +129,30 @@ function init() {
             loadSound(
                 "assets/audio/" + headName + "/" + i + ".wav",
                 (sound) => {
-                    sound_effects[headName].push(sound)
+                    sound_effects[headName].push(sound);
                 }
             )
         }
     }
+
+    let mp3s = ['casino', 'highscore', 'miniover']
+    let wavs = ['correct', 'drumroll_short', 'drumroll_long']
+    mp3s.forEach(name => {
+        loadSound(
+            "assets/audio/" + name + ".mp3",
+            (sound) => {
+                sound_effects[name] = sound;
+            }
+        )
+    });
+    wavs.forEach(name => {
+        loadSound(
+            "assets/audio/" + name + ".wav",
+            (sound) => {
+                sound_effects[name] = sound;
+            }
+        )
+    });
 
     TOTAL_LOADING = LOADING
 
@@ -474,9 +494,11 @@ function tap(x, y, tapId) {
             if (tappedHead == -2 || game.level.heads[tappedHead].isTarget) {
                 game.countdownTimer += 5;
                 game.countdownTimer = clamp(game.countdownTimer, 0, 50.99);
+                playHeadSound(game.level.targetHead.sprite % 4);
                 if (quickmode) setState(S_NextStage);
                 else setState(S_Victory);
             } else if (tappedHead >= 0) {
+                playHeadSound(game.level.heads[tappedHead].sprite % 4);
                 game.countdownTimer -= 10;
                 game.smoothTimer -= 10;
                 game.level.heads.splice(tappedHead, 1);
@@ -525,20 +547,35 @@ function setState(newState) {
     timescale(1);
 
     switch (newState) {
+        case S_Loading:
+        case S_Menu:
+        case S_Settings:
+            if (current_bgm != null) {
+                current_bgm.loop = false;
+                current_bgm = null;
+            }
+            document.title = "Find Luigi"
+            if (gameSettings.highscores[0] == game.currentLevel - 1) {
+                sound_effects['highscore'].play();
+            }
+            clearGame();
+            break;
         case S_Searching:
             document.title = "Find Luigi - Level " + game.currentLevel;
             timescale(game.level.timescale);
             break;
-        case S_Loading:
-        case S_Menu:
-        case S_Settings:
-            document.title = "Find Luigi"
-            clearGame();
-            break;
         case S_NextStage:
+            if (current_bgm == null) {
+                current_bgm = sound_effects['casino'].play();
+                current_bgm.loop = true;
+            }
+
             game.currentLevel++;
             game.level = generateLevel(game.forceStage != null ? game.forceStage : game.currentLevel);
             document.title = "Find Luigi - Level " + game.currentLevel;
+
+            let soundName = game.level.longIntro && !quickmode ? 'drumroll_long' : 'drumroll_short';
+            sound_effects[soundName].play()
             break;
         case S_GameOver:
             if (forceStage == null) {
@@ -547,9 +584,10 @@ function setState(newState) {
                 gameSettings.highscores = gameSettings.highscores.slice(0, 10);
                 localStorage.setItem("settings", JSON.stringify(gameSettings));
             }
+            sound_effects['miniover'].play();
         // fallthrough
         case S_Victory:
-            playHeadSound(game.level.lookingFor);
+            if (newState == S_Victory) sound_effects['correct'].play();
             game.level.heads.forEach(head => {
                 if (head.getPosition) {
                     pos = head.getPosition(oldStateTimer);

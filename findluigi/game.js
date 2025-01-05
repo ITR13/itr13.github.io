@@ -155,7 +155,7 @@ function init() {
     }
 
     let mp3s = ['highscore', 'miniover']
-    let wavs = ['correct', 'drumroll_short', 'drumroll_long']
+    let wavs = ['correct', 'drumroll_short', 'drumroll_long', 'incorrect']
     mp3s.forEach(name => {
         loadSound(
             "assets/audio/" + name + ".mp3",
@@ -545,6 +545,7 @@ function tap(x, y, tapId) {
                 else setState(S_Victory);
             } else if (tappedHead >= 0) {
                 playHeadSound(game.level.lookingFor, false);
+                sound_effects['incorrect'].play()
                 game.countdownTimer -= 10;
                 game.smoothTimer -= 10;
                 game.level.heads.splice(tappedHead, 1);

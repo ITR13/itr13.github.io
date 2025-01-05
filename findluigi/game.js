@@ -17,6 +17,23 @@ const FLASHLIGHT_SIZE_SMALL = 64.5
 const FLASHLIGHT_SIZE_LARGE = 160
 
 const HEAD_ORDER = ['mario', 'luigi', 'wario', 'yoshi'];
+// Color picked from the original minigame....
+// We only use 000 and FBE341, so the rest could just be null lol
+const COLORS = [
+    '#000', 
+    '#303030',
+    '#929292',
+    '#FBFBE3',
+    '#F33828',
+    '#FBE341',
+
+    '#6161C3',
+    '#41AAEB',
+    '#286918',
+    '#9AE39A',
+    '#793838',
+    '#E3B220',
+]
 
 // Dumb stuff
 function isOnPhone() {
@@ -46,7 +63,7 @@ let gameSettings = {
     }
 }
 
-litecanvas({
+instance = litecanvas({
     loop: {
         init, update, draw,
         tap,
@@ -56,6 +73,7 @@ litecanvas({
     pixelart: gameSettings.pixelart,
     pauseOnBlur: false,
 })
+instance.getcolor = index=>COLORS[~~index%COLORS.length];
 
 
 use(pluginAssetLoader)

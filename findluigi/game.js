@@ -62,7 +62,7 @@ use(pluginAssetLoader)
 
 function init() {
     forceStage = null;
-    current_bgm = null;
+    bgm = null;
     stateTimer = 0;
     stateCounter = 0;
     clearGame();
@@ -135,7 +135,7 @@ function init() {
         }
     }
 
-    let mp3s = ['casino', 'highscore', 'miniover']
+    let mp3s = ['highscore', 'miniover']
     let wavs = ['correct', 'drumroll_short', 'drumroll_long']
     mp3s.forEach(name => {
         loadSound(
@@ -152,6 +152,14 @@ function init() {
                 sound_effects[name] = sound;
             }
         )
+    });
+
+    bgm = new Howl({
+        src: ['assets/audio/casino.wav'],
+        preload: true, loop: true,
+        onfade: () => {
+            bgm.stop();
+        },
     });
 
     TOTAL_LOADING = LOADING
@@ -388,11 +396,11 @@ function drawLevelText() {
     let centerX = SCREEN_WIDTH / 2;
     let y = SCREEN_HEIGHT - 14 * 2;
     let x = centerX - totalLength * 7;
-    
+
     image(x, y, images.level);
     x += 14 * 6;
 
-    for(let i = 0; i<text.length; i++){
+    for (let i = 0; i < text.length; i++) {
         let digit = parseInt(text.charAt(i));
         image(x, y, images.numbers[digit]);
         x += 14;
@@ -569,10 +577,6 @@ function setState(newState) {
         case S_Loading:
         case S_Menu:
         case S_Settings:
-            if (current_bgm != null) {
-                current_bgm.loop = false;
-                current_bgm = null;
-            }
             document.title = "Find Luigi"
             if (gameSettings.highscores[0] == game.currentLevel - 1) {
                 sound_effects['highscore'].play();
@@ -584,11 +588,10 @@ function setState(newState) {
             timescale(game.level.timescale);
             break;
         case S_NextStage:
-            if (current_bgm == null) {
-                current_bgm = sound_effects['casino'].play();
-                current_bgm.loop = true;
+            if (!bgm.playing()) {
+                bgm.volume(1.0);
+                bgm.play();
             }
-
             game.currentLevel++;
             game.level = generateLevel(game.forceStage != null ? game.forceStage : game.currentLevel);
             document.title = "Find Luigi - Level " + game.currentLevel;
@@ -597,6 +600,7 @@ function setState(newState) {
             sound_effects[soundName].play()
             break;
         case S_GameOver:
+            bgm.fade(1.0, 0.0, 1000);
             if (forceStage == null) {
                 gameSettings.highscores.push(game.currentLevel - 1);
                 gameSettings.highscores.sort((a, b) => b - a);

@@ -8,11 +8,21 @@ layout: default
 
 <p>
 <h1>Find Luigi!</h1>
-<p>A recreation of the game "Wanted" from Super Mario 64 DS.</p>
-
-<h3>Credits:</h2>
+<p>A recreation of the game "Wanted" from Super Mario 64 DS, with additional patterns and challenges.</p>
+<p>Most sprites and sounds are ripped from the game except the following. If you can make a better replacement for them,
+    please send a PR:</p>
 <ul>
-    <li>Original Idea: <a href="https://en.wikipedia.org/wiki/Super_Mario_64">Somebody who worked on Super Mario 64</a>
+    <li>Clock Ticking Sound</li>
+    <li>Gaining a star sound</li>
+    <li>Stars merging sound</li>
+    <li>"Correct" Sound Effect</li>
+    <li>Drumroll Short / end of Drumroll Long</li>
+    <li>Time increasing sound</li>
+</ul>
+<h3>Credits:</h3>
+<ul>
+    <li>Original Idea: <a href="https://en.wikipedia.org/wiki/Super_Mario_64">Somebody who worked on Super Mario
+            64</a>
     </li>
     <li>Implementation: ITR</li>
     <li>Game Engine: <a href="https://github.com/litecanvas">Litecanvas</a></li>
@@ -24,21 +34,22 @@ layout: default
             <li><a href="https://mfgg.net/index.php?act=user&param=01&uid=8">The Trasher</a></li>
             <li><a href="https://www.sounds-resource.com/submitter/Mystie/">Mystie</a></li>
             <li><a href="https://www.sounds-resource.com/submitter/Inthegrave/">Inthegrave</a></li>
-            <li><a href="https://downloads.khinsider.com/game-soundtracks/album/super-mario-64-ds-2004-nds">khinsider</a></li>
+            <li><a
+                    href="https://downloads.khinsider.com/game-soundtracks/album/super-mario-64-ds-2004-nds">khinsider</a>
+            </li>
         </ul>
     </li>
-    </p>
+</ul>
 
-
-    <script>
-        function toggleFullscreen() {
-            const iframe = document.getElementById('gameFrame');
-            if (!document.fullscreenElement) {
-                iframe.requestFullscreen().catch(err => {
-                    alert(`Error attempting to enable full-screen mode: ${err.message}`);
-                });
-            } else {
-                document.exitFullscreen();
-            }
+<script>
+    function toggleFullscreen() {
+        const iframe = document.getElementById('gameFrame');
+        if (!document.fullscreenElement) {
+            iframe.requestFullscreen().catch(err => {
+                alert(`Error attempting to enable full-screen mode: ${err.message}`);
+            });
+        } else {
+            document.exitFullscreen();
         }
-    </script>
+    }
+</script>

@@ -156,6 +156,7 @@ function init() {
 
     TOTAL_LOADING = LOADING
 
+    quickstart = false;
     quickmode = false;
 
     button_positions = [];
@@ -182,7 +183,7 @@ function update(dt) {
     switch (state) {
         case S_Loading:
             if (LOADING == 0) {
-                setState(quickmode ? S_NextStage : S_Menu);
+                setState(quickstart ? S_NextStage : S_Menu);
             }
             break;
         case S_Menu:
@@ -303,6 +304,7 @@ function drawInfo() {
             drawPosters();
             pop();
             drawStars();
+            drawLevelText();
             break;
         }
         case S_Searching: {
@@ -377,6 +379,23 @@ function drawStars() {
     for (let i = stack.length - 1; i >= 0; i--) {
         let val = stack[i];
         image(val[0], val[1], val[2]);
+    }
+}
+
+function drawLevelText() {
+    let text = game.currentLevel.toString();
+    let totalLength = text.length + 6;
+    let centerX = SCREEN_WIDTH / 2;
+    let y = SCREEN_HEIGHT - 14 * 2;
+    let x = centerX - totalLength * 7;
+    
+    image(x, y, images.level);
+    x += 14 * 6;
+
+    for(let i = 0; i<text.length; i++){
+        let digit = parseInt(text.charAt(i));
+        image(x, y, images.numbers[digit]);
+        x += 14;
     }
 }
 

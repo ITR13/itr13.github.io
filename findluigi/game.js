@@ -88,7 +88,7 @@ function init() {
     setState(S_Loading)
 
     sound_effects = {}
-    HEAD_ORDER.forEach(head => sound_effects[head] = {'fail': [], 'win': []});
+    HEAD_ORDER.forEach(head => sound_effects[head] = { 'fail': [], 'win': [] });
 
     images_converted = {}
     images_original = {}
@@ -131,8 +131,8 @@ function init() {
         images_converted.time = convertColors(image)
     })
 
-    let failSoundsPerHead = [4,5,3,4]
-    let winSoundsPerHead = [4,2,1,3]
+    let failSoundsPerHead = [4, 5, 3, 4]
+    let winSoundsPerHead = [4, 2, 1, 3]
 
     for (let head = 0; head < 4; head++) {
         let headName = HEAD_ORDER[head];
@@ -155,7 +155,7 @@ function init() {
     }
 
     let mp3s = ['highscore', 'miniover']
-    let wavs = ['correct', 'drumroll_short', 'drumroll_long', 'incorrect']
+    let wavs = ['correct', 'drumroll_short', 'drumroll_long', 'incorrect', 'time_increase']
     mp3s.forEach(name => {
         loadSound(
             "assets/audio/" + name + ".mp3",
@@ -252,7 +252,9 @@ function update(dt) {
 function animateLevelEnd(nextState) {
     if (stateTimer < 1.38333333 + stateCounter * 0.5) return;
     stateCounter++;
-    if (stateCounter == 4) {
+    if (stateCounter == 1 && nextState == S_NextStage) {
+        sound_effects['time_increase'].play()
+    } else if (stateCounter == 4) {
         setState(nextState);
         return;
     }

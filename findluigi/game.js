@@ -83,7 +83,7 @@ function init() {
     bgm = null;
     stateTimer = 0;
     stateCounter = 0;
-    clearGame();
+    clearGame(false);
 
     setState(S_Loading)
 
@@ -194,13 +194,87 @@ function init() {
     }
 }
 
-function clearGame(forceStage = null) {
+function clearGame(generateLevels, forceStage = null) {
+    let levelGenerators = [];
+    if (generateLevels) {
+        // Args: Level, Hardmode
+        const startGenerators = [
+            generateBasicGroup,
+            generateDirectionalGroup,
+            generateLineGroup,
+        ];
+        const advancedGenerators = [
+            generateBouncyWaveGroup,
+            generateEdgeGroup,
+            generateCircleGroup,
+        ];
+        shuffle(advancedGenerators);
+
+        const defaultGenerators = startGenerators.concat(advancedGenerators)
+
+        function generateBasic(hardMode) {
+            var array = new Array(defaultGenerators.length * 10);
+            for (var i = 0; i < defaultGenerators.length; i++) {
+                let cI = i;
+                for (var j = 0; j < 10; j++) {
+                    let cJ = j;
+                    array[i * 10 + j] = () => {
+                        let level = defaultGenerators[cI](cJ, hardMode);
+                        level.longIntro = cJ == 0;
+                        return level;
+                    }
+                }
+            }
+            return array;
+        }
+
+        function generateRotated() {
+            var array = new Array(defaultGenerators.length * 10);
+            for (var i = 0; i < defaultGenerators.length; i++) {
+                let cI = i;
+                for (var j = 0; j < 10; j++) {
+                    let cJ = j;
+                    array[i * 10 + j] = () => {
+                        let level = defaultGenerators[cI](cJ, false);
+                        level.heads.forEach(head => head.sprite = head.sprite + randi(0, 3) * 4);
+                        level.timescale = 1.15;
+                        level.longIntro = cJ == 0;
+                        return level;
+                    }
+                }
+            }
+            return array;
+        }
+
+        const overgroups = [
+            generateBasic(false),
+            generateRotated(false),
+            generateBasic(true),
+        ];
+        shuffle(overgroups, 1);
+
+        let totalLevels = 0;
+        for (var i = 0; i < overgroups.length; i++) {
+            totalLevels += overgroups[i].length;
+        }
+
+        levelGenerators = new Array(totalLevels);
+        let levelIndex = 0;
+        for (var i = 0; i < overgroups.length; i++) {
+            for (var j = 0; j < overgroups[i].length; j++) {
+                levelGenerators[levelIndex] = overgroups[i][j];
+                levelIndex++;
+            }
+        }
+    }
+
     game = {
         currentLevel: 0,
         countdownTimer: 10.99,
         smoothTimer: 10.99,
         level: {},
         forceStage: forceStage,
+        levelGenerators: levelGenerators,
     }
 }
 
@@ -210,7 +284,12 @@ function update(dt) {
     switch (state) {
         case S_Loading:
             if (LOADING == 0) {
-                setState(quickstart ? S_NextStage : S_Menu);
+                if (quickstart) {
+                    clearGame(true);
+                    setState(S_NextStage);
+                    return;
+                }
+                setState(S_Menu);
             }
             break;
         case S_Menu:
@@ -433,8 +512,8 @@ function drawTimer() {
     let y = 23;
 
     image(centerX - 16, y - 12, images.time);
-
     let text = floor(clamp(game.smoothTimer, 0, 50)).toString();
+
     let startX = centerX - text.length * 16;
     for (var i = 0; i < text.length; i++) {
         let x = startX + 32 * i;
@@ -498,7 +577,7 @@ function tap(x, y, tapId) {
                 if (x < pos.x - 2 || x >= pos.x + 130 || y < pos.y - 2 || y >= pos.y + 40) continue;
                 switch (i) {
                     case 0:
-                        clearGame();
+                        clearGame(true);
                         setState(S_NextStage);
                         return;
                     case 1:
@@ -507,7 +586,7 @@ function tap(x, y, tapId) {
                     case 2:
                         let forceStage = getUserNumber();
                         if (forceStage == null) return;
-                        clearGame(forceStage);
+                        clearGame(true, forceStage);
                         setState(S_NextStage);
                         return;
                 }
@@ -603,7 +682,7 @@ function setState(newState) {
             if (gameSettings.highscores[0] == game.currentLevel - 1) {
                 sound_effects['highscore'].play();
             }
-            clearGame();
+            clearGame(false);
             break;
         case S_Searching:
             document.title = "Find Luigi - Level " + game.currentLevel;
@@ -615,9 +694,12 @@ function setState(newState) {
                 bgm.play();
             }
             game.currentLevel++;
-            game.level = generateLevel(game.forceStage != null ? game.forceStage : game.currentLevel);
+            let levelIndex = (game.forceStage != null ? game.forceStage : game.currentLevel) - 1;
+            if (levelIndex >= game.levelGenerators.length) {
+                throw "LevelIndex " + levelIndex + " is out of bounds for array 0->" + game.levelGenerators.length;
+            }
+            game.level = game.levelGenerators[levelIndex]();
             document.title = "Find Luigi - Level " + game.currentLevel;
-
             let soundName = game.level.longIntro && !quickmode ? 'drumroll_long' : 'drumroll_short';
             sound_effects[soundName].play()
             break;
@@ -650,202 +732,179 @@ function playHeadSound(head, wasCaught) {
     sound.play();
 }
 
-function generateLevel(currentLevel) {
-    let hardMode = currentLevel > 200 && currentLevel <= 300;
-    let level = generateLevelInner((currentLevel - 1) % 100 + 1, hardMode);
-    if (currentLevel > 100 && currentLevel <= 200) {
-        level.heads.forEach(head => {
-            head.sprite += randi(0, 3) * 4;
-        });
-        level.timescale = 1.15;
+// Level group generators
+
+function generateBasicGroup(level, hardMode) {
+    if (hardMode) {
+        switch (level) {
+            case 0:
+            case 1:
+            case 2:
+                return generateSquare(8, 7, 1);
+            case 3:
+                return generateFill(100, true);
+            case 4:
+                return generateFill(120, true);
+            case 5: {
+                let sq = generateSquare(8, 7);
+                setVerticalMovement(sq, -48, 48);
+                return sq;
+            }
+            case 9: {
+                let sq = generateSquare(8, 1);
+                sq.heads.forEach(h => h.y = -12);
+                return sq;
+            }
+            default:
+                return generateFill(140);
+        }
     } else {
-        level.timescale = floor((currentLevel - 201) / 100) * 0.25 + 1;
+        switch (level) {
+            case 0:
+                return generate2x2();
+            case 1:
+                return generateSquare(4, 4);
+            case 2:
+                return generateSquare(8, 6);
+            case 3:
+                return generateFill(80, true);
+            case 4:
+                return generateFill(100, true);
+            case 5: {
+                let sq = generateSquare(8, 6);
+                setVerticalMovement(sq, -48, 48);
+                return sq;
+            }
+            case 9: {
+                let sq = generateSquare(8, 1);
+                sq.heads.forEach(h => h.y = -4);
+                return sq;
+            }
+            default:
+                return generateFill(120);
+        }
     }
 
-    level.longIntro = currentLevel <= 51 ? (currentLevel % 10) == 1 : (currentLevel % 50) == 1;
-    return level;
 }
 
-function generateLevelInner(currentLevel, hardMode) {
-    // Single level overrides
-    if (hardMode) {
-        switch (currentLevel) {
-            case 1:
-                return generateSquare(8, 7, 1);
-            case 2:
-                return generateSquare(8, 7, 1);
-            case 3:
-                return generateSquare(8, 7, 1);
-            case 4:
-                return generateFill(100, true, false, 0, 0, [1, 3])
-            case 5:
-                return generateFill(120, true, false, 0, 0, [1, 3])
-            case 6: {
-                let level = generateSquare(8, 7, 1);
-                setVerticalMovement(level, -48, 48);
-                return level;
-            }
-            case 10: {
-                let level = generateSquare(8, 1);
-                level.heads.forEach(head => head.y = -12);
-                return level;
-            }
-            case 20:
-                return generateHiddenLine(64, 17, 8);
-            case 30:
-                return generateHiddenLine(64, 18, 0);
-            case 40: {
-                let level = generateSquare(8, 1);
-                level.heads.forEach(head => head.y = -14);
-                return level;
-            }
+function generateDirectionalGroup(level, hardMode) {
+    if (level === 9) return generateHiddenLine(64, 17, hardMode ? 8 : 0);
+    let fill = generateFill(hardMode ? 120 : 100);
+    switch (level % 3) {
+        case 1:
+            setVerticalMovementPerType(fill, -48, 48);
+            setPerTypeOffset(fill, 16, 4, 0);
+            break;
+        case 2:
+            setPerTypeMovement(fill, 32);
+            setPerTypeOffset(fill, 8, 0.2, 0);
+            break;
+    }
+    return fill;
+}
+
+function generateLineGroup(level, hardMode) {
+    let fill = generateFill(hardMode ? 200 : 120, false, hardMode);
+    switch (level % 3) {
+        case 0:
+            setVerticalMovementPerType(fill, -96, 96);
+            setPerTypeOffset(fill, 16, 4, 0);
+            break;
+        case 1:
+            return generateHiddenLine(64, hardMode ? 16 : 12, 8);
+        case 2:
+            setVerticalMovement(fill, -96, 96);
+            setPerTypeOffset(fill, 16, 4, 0);
+            break;
+    }
+    return fill;
+}
+
+function generateBouncyWaveGroup(level, hardMode) {
+    switch (level % 3) {
+        case 0: {
+            let fill = generateFill(200, false, true, 0, 0, hardMode ? [1, 3] : [0, 2]);
+            setBouncyMovement(fill, 32);
+            setCircularOffset(fill, 32, 0.2);
+            return fill;
         }
-    } else {
-        switch (currentLevel) {
-            case 1:
-                return generate2x2();
-            case 2:
-                return generateSquare(4, 4);
-            case 3:
-                return generateSquare(8, 6);
-            case 4:
-                return generateFill(80, true);
-            case 5:
-                return generateFill(100, true);
-            case 6: {
-                let level = generateSquare(8, 6);
-                setVerticalMovement(level, -48, 48);
-                return level;
-            }
-            case 10: {
-                let level = generateSquare(8, 1);
-                level.heads.forEach(head => head.y = -4);
-                return level;
-            }
-            case 20:
-                return generateHiddenLine(64, 8, 8);
-            case 30:
-                return generateHiddenLine(64, 17, 0);
-            case 40: {
-                let level = generateSquare(8, 1);
-                level.heads.forEach(head => head.y = -10);
-                return level;
-            }
+        case 1: {
+            let fill = generateFill(hardMode ? 252 : 200, false, false, 2, 2);
+            fill.heads.forEach(h => h.onMove = (dt) => {
+                h.x += 32 * dt;
+                h.y += 32 * dt;
+                if (h.y > SCREEN_HEIGHT + 40) h.y -= SCREEN_HEIGHT + 80;
+                if (h.x > SCREEN_WIDTH + 40) h.x -= SCREEN_WIDTH + 80;
+            });
+            setPerTypeOffset(fill, 8, 4, 45);
+            return fill;
+        }
+        case 2:
+            return generateFill(hardMode ? 252 : 140);
+    }
+}
+
+function generateEdgeGroup(level, hardMode) {
+    switch (level % 4) {
+        case 0: {
+            let distance = hardMode ? 13 : 8;
+            let sq = generateSquare(8, 2);
+            sq.heads.forEach(h => h.y = h.y < SCREEN_HEIGHT / 2 ? -distance : SCREEN_HEIGHT + distance);
+            return sq;
+        }
+        case 1: {
+            let fill = generateFill(140, false, false, 0, 0, hardMode ? [1, 3] : [0, 2]);
+            setBouncyMovement(fill, 64);
+            return fill;
+        }
+        case 2: {
+            let distance = hardMode ? 10 : 8;
+            let sq = generateSquare(2, 6);
+            sq.heads.forEach(h => h.x = h.x < SCREEN_WIDTH / 2 ? -distance : SCREEN_WIDTH + distance);
+            return sq;
+        }
+        case 3: {
+            let fill = generateFill(200, false, true, 0, 0, hardMode ? [1, 3] : [0, 2]);
+            setBouncyMovement(fill, 64);
+            return fill;
         }
     }
-    // Level range overrides
-    if (currentLevel < 10) {
-        return generateFill(hardMode ? 140 : 120);
-    } else if (currentLevel < 20) {
-        let level = generateFill(hardMode ? 120 : 100);
-        switch (currentLevel % 3) {
-            case 1:
-                setVerticalMovementPerType(level, -48, 48);
-                setPerTypeOffset(level, 16, 4, 0);
-                return level;
-            case 2:
-                setPerTypeMovement(level, 32);
-                setPerTypeOffset(level, 8, 0.2, 0);
-                return level;
-        }
-        return level;
-    } else if (currentLevel < 30) {
-        let level = generateFill(hardMode ? 200 : 120, false, hardMode);
-        switch (currentLevel % 3) {
-            case 0:
-                setVerticalMovementPerType(level, -96, 96);
-                setPerTypeOffset(level, 16, 4, 0);
-                return level;
-            case 1:
-                return generateHiddenLine(64, hardMode ? 16 : 12, 8);
-            case 2:
-                setVerticalMovement(level, -96, 96);
-                setPerTypeOffset(level, 16, 4, 0);
-                return level;
-        }
-    } else if (currentLevel < 40) {
-        switch (currentLevel % 3) {
-            case 0: {
-                let level = generateFill(200, false, true, 0, 0, hardMode ? [1, 3] : [0, 2]);
-                setBouncyMovement(level, 32);
-                setCircularOffset(level, 32, 0.2);
-                return level;
-            }
-            case 1: {
-                let level = generateFill(hardMode ? 252 : 200, false, false, 2, 2);
-                level.heads.forEach(head => head.onMove = (dt) => {
-                    head.x += 32 * dt;
-                    head.y += 32 * dt;
-                    if (head.y > SCREEN_HEIGHT + 40) head.y -= SCREEN_HEIGHT + 40 * 2;
-                    if (head.x > SCREEN_WIDTH + 40) head.x -= SCREEN_WIDTH + 40 * 2;
-                });
-                setPerTypeOffset(level, 8, 4, 45);
-                return level;
-            }
-            case 2:
-                return generateFill(hardMode ? 252 : 140);
-        }
-    } else if (currentLevel < 50) {
-        switch (currentLevel % 4) {
-            case 0: {
-                let distance = hardMode ? 13 : 8;
-                let level = generateSquare(8, 2);
-                level.heads.forEach(head => head.y = head.y < SCREEN_HEIGHT / 2 ? -distance : SCREEN_HEIGHT + distance);
-                return level;
-            }
-            case 1: {
-                let level = generateFill(140, false, false, 0, 0, hardMode ? [1, 3] : [0, 2]);
-                setBouncyMovement(level, 64);
-                return level;
-            }
-            case 2: {
-                let distance = hardMode ? 10 : 8;
-                let level = generateSquare(2, 6);
-                level.heads.forEach(head => head.x = head.x < SCREEN_WIDTH / 2 ? -distance : SCREEN_WIDTH + distance);
-                return level;
-            }
-            case 3: {
-                let level = generateFill(200, false, true, 0, 0, hardMode ? [1, 3] : [0, 2]);
-                setBouncyMovement(level, 64);
-                return level;
-            }
-        }
-    } else if (currentLevel < 60) {
+}
+
+function generateCircleGroup(level, hardMode) {
+    if (level == 4) {
         if (hardMode) {
-            switch (currentLevel % 5) {
-                case 0:
-                case 2:
-                    return generateCircles([4, 6, 8, 10, 16], [20, 40, 60, 80, 100], 150, 20, currentLevel < 55);
-                case 1:
-                case 3:
-                    return generateCircles2([8, 12, 16], [30, 60, 90], 150, 20, currentLevel < 55);
-                case 4:
-                    return generateFill(currentLevel <= 55 ? 140 : 252);
-            }
-        } else {
-            switch (currentLevel % 5) {
-                case 0:
-                case 2:
-                    return generateCircles([6, 10, 16], [30, 60, 90], 150, 20, currentLevel < 55);
-                case 1:
-                case 3:
-                    return generateCircles2([4, 8, 12], [30, 60, 90], 150, 20, currentLevel < 55);
-                case 4:
-                    if (currentLevel <= 55) {
-                        return generateSquare(8, 7);
-                    }
-                    return generateFill(120, false, false, 0, 0, [1]);
-            }
+            return generateFill(140);
         }
+        return generateSquare(8, 7);
+    } else if (level == 9) {
+        return generateFill(hardMode ? 252 : 120, false, false, 0, 0, [1]);
     }
-    // TODO: 60->100
-    return generateLevelInner(randi(1, 59), hardMode);
+
+    if (hardMode) {
+        if (level % 2 == 0) {
+            return generateCircles([4, 6, 8, 10, 16], [20, 40, 60, 80, 100], 150, 20, level < 5);
+        }
+        return generateCircles2([8, 12, 16], [30, 60, 90], 150, 20, level < 5);
+    }
+    if (level % 2 == 0) {
+        return generateCircles([6, 10, 16], [30, 60, 90], 150, 20, level < 5);
+    }
+    return generateCircles2([4, 8, 12], [30, 60, 90], 150, 20, level < 5);
+}
+
+// Level generators
+function levelTemplate() {
+    return {
+        heads: [],
+        longIntro: false,
+        timescale: 1,
+    };
 }
 
 function generate2x2() {
-    let level = {};
+    let level = levelTemplate();
     level.lookingFor = randi(0, 3);
-    level.heads = [];
     level.poster = level.lookingFor;
 
     let order = [0, 1, 2, 3];
@@ -868,13 +927,12 @@ function generate2x2() {
 }
 
 function generateSquare(width, height, forceLookingFor = null) {
-    let level = {};
+    let level = levelTemplate();
     if (forceLookingFor != null) {
         level.lookingFor = forceLookingFor;
     } else {
         level.lookingFor = randi(0, 3);
     }
-    level.heads = [];
     level.poster = level.lookingFor;
 
     for (let x = 0; x < width; x++) {
@@ -898,9 +956,8 @@ function generateSquare(width, height, forceLookingFor = null) {
 }
 
 function generateFill(count, forceTop = false, diagonals = false, overFillX = 0, overFillY = 0, allowedLookingFor = [0, 1, 2, 3]) {
-    let level = {};
+    let level = levelTemplate();
     level.lookingFor = allowedLookingFor[randi(0, allowedLookingFor.length - 1)];
-    level.heads = [];
     level.poster = level.lookingFor;
 
     let yStart = -overFillY;
@@ -948,9 +1005,8 @@ function generateFill(count, forceTop = false, diagonals = false, overFillX = 0,
 }
 
 function generateHiddenLine(speed, tightness, variance) {
-    let level = {};
+    let level = levelTemplate();
     level.lookingFor = randi(0, 3);
-    level.heads = [];
     level.poster = level.lookingFor;
 
     // Luigi needs a little more spacing
@@ -1004,9 +1060,8 @@ function generateHiddenLine(speed, tightness, variance) {
 }
 
 function generateCircles(countPerCircles, radiuses, maxSpeed, reverse) {
-    let level = {};
+    let level = levelTemplate();
     level.lookingFor = randi(0, 3);
-    level.heads = [];
     level.poster = level.lookingFor;
 
     let x = SCREEN_WIDTH / 2;
@@ -1071,9 +1126,8 @@ function generateCircles(countPerCircles, radiuses, maxSpeed, reverse) {
 }
 
 function generateCircles2(countPerCircles, radiuses, maxSpeed, reverse) {
-    let level = {};
+    let level = levelTemplate();
     level.lookingFor = randi(0, 3);
-    level.heads = [];
     level.poster = level.lookingFor;
 
     let x = SCREEN_WIDTH / 2;
@@ -1141,6 +1195,8 @@ function generateCircles2(countPerCircles, radiuses, maxSpeed, reverse) {
 
     return level;
 }
+
+// Level overwrites
 
 function setVerticalMovement(level, upSpeed, downSpeed, padding = 16) {
     let wrapHeight = SCREEN_HEIGHT + padding;

@@ -608,12 +608,12 @@ function tap(x, y, tapId) {
                         setState(S_NextStage);
                         return;
                     case 1:
-                        setState(S_Settings);
-                        return;
-                    case 2:
                         clearGame(true);
                         game.practiceMode = true;
                         setState(S_NextStage);
+                        return;
+                    case 2:
+                        setState(S_Settings);
                         return;
                 }
             }

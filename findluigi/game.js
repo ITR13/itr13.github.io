@@ -6,6 +6,7 @@ const S_NextStage = 3;
 const S_Searching = 4;
 const S_Victory = 5;
 const S_GameOver = 6;
+const S_Continue = 7;
 
 // Other constants
 const SCREEN_HEIGHT = 192; // NB: Two screens!
@@ -79,7 +80,6 @@ instance.getcolor = index => COLORS[~~index % COLORS.length];
 use(pluginAssetLoader)
 
 function init() {
-    forceStage = null;
     bgm = null;
     stateTimer = 0;
     stateCounter = 0;
@@ -129,6 +129,10 @@ function init() {
     loadImage("assets/sprites/time.png", (image, { convertColors, splitFrames }) => {
         images_original.time = image
         images_converted.time = convertColors(image)
+    })
+    loadImage("assets/sprites/continue.png", (image, { convertColors, splitFrames }) => {
+        images_original.continue = image
+        images_converted.continue = convertColors(image)
     })
 
     let failSoundsPerHead = [4, 5, 3, 4]
@@ -194,7 +198,7 @@ function init() {
     }
 }
 
-function clearGame(generateLevels, forceStage = null) {
+function clearGame(generateLevels) {
     let levelGenerators = [];
     if (generateLevels) {
         // Args: Level, Hardmode
@@ -273,8 +277,10 @@ function clearGame(generateLevels, forceStage = null) {
         countdownTimer: 10.99,
         smoothTimer: 10.99,
         level: {},
-        forceStage: forceStage,
         levelGenerators: levelGenerators,
+        practiceMode: false,
+        continuesUsed: 0,
+        highscore: 0,
     }
 }
 
@@ -294,6 +300,7 @@ function update(dt) {
             break;
         case S_Menu:
         case S_Settings:
+        case S_Continue:
             break;
         case S_NextStage:
             if (quickmode) timescale(5);
@@ -323,7 +330,9 @@ function update(dt) {
             animateLevelEnd(S_NextStage);
             break;
         case S_GameOver:
-            animateLevelEnd(S_Menu);
+            let continueCost = game.continuesUsed * 5 + 1;
+            let canContinue = game.practiceMode && game.currentLevel > continueCost;
+            animateLevelEnd(canContinue ? S_Continue : S_Menu);
             break;
     }
 }
@@ -360,10 +369,11 @@ function draw() {
             )
             return;
         case S_Menu:
-            cls(5);
-            break;
         case S_Settings:
             cls(5);
+            break;
+        case S_Continue:
+            image(0, 0, images.continue);
             break;
         case S_Victory:
         case S_GameOver:
@@ -441,6 +451,8 @@ function drawInfo() {
             }
             drawStars();
             drawTimer();
+            break;
+        case S_Continue:
             break;
     }
 }
@@ -564,6 +576,8 @@ function drawBoard() {
             let y = floor(head.y - HEAD_CENTER + SCREEN_HEIGHT);
             image(x, y, images.heads[head.sprite]);
             break;
+        case S_Continue:
+            break;
     }
 }
 
@@ -584,9 +598,8 @@ function tap(x, y, tapId) {
                         setState(S_Settings);
                         return;
                     case 2:
-                        let forceStage = getUserNumber();
-                        if (forceStage == null) return;
-                        clearGame(true, forceStage);
+                        clearGame(true);
+                        game.practiceMode = true;
                         setState(S_NextStage);
                         return;
                 }
@@ -613,6 +626,18 @@ function tap(x, y, tapId) {
                         return;
                 }
             }
+        case S_Continue:
+            if (y >= 243 && y <= 286) {
+                let continueCost = 5 * game.continuesUsed + 1;
+                game.continuesUsed++;
+                game.currentLevel -= continueCost;
+                game.countdownTimer = 10.9;
+                game.smoothTimer = 10.9;
+                setState(S_NextStage);
+            } else if (y >= 291 && y <= 334) {
+                setState(S_Menu);
+            }
+            break;
         case S_Searching:
             y -= SCREEN_HEIGHT;
 
@@ -679,7 +704,7 @@ function setState(newState) {
         case S_Menu:
         case S_Settings:
             document.title = "Find Luigi"
-            if (gameSettings.highscores[0] == game.currentLevel - 1) {
+            if (game.highscore > 0 && gameSettings.highscores[0] == game.highscore) {
                 sound_effects['highscore'].play();
             }
             clearGame(false);
@@ -694,7 +719,7 @@ function setState(newState) {
                 bgm.play();
             }
             game.currentLevel++;
-            let levelIndex = (game.forceStage != null ? game.forceStage : game.currentLevel) - 1;
+            let levelIndex = game.currentLevel - 1;
             if (levelIndex >= game.levelGenerators.length) {
                 throw "LevelIndex " + levelIndex + " is out of bounds for array 0->" + game.levelGenerators.length;
             }
@@ -705,7 +730,8 @@ function setState(newState) {
             break;
         case S_GameOver:
             bgm.fade(1.0, 0.0, 1000);
-            if (forceStage == null) {
+            if (game.continuesUsed == 0) {
+                game.highscore = game.currentLevel - 1;
                 gameSettings.highscores.push(game.currentLevel - 1);
                 gameSettings.highscores.sort((a, b) => b - a);
                 gameSettings.highscores = gameSettings.highscores.slice(0, 10);
@@ -722,6 +748,8 @@ function setState(newState) {
                     head.y = pos.y;
                 }
             });
+            break;
+        case S_Continue:
             break;
     }
 }

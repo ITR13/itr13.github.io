@@ -278,6 +278,7 @@ function clearGame(generateLevels) {
 
     game = {
         currentLevel: 0,
+        stars: 0,
         countdownTimer: 10.99,
         smoothTimer: 10.99,
         level: {},
@@ -411,7 +412,7 @@ function drawInfo() {
                 image(x, y, images.stars[1]);
                 x += 18;
                 image(x, y, images.stars[2]);
-                x += 21 + (4-text.length) * 15;
+                x += 21 + (4 - text.length) * 15;
                 for (let j = 0; j < text.length; j++) {
                     let digit = parseInt(text.charAt(j));
                     image(x, y, images.numbers[digit]);
@@ -475,7 +476,11 @@ function drawPosters() {
 }
 
 function drawStars() {
-    let stars = game.currentLevel - 1;
+    let stars = game.stars;
+    if (state == S_Victory) {
+        stars -= 1;
+    }
+
     let bigStars = floor(stars / 5);
     stars -= bigStars * 5;
     let smallStarDistance = 16;
@@ -644,6 +649,7 @@ function tap(x, y, tapId) {
                 let continueCost = 5 * game.continuesUsed + 1;
                 game.continuesUsed++;
                 game.currentLevel -= continueCost;
+                game.stars = 0;
                 game.countdownTimer = 10.9;
                 game.smoothTimer = 10.9;
                 setState(S_NextStage);
@@ -743,17 +749,18 @@ function setState(newState) {
             break;
         case S_GameOver:
             bgm.fade(1.0, 0.0, 1000);
-            if (game.continuesUsed == 0) {
-                game.highscore = game.currentLevel - 1;
-                gameSettings.highscores.push(game.currentLevel - 1);
-                gameSettings.highscores.sort((a, b) => b - a);
-                gameSettings.highscores = gameSettings.highscores.slice(0, 6);
-                localStorage.setItem("settings", JSON.stringify(gameSettings));
-            }
+            game.highscore = max(game.highscore, game.stars);
+            gameSettings.highscores.push(game.stars);
+            gameSettings.highscores.sort((a, b) => b - a);
+            gameSettings.highscores = gameSettings.highscores.slice(0, 6);
+            localStorage.setItem("settings", JSON.stringify(gameSettings));
             sound_effects['miniover'].play();
         // fallthrough
         case S_Victory:
-            if (newState == S_Victory) sound_effects['correct'].play();
+            if (newState == S_Victory) {
+                sound_effects['correct'].play();
+                game.stars++;
+            }
             game.level.heads.forEach(head => {
                 if (head.getPosition) {
                     pos = head.getPosition(oldStateTimer);

@@ -134,6 +134,10 @@ function init() {
         images_original.continue = image
         images_converted.continue = convertColors(image)
     })
+    loadImage("assets/sprites/highscore.png", (image, { convertColors, splitFrames }) => {
+        images_original.highscore = image
+        images_converted.highscore = convertColors(image)
+    })
 
     let failSoundsPerHead = [4, 5, 3, 4]
     let winSoundsPerHead = [4, 2, 1, 3]
@@ -399,11 +403,20 @@ function drawInfo() {
     switch (state) {
         case S_Menu:
             if (gameSettings.highscores.length <= 0) return;
-            textsize(12);
-            textalign("center", "top");
-            text(SCREEN_WIDTH / 2, 8, "Highscores", 0);
+            image(SCREEN_WIDTH / 2 - 66, 8, images.highscore);
             for (let i = 0; i < gameSettings.highscores.length; i++) {
-                text(SCREEN_WIDTH / 2, 8 + (i + 1) * 12, gameSettings.highscores[i], 0);
+                let text = gameSettings.highscores[i].toString();
+                let x = SCREEN_WIDTH / 2 - 18 * 3;
+                let y = 35 + i * 22;
+                image(x, y, images.stars[1]);
+                x += 18;
+                image(x, y, images.stars[2]);
+                x += 21 + (4-text.length) * 15;
+                for (let j = 0; j < text.length; j++) {
+                    let digit = parseInt(text.charAt(j));
+                    image(x, y, images.numbers[digit]);
+                    x += 15;
+                }
             }
             break;
         case S_NextStage: {
@@ -734,7 +747,7 @@ function setState(newState) {
                 game.highscore = game.currentLevel - 1;
                 gameSettings.highscores.push(game.currentLevel - 1);
                 gameSettings.highscores.sort((a, b) => b - a);
-                gameSettings.highscores = gameSettings.highscores.slice(0, 10);
+                gameSettings.highscores = gameSettings.highscores.slice(0, 6);
                 localStorage.setItem("settings", JSON.stringify(gameSettings));
             }
             sound_effects['miniover'].play();

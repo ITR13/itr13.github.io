@@ -510,6 +510,8 @@ function drawBoard() {
         case S_NextStage:
             break;
         case S_Searching:
+            if (game.level.flashes && (stateTimer % 1) > 0.1) return;
+
             game.level.heads.forEach(head => {
                 let pos = head.getPosition ? head.getPosition(stateTimer) : head;
 
@@ -819,6 +821,54 @@ function preGenerateLevels() {
         return array;
     }
 
+    function generateFlashes() {
+        var array = new Array(10);
+        for (var i = 0; i < 10; i++) {
+            let cI = i;
+            array[i] = () => {
+                let level = generateStaticGroup(cI)
+                level.timescale = 1;
+                level.longIntro = cI == 0;
+                level.flashes = true;
+                return level;
+            }
+        }
+        return array;
+    }
+
+    function modifyUnknownPoster(array) {
+        for (let i = 0; i < array.length; i++) {
+            let original = array[i];
+            array[i] = () => {
+                let level = original();
+
+                let counts = [0, 0, 0, 0]
+                level.heads.forEach(head => counts[head.sprite % 4]++);
+
+                let largest = counts.reduce((maxIndex, currentValue, currentIndex, array) =>
+                    currentValue > array[maxIndex] ? currentIndex : maxIndex, 0);
+
+                for (let j = 0; j < 4; j++) {
+                    if (counts[j] >= 2 || j == level.lookingFor) continue;
+                    // This is so ugly, lol
+                    for (let k = 2 - counts[j]; k > 0; k--) {
+                        for (let l = 0; l < level.heads.length; l++) {
+                            let head = level.heads[l];
+                            if ((head.sprite % 4) != largest) continue;
+                            head.sprite = floor(head.sprite / 4) + j;
+                            break;
+                        }
+                    }
+                }
+
+                level.poster = 4;
+                return level;
+            }
+        }
+
+        return array;
+    }
+
     const fixedEasy = [
         generateBasic(false, false),
         generateBasic(true, false),
@@ -835,7 +885,12 @@ function preGenerateLevels() {
 
     const fixedHard = [
         generateSpeedup(2.5, false),
+        generateSpeedup(2, true),
         generateOutlines(true),
+        modifyUnknownPoster(generateBasic(true, false)),
+        modifyUnknownPoster(generateFlashes()),
+        modifyUnknownPoster(generateSpeedup(1.5, false)),
+        modifyUnknownPoster(generateRotated(true)),
     ]
 
     shuffle(fixedEasy, 1);
@@ -850,7 +905,7 @@ function preGenerateLevels() {
     shuffle(randomHard);
 
     const splitEasy = splitArray(randomEasy, 10);
-    const splitMedium = splitArray(randomEasy, 10);
+    const splitMedium = splitArray(randomMedium, 10);
 
     let part2 = fixedMedium.concat(splitEasy);
     shuffle(part2, 1);
@@ -1011,7 +1066,7 @@ function generateWheelGroup(level, hardMode) {
 }
 
 function generateLineGroup(level, hardMode) {
-    if (level === 0) return generateHiddenLine(64, 17, hardMode ? 8 : 0);
+    if (level === 9) return generateHiddenLine(64, 17, hardMode ? 8 : 0);
     let fill = generateFill(hardMode ? 200 : 120, false, hardMode);
     switch ((level - 1) % 3) {
         case 0:
@@ -1265,11 +1320,45 @@ function generateVisualGroup2(level, hardMode) {
     }
 }
 
+// -- Static
+function generateStaticGroup(level) {
+    let distance = 4;
+    let majorSquare = generateSquare(8, 6);
+
+    switch (level) {
+        case 0:
+            return generate2x2();
+        case 1:
+            return generateSquare(4, 4);
+        case 2:
+        case 4:
+        case 6:
+            return majorSquare;
+        case 3:
+            return generateFill(80, true);
+        case 5:
+            return generateFill(100, true);
+        case 7:
+            return generateFill(120, true);
+        case 8: {
+            let sq = generateSquare(8, 1);
+            sq.heads.forEach(h => h.y = -distance);
+            return sq;
+        }
+        case 9: {
+            let sq = generateSquare(8, 2);
+            sq.heads.forEach(h => h.y = h.y < SCREEN_HEIGHT / 2 ? -distance : SCREEN_HEIGHT + distance);
+            return sq;
+        }
+    }
+}
+
 // Level generators
 function levelTemplate() {
     return {
         heads: [],
         longIntro: false,
+        flashes: false,
         timescale: 1,
     };
 }

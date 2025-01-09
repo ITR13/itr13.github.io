@@ -191,8 +191,8 @@ function init() {
 
     TOTAL_LOADING = LOADING
 
-    quickstart = false;
-    quickmode = false;
+    quickstart = true;
+    quickmode = true;
 
     button_positions = [];
     for (let i = 0; i < 3; i++) {
@@ -205,142 +205,7 @@ function init() {
 function clearGame(generateLevels) {
     let levelGenerators = [];
     if (generateLevels) {
-        // Args: Level, Hardmode
-        const startGenerators = [
-            generateBasicGroup,
-            generateDirectionalGroup,
-            generateWheelGroup,
-        ];
-        const intermediateGenerators = [
-            generateLineGroup,
-        ]
-        const advancedGenerators = [
-            generateBouncyWaveGroup,
-            generateEdgeGroup,
-            generateCircleGroup,
-        ];
-        shuffle(startGenerators, 1);
-        shuffle(advancedGenerators);
-
-        const defaultGenerators = startGenerators.concat(intermediateGenerators, advancedGenerators)
-
-        const speedyGenerators = [
-            generateBasicSpeedyGroup,
-            generateSecondSpeedyGroup,
-            generateCircleSpeedyGroup,
-        ]
-        shuffle(speedyGenerators);
-
-        const visualGenerators = [
-            generateVisualGroup1,
-            generateVisualGroup2,
-        ]
-
-
-        function generateBasic(hardMode) {
-            var array = new Array(defaultGenerators.length * 10);
-            for (var i = 0; i < defaultGenerators.length; i++) {
-                let cI = i;
-                for (var j = 0; j < 10; j++) {
-                    let cJ = j;
-                    array[i * 10 + j] = () => {
-                        let level = defaultGenerators[cI](cJ, hardMode);
-                        level.longIntro = cJ == 0;
-                        return level;
-                    }
-                }
-            }
-            return array;
-        }
-
-        function generateRotated() {
-            var array = new Array(defaultGenerators.length * 10);
-            for (var i = 0; i < defaultGenerators.length; i++) {
-                let cI = i;
-                for (var j = 0; j < 10; j++) {
-                    let cJ = j;
-                    array[i * 10 + j] = () => {
-                        let level = defaultGenerators[cI](cJ, false);
-                        level.heads.forEach(head => head.sprite = head.sprite + randi(0, 3) * 4);
-                        level.timescale = 1.15;
-                        level.longIntro = cJ == 0;
-                        return level;
-                    }
-                }
-            }
-            return array;
-        }
-
-        function generateOutlines() {
-            var array = new Array(visualGenerators.length * 10);
-            for (var i = 0; i < visualGenerators.length; i++) {
-                let cI = i;
-                for (var j = 0; j < 10; j++) {
-                    let cJ = j;
-                    array[i * 10 + j] = () => {
-                        let level = visualGenerators[cI](cJ, false);
-                        level.heads.forEach(head => head.sprite = head.sprite + 4 * 4);
-                        level.longIntro = cJ == 0;
-                        return level;
-                    }
-                }
-            }
-            return array;
-        }
-
-        function generateSpeedup(timescale, hardMode) {
-            var array = new Array(speedyGenerators.length * 10);
-            for (var i = 0; i < speedyGenerators.length; i++) {
-                let cI = i;
-                for (var j = 0; j < 10; j++) {
-                    let cJ = j;
-                    array[i * 10 + j] = () => {
-                        let level = speedyGenerators[cI](cJ, hardMode);
-                        level.timescale = timescale;
-                        level.longIntro = cJ == 0;
-                        return level;
-                    }
-                }
-            }
-            return array;
-        }
-
-        const overgroupsEasy = [
-            generateBasic(false),
-            generateRotated(false),
-        ];
-
-        const overgroupsMedium = [
-            generateBasic(true),
-            generateSpeedup(1.5, false),
-            generateOutlines(false),
-        ]
-
-        const overgroupsHard = [
-            generateSpeedup(2.5, false),
-            generateOutlines(true),
-        ]
-
-        shuffle(overgroupsEasy, 1);
-        shuffle(overgroupsMedium);
-        shuffle(overgroupsHard);
-
-        overgroups = overgroupsEasy.concat(overgroupsMedium, overgroupsHard);
-
-        let totalLevels = 0;
-        for (var i = 0; i < overgroups.length; i++) {
-            totalLevels += overgroups[i].length;
-        }
-        console.log(totalLevels);
-
-        levelGenerators = new Array(totalLevels);
-        let levelIndex = 0;
-        for (var i = 0; i < overgroups.length; i++) {
-            for (var j = 0; j < overgroups[i].length; j++) {
-                levelGenerators[levelIndex] = overgroups[i][j];
-                levelIndex++;
-            }
-        }
+        levelGenerators = preGenerateLevels();
     }
 
     game = {
@@ -728,6 +593,7 @@ function tap(x, y, tapId) {
             y -= SCREEN_HEIGHT;
 
             let tappedHead = findTappedHead(x, y);
+            tappedHead = -2;
             if (tappedHead == -1) return;
             if (tappedHead == -2 || game.level.heads[tappedHead].isTarget) {
                 playHeadSound(game.level.lookingFor, true);
@@ -848,6 +714,188 @@ function playHeadSound(head, wasCaught) {
     let sounds = sound_effects[HEAD_ORDER[head]][wasCaught ? 'fail' : 'win'];
     let sound = sounds[randi(0, sounds.length - 1)];
     sound.play();
+}
+
+
+
+function preGenerateLevels() {
+    // Args: Level, Hardmode
+    const startGenerators = [
+        generateBasicGroup,
+        generateDirectionalGroup,
+        generateWheelGroup,
+    ];
+    const advancedGenerators = [
+        generateLineGroup,
+        generateBouncyWaveGroup,
+        generateEdgeGroup,
+        generateCircleGroup,
+    ];
+    shuffle(startGenerators, 1);
+    shuffle(advancedGenerators, 1);
+
+    const speedyGenerators = [
+        generateBasicSpeedyGroup,
+        generateSecondSpeedyGroup,
+        generateCircleSpeedyGroup,
+    ]
+    shuffle(speedyGenerators);
+
+    const visualGenerators = [
+        generateVisualGroup1,
+        generateVisualGroup2,
+    ]
+
+
+    function generateBasic(advanced, hardMode) {
+        let generators = advanced ? advancedGenerators : startGenerators;
+
+        var array = new Array(generators.length * 10);
+        for (var i = 0; i < generators.length; i++) {
+            let cI = i;
+            for (var j = 0; j < 10; j++) {
+                let cJ = j;
+                array[i * 10 + j] = () => {
+                    let level = generators[cI](cJ, hardMode);
+                    level.longIntro = cJ == 0;
+                    return level;
+                }
+            }
+        }
+        return array;
+    }
+
+    function generateRotated(advanced) {
+        let generators = advanced ? advancedGenerators : startGenerators;
+
+        var array = new Array(generators.length * 10);
+        for (var i = 0; i < generators.length; i++) {
+            let cI = i;
+            for (var j = 0; j < 10; j++) {
+                let cJ = j;
+                array[i * 10 + j] = () => {
+                    let level = generators[cI](cJ, false);
+                    level.heads.forEach(head => head.sprite = head.sprite + randi(0, 3) * 4);
+                    level.timescale = 1.15;
+                    level.longIntro = cJ == 0;
+                    return level;
+                }
+            }
+        }
+        return array;
+    }
+
+    function generateOutlines() {
+        var array = new Array(visualGenerators.length * 10);
+        for (var i = 0; i < visualGenerators.length; i++) {
+            let cI = i;
+            for (var j = 0; j < 10; j++) {
+                let cJ = j;
+                array[i * 10 + j] = () => {
+                    let level = visualGenerators[cI](cJ, false);
+                    level.heads.forEach(head => head.sprite = head.sprite + 4 * 4);
+                    level.longIntro = cJ == 0;
+                    return level;
+                }
+            }
+        }
+        return array;
+    }
+
+    function generateSpeedup(timescale, hardMode) {
+        var array = new Array(speedyGenerators.length * 10);
+        for (var i = 0; i < speedyGenerators.length; i++) {
+            let cI = i;
+            for (var j = 0; j < 10; j++) {
+                let cJ = j;
+                array[i * 10 + j] = () => {
+                    let level = speedyGenerators[cI](cJ, hardMode);
+                    level.timescale = timescale;
+                    level.longIntro = cJ == 0;
+                    return level;
+                }
+            }
+        }
+        return array;
+    }
+
+    const fixedEasy = [
+        generateBasic(false, false),
+        generateBasic(true, false),
+        generateRotated(false),
+    ];
+
+    const fixedMedium = [
+        generateBasic(false, true),
+        generateBasic(true, true),
+        generateRotated(true),
+        generateSpeedup(1.5, false),
+        generateOutlines(false),
+    ]
+
+    const fixedHard = [
+        generateSpeedup(2.5, false),
+        generateOutlines(true),
+    ]
+
+    shuffle(fixedEasy, 1);
+    shuffle(fixedMedium);
+    shuffle(fixedHard);
+
+    const randomEasy = fixedEasy.flat();
+    const randomMedium = randomEasy.concat(fixedMedium.flat());
+    const randomHard = randomMedium.concat(fixedHard);
+    shuffle(randomEasy);
+    shuffle(randomMedium);
+    shuffle(randomHard);
+
+    const splitEasy = splitArray(randomEasy, 10);
+    const splitMedium = splitArray(randomEasy, 10);
+
+    let part2 = fixedMedium.concat(splitEasy);
+    shuffle(part2, 1);
+
+    let part3 = fixedHard.concat(splitMedium);
+    shuffle(part3, 1);
+
+    let overgroups = fixedEasy.concat(
+        fixedEasy,
+        part2,
+        part3,
+        part3
+    );
+
+    let levelsAtGroup = [];
+    let totalLevels = 0;
+    for (var i = 0; i < overgroups.length; i++) {
+        levelsAtGroup.push(totalLevels);
+        totalLevels += overgroups[i].length;
+    }
+    console.log(totalLevels);
+
+    levelGenerators = new Array(totalLevels);
+    let levelIndex = 0;
+    for (var i = 0; i < overgroups.length; i++) {
+        for (var j = 0; j < overgroups[i].length; j++) {
+            levelGenerators[levelIndex] = overgroups[i][j];
+            levelIndex++;
+        }
+    }
+
+    shuffle(levelGenerators, levelsAtGroup[levelsAtGroup.length - 1]);
+
+    return levelGenerators;
+}
+
+function splitArray(array, splitSize) {
+    const count = Math.ceil(array.length / splitSize);
+    const result = new Array(count);
+
+    for (let i = 0; i < count; i++) {
+        result[i] = array.slice(i * splitSize, (i + 1) * splitSize);
+    }
+
+    return result;
 }
 
 // Level group generators
@@ -1555,7 +1603,7 @@ function generateCircles2(countPerCircles, radiuses, maxSpeed, reverse, onTop = 
     }
 
     shuffle(level.heads, 1);
-    
+
     if (onTop) {
         let radiusIndex = randi(0, radiuses.length - 1);
         let radius = radiuses[radiusIndex];

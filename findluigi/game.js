@@ -209,16 +209,33 @@ function clearGame(generateLevels) {
         const startGenerators = [
             generateBasicGroup,
             generateDirectionalGroup,
-            generateLineGroup,
+            generateWheelGroup,
         ];
+        const intermediateGenerators = [
+            generateLineGroup,
+        ]
         const advancedGenerators = [
             generateBouncyWaveGroup,
             generateEdgeGroup,
             generateCircleGroup,
         ];
+        shuffle(startGenerators, 1);
         shuffle(advancedGenerators);
 
-        const defaultGenerators = startGenerators.concat(advancedGenerators)
+        const defaultGenerators = startGenerators.concat(intermediateGenerators, advancedGenerators)
+
+        const speedyGenerators = [
+            generateBasicSpeedyGroup,
+            generateSecondSpeedyGroup,
+            generateCircleSpeedyGroup,
+        ]
+        shuffle(speedyGenerators);
+
+        const visualGenerators = [
+            generateVisualGroup1,
+            generateVisualGroup2,
+        ]
+
 
         function generateBasic(hardMode) {
             var array = new Array(defaultGenerators.length * 10);
@@ -254,17 +271,67 @@ function clearGame(generateLevels) {
             return array;
         }
 
-        const overgroups = [
+        function generateOutlines() {
+            var array = new Array(visualGenerators.length * 10);
+            for (var i = 0; i < visualGenerators.length; i++) {
+                let cI = i;
+                for (var j = 0; j < 10; j++) {
+                    let cJ = j;
+                    array[i * 10 + j] = () => {
+                        let level = visualGenerators[cI](cJ, false);
+                        level.heads.forEach(head => head.sprite = head.sprite + 4 * 4);
+                        level.longIntro = cJ == 0;
+                        return level;
+                    }
+                }
+            }
+            return array;
+        }
+
+        function generateSpeedup(timescale, hardMode) {
+            var array = new Array(speedyGenerators.length * 10);
+            for (var i = 0; i < speedyGenerators.length; i++) {
+                let cI = i;
+                for (var j = 0; j < 10; j++) {
+                    let cJ = j;
+                    array[i * 10 + j] = () => {
+                        let level = speedyGenerators[cI](cJ, hardMode);
+                        level.timescale = timescale;
+                        level.longIntro = cJ == 0;
+                        return level;
+                    }
+                }
+            }
+            return array;
+        }
+
+        const overgroupsEasy = [
             generateBasic(false),
             generateRotated(false),
-            generateBasic(true),
         ];
-        shuffle(overgroups, 1);
+
+        const overgroupsMedium = [
+            generateBasic(true),
+            generateSpeedup(1.5, false),
+            generateOutlines(false),
+        ]
+
+        const overgroupsHard = [
+            generateSpeedup(2.5, false),
+            generateOutlines(true),
+        ]
+
+        shuffle(overgroupsEasy, 1);
+        shuffle(overgroupsMedium);
+        shuffle(overgroupsHard);
+
+        overgroups = overgroupsEasy.concat(overgroupsMedium, overgroupsHard);
 
         let totalLevels = 0;
         for (var i = 0; i < overgroups.length; i++) {
             totalLevels += overgroups[i].length;
         }
+        console.log(totalLevels);
 
         levelGenerators = new Array(totalLevels);
         let levelIndex = 0;
@@ -666,7 +733,10 @@ function tap(x, y, tapId) {
                 playHeadSound(game.level.lookingFor, true);
                 game.countdownTimer += 5;
                 game.countdownTimer = clamp(game.countdownTimer, 0, 50.99);
-                if (quickmode) setState(S_NextStage);
+                if (quickmode) {
+                    game.stars++;
+                    setState(S_NextStage);
+                }
                 else setState(S_Victory);
             } else if (tappedHead >= 0) {
                 playHeadSound(game.level.lookingFor, false);
@@ -781,6 +851,7 @@ function playHeadSound(head, wasCaught) {
 }
 
 // Level group generators
+// -- Regular
 
 function generateBasicGroup(level, hardMode) {
     if (hardMode) {
@@ -832,12 +903,13 @@ function generateBasicGroup(level, hardMode) {
                 return generateFill(120);
         }
     }
-
 }
 
 function generateDirectionalGroup(level, hardMode) {
-    if (level === 9) return generateHiddenLine(64, 17, hardMode ? 8 : 0);
-    let fill = generateFill(hardMode ? 120 : 100);
+    let fill =
+        level == 9 ?
+            generateFill(hardMode ? 120 : 100) :
+            generateFill(hardMode ? 140 : 120);
     switch (level % 3) {
         case 1:
             setVerticalMovementPerType(fill, -48, 48);
@@ -851,9 +923,49 @@ function generateDirectionalGroup(level, hardMode) {
     return fill;
 }
 
+function generateWheelGroup(level, hardMode) {
+    let center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2];
+    let centerCount = hardMode ? 20 : 12;
+
+    let maxSpeed = 64;
+
+    if (level == 0) {
+        return generateWheels([hardMode ? 32 : 16], [72], [center], maxSpeed);
+    }
+
+    let offset = 64;
+    let x0 = center[0] - offset;
+    let y0 = center[1] - offset;
+
+    let tl = [x0, y0];
+    let tr = [x0 + offset * 2, y0];
+    let bl = [x0, y0 + offset * 2];
+    let br = [x0 + offset * 2, y0 + offset * 2];
+
+    let outerCount = hardMode ? 8 : 4;
+
+    let hypo = sqrt(offset * offset * 2);
+    let leftMost = [center[0] - hypo, center[1]];
+    let rightMost = [center[0] + hypo, center[1]];
+
+    switch ((level - 1) % 3) {
+        case 0:
+            return generateWheels([centerCount, outerCount, outerCount, outerCount, outerCount], [64, 24, 24, 24, 24], [center, tl, tr, bl, br], maxSpeed, level < 5);
+        case 1:
+            return generateWheels([centerCount - 2, outerCount - 2, outerCount - 2, outerCount - 2, outerCount - 2, outerCount - 2, outerCount - 2], [36, 18, 18, 18, 18, 18, 18], [center, tl, tr, bl, br, leftMost, rightMost], 0);
+        case 2: {
+            let level = hardMode ? generateSquare(9, 7, null, 1 + 1 / 18) : generateSquare(5, 4, null, 2);
+            setDirectionMovement(level, 32, -45, [40, 40, 16, 16]);
+            setSquareOffset(level, 32, 0.25, 45);
+            return level;
+        }
+    }
+}
+
 function generateLineGroup(level, hardMode) {
+    if (level === 0) return generateHiddenLine(64, 17, hardMode ? 8 : 0);
     let fill = generateFill(hardMode ? 200 : 120, false, hardMode);
-    switch (level % 3) {
+    switch ((level - 1) % 3) {
         case 0:
             setVerticalMovementPerType(fill, -96, 96);
             setPerTypeOffset(fill, 16, 4, 0);
@@ -941,6 +1053,170 @@ function generateCircleGroup(level, hardMode) {
     return generateCircles2([4, 8, 12], [30, 60, 90], 150, 20, level < 5);
 }
 
+
+// -- Speedy
+function generateBasicSpeedyGroup(level) {
+    let fill = generateFill(level < 5 ? 100 : 120);
+    switch (level % 5) {
+        case 0:
+            let sq = generateSquare(8, 6);
+            setVerticalMovement(sq, -48, 48);
+            return sq
+        case 1:
+            setVerticalMovementPerType(fill, -48, 48);
+            setPerTypeOffset(fill, 16, 4, 0);
+            return fill;
+        case 2:
+            let fill2 = generateFill(100);
+            setPerTypeMovement(fill2, 32);
+            setPerTypeOffset(fill2, 8, 0.2, 0);
+            return fill2;
+        case 3:
+            setVerticalMovementPerType(fill, -96, 96);
+            setPerTypeOffset(fill, 16, 4, 0);
+            return fill;
+        case 4:
+            setVerticalMovement(fill, -96, 96);
+            setPerTypeOffset(fill, 16, 4, 0);
+            return fill;
+    }
+}
+
+
+function generateSecondSpeedyGroup(level) {
+    switch (level % 3) {
+        case 0: {
+            let fill = generateFill(140, false, false, 0, 0, [0, 2]);
+            setBouncyMovement(fill, 64);
+            return fill;
+        }
+        case 1: {
+            let fill = generateFill(200, false, false, 2, 2);
+            fill.heads.forEach(h => h.onMove = (dt) => {
+                h.x += 32 * dt;
+                h.y += 32 * dt;
+                if (h.y > SCREEN_HEIGHT + 40) h.y -= SCREEN_HEIGHT + 80;
+                if (h.x > SCREEN_WIDTH + 40) h.x -= SCREEN_WIDTH + 80;
+            });
+            setPerTypeOffset(fill, 8, 4, 45);
+            return fill;
+        }
+        case 2: {
+            let fill = generateFill(200, false, true, 0, 0, [0, 2]);
+            setBouncyMovement(fill, 32);
+            setCircularOffset(fill, 32, 0.2);
+            return fill;
+        }
+    }
+}
+
+function generateCircleSpeedyGroup(level) {
+    let center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2];
+    let centerCount = hardMode ? 20 : 12;
+
+    let maxSpeed = 64;
+
+    if (level == 0) {
+        return generateWheels([16], [72], [center], maxSpeed);
+    } else if (level == 9) {
+        return generateCircles2([8, 12, 16], [30, 60, 90], 150, 20, false);
+    }
+
+    let offset = 64;
+    let x0 = center[0] - offset;
+    let y0 = center[1] - offset;
+
+    let tl = [x0, y0];
+    let tr = [x0 + offset * 2, y0];
+    let bl = [x0, y0 + offset * 2];
+    let br = [x0 + offset * 2, y0 + offset * 2];
+
+    let outerCount = 4;
+
+    switch (level % 4) {
+        case 0:
+            return generateWheels([centerCount, outerCount, outerCount, outerCount, outerCount], [64, 24, 24, 24, 24], [center, tl, tr, bl, br], maxSpeed, level < 5);
+        case 1:
+            return generateCircles2([4, 8, 12], [30, 60, 90], 150, 20, level < 5);
+        case 2: {
+            let level = generateSquare(5, 4, null, 2);
+            setDirectionMovement(level, 32, -45, [40, 40, 16, 16]);
+            setSquareOffset(level, 32, 0.25, 45);
+            return level;
+        }
+        case 3: {
+            return generateCircles([6, 10, 16], [30, 60, 90], 150, 20, level < 5);
+        }
+    }
+}
+
+// -- Visual
+function generateVisualGroup1(level, hardMode) {
+    let distance = hardMode ? 8 : 4;
+    let majorSquare = hardMode ?
+        generateSquare(9, 7, 3 - floor(level / 2), 0.75) :
+        generateSquare(8, 6);
+
+    switch (level) {
+        case 0:
+            return hardMode ?
+                generateSquare(4, 4, null, spacingMultiplier = 1.5) :
+                generate2x2();
+        case 1:
+            return hardMode ?
+                majorSquare :
+                generateSquare(4, 4);
+        case 2:
+        case 4:
+        case 6:
+            return majorSquare;
+        case 3:
+        case 5:
+        case 7: {
+            setVerticalMovement(majorSquare, -48, 48);
+            return majorSquare;
+        }
+        case 8: {
+            let sq = generateSquare(8, 1);
+            sq.heads.forEach(h => h.y = -distance);
+            return sq;
+        }
+        case 9: {
+            let sq = generateSquare(8, 2);
+            sq.heads.forEach(h => h.y = h.y < SCREEN_HEIGHT / 2 ? -distance : SCREEN_HEIGHT + distance);
+            return sq;
+        }
+    }
+}
+
+
+function generateVisualGroup2(level, hardMode) {
+    switch (level % 5) {
+        case 0:
+            let center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2];
+            let maxSpeed = 64;
+            return generateWheels([hardMode ? 20 : 16], [72], [center], maxSpeed);
+        case 1:
+            let lvl = hardMode ? generateSquare(9, 7, null, 1 + 1 / 18) : generateSquare(5, 4, null, 2);
+            setDirectionMovement(lvl, 32, -45, [40, 40, 16, 16]);
+            setSquareOffset(lvl, 32, 0.25, 45);
+            return lvl;
+        case 2:
+            let fill = generateFill(hardMode ? 80 : 40);
+            setVerticalMovementPerType(fill, -48, 48);
+            setPerTypeOffset(fill, 16, 4, 0);
+            return fill;
+        case 3: {
+            let counts = hardMode ? [6, 10, 16] : [3, 5, 8];
+            return generateCircles(counts, [30, 60, 90], 150, 20, level < 5);
+        }
+        case 4: {
+            let counts = hardMode ? [4, 8, 12] : [2, 4, 4];
+            return generateCircles2(counts, [30, 60, 90], 150, 20, level < 5, true);
+        }
+    }
+}
+
 // Level generators
 function levelTemplate() {
     return {
@@ -974,7 +1250,7 @@ function generate2x2() {
     return level;
 }
 
-function generateSquare(width, height, forceLookingFor = null) {
+function generateSquare(width, height, forceLookingFor = null, spacingMultiplier = 1) {
     let level = levelTemplate();
     if (forceLookingFor != null) {
         level.lookingFor = forceLookingFor;
@@ -986,8 +1262,8 @@ function generateSquare(width, height, forceLookingFor = null) {
     for (let x = 0; x < width; x++) {
         for (let y = 0; y < height; y++) {
             let head = {
-                x: SCREEN_WIDTH / 2 - width * 16 + x * 32 + 16,
-                y: SCREEN_HEIGHT / 2 - height * 16 + y * 32 + 16,
+                x: SCREEN_WIDTH / 2 + (- width * 16 + x * 32 + 16) * spacingMultiplier,
+                y: SCREEN_HEIGHT / 2 + (- height * 16 + y * 32 + 16) * spacingMultiplier,
                 sprite: (randi(1, 3) + level.lookingFor) % 4,
                 isTarget: false,
             };
@@ -1107,6 +1383,45 @@ function generateHiddenLine(speed, tightness, variance) {
     return level;
 }
 
+function generateWheels(countPerCircles, radiuses, centers, maxSpeed, reverse = false) {
+    let level = levelTemplate();
+    level.lookingFor = randi(0, 3);
+    level.poster = level.lookingFor;
+
+    for (let circleIndex = 0; circleIndex < radiuses.length; circleIndex++) {
+        let radius = radiuses[circleIndex];
+        let countPerCircle = countPerCircles[circleIndex];
+        let radiusSpeed = maxSpeed / (radius * 2);
+        let pos = centers[circleIndex];
+
+        let speed = rand(radiusSpeed / 2, radiusSpeed);
+        if (reverse) speed = -speed
+        for (var j = 0; j < countPerCircle; j++) {
+            let offset = (j / countPerCircle) * TWO_PI;
+            let head = {
+                x: pos[0],
+                y: pos[1],
+                sprite: (randi(1, 3) + level.lookingFor) % 4,
+                isTarget: false,
+                getPosition: (stateTimer) => {
+                    let t = offset + stateTimer * speed;
+                    let dx = cos(t) * radius;
+                    let dy = sin(t) * radius;
+                    return { x: head.x + dx, y: head.y + dy };
+                },
+            };
+            level.heads.push(head);
+        }
+    }
+    shuffle(level.heads);
+
+    level.targetHead = level.heads[0];
+    level.targetHead.isTarget = true;
+    level.targetHead.sprite = level.lookingFor;
+
+    return level;
+}
+
 function generateCircles(countPerCircles, radiuses, maxSpeed, reverse) {
     let level = levelTemplate();
     level.lookingFor = randi(0, 3);
@@ -1173,7 +1488,7 @@ function generateCircles(countPerCircles, radiuses, maxSpeed, reverse) {
     return level;
 }
 
-function generateCircles2(countPerCircles, radiuses, maxSpeed, reverse) {
+function generateCircles2(countPerCircles, radiuses, maxSpeed, reverse, onTop = false) {
     let level = levelTemplate();
     level.lookingFor = randi(0, 3);
     level.poster = level.lookingFor;
@@ -1184,7 +1499,7 @@ function generateCircles2(countPerCircles, radiuses, maxSpeed, reverse) {
     let waveSpeeds = [0, 0.5, 1, 2]
     shuffle(waveSpeeds);
 
-    {
+    if (!onTop) {
         let radiusIndex = randi(0, radiuses.length - 1);
         let radius = radiuses[radiusIndex];
         let countPerCircle = countPerCircles[radiusIndex];
@@ -1240,6 +1555,34 @@ function generateCircles2(countPerCircles, radiuses, maxSpeed, reverse) {
     }
 
     shuffle(level.heads, 1);
+    
+    if (onTop) {
+        let radiusIndex = randi(0, radiuses.length - 1);
+        let radius = radiuses[radiusIndex];
+        let countPerCircle = countPerCircles[radiusIndex];
+
+        let speed = maxSpeed / (radius * 2);
+        speed = rand(speed / 2, speed);
+        if (reverse) speed = -speed
+
+        let offset = (randi(1, countPerCircle) / countPerCircle) * TWO_PI;
+        let head = {
+            x: x,
+            y: y,
+            sprite: level.lookingFor,
+            isTarget: true,
+            getPosition: (stateTimer) => {
+                let t = offset + stateTimer * speed;
+                let actualRadius = sin(stateTimer * waveSpeeds[level.lookingFor]) + radius
+                let dx = cos(t) * actualRadius;
+                let dy = sin(t) * actualRadius;
+                return { x: head.x + dx, y: head.y + dy };
+            },
+        };
+        level.targetHead = head;
+        level.heads.push(head);
+    }
+
 
     return level;
 }
@@ -1287,7 +1630,7 @@ function setVerticalMovementPerType(level, upSpeed, downSpeed) {
 function setPerTypeMovement(level, speed, padding = 16) {
     let headSpeeds = [];
     for (let i = 0; i < 4; i++) {
-        let angle = deg2rad(rand(0, 360));
+        let angle = deg2rad(rand(0, 360))
         headSpeeds.push({
             x: cos(angle) * speed,
             y: sin(angle) * speed,
@@ -1307,6 +1650,28 @@ function setPerTypeMovement(level, speed, padding = 16) {
             if (head.y >= wrapHeight) head.y -= wrapHeight - wrapLowth;
             if (head.x < wrapLowth) head.x += wrapWidth - wrapLowth;
             if (head.x >= wrapWidth) head.x -= wrapWidth - wrapLowth;
+        }
+    });
+}
+
+function setDirectionMovement(level, speed, angleDeg, padding = [16, 16, 16, 16]) {
+    let angle = deg2rad(angleDeg)
+    dx = cos(angle) * speed;
+    dy = sin(angle) * speed;
+
+    let wrapLowthX = -padding[0];
+    let wrapLowthY = -padding[1];
+    let wrapWidth = SCREEN_WIDTH + padding[2];
+    let wrapHeight = SCREEN_HEIGHT + padding[3];
+
+    level.heads.forEach(head => {
+        head.onMove = (dt) => {
+            head.y += dy * dt;
+            head.x += dx * dt;
+            if (head.y < wrapLowthY) head.y += wrapHeight - wrapLowthY;
+            if (head.y >= wrapHeight) head.y -= wrapHeight - wrapLowthY;
+            if (head.x < wrapLowthX) head.x += wrapWidth - wrapLowthX;
+            if (head.x >= wrapWidth) head.x -= wrapWidth - wrapLowthX;
         }
     });
 }
@@ -1372,6 +1737,23 @@ function setCircularOffset(level, radius, frequency) {
             return {
                 x: head.x + cos(angle + anglePerTime * stateTimer) * radius,
                 y: head.y + sin(angle + anglePerTime * stateTimer) * radius,
+            };
+        }
+    });
+}
+
+function setSquareOffset(level, distance, speed, angleDeg) {
+    let angle = deg2rad(angleDeg);
+    let dx = cos(angle) * distance;
+    let dy = sin(angle) * distance;
+
+    level.heads.forEach(head => {
+        head.getPosition = (stateTimer) => {
+            let s = sin(stateTimer * TWO_PI * speed);
+            s *= s;
+            return {
+                x: head.x + s * dx,
+                y: head.y + s * dy,
             };
         }
     });

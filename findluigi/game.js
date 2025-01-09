@@ -191,8 +191,8 @@ function init() {
 
     TOTAL_LOADING = LOADING
 
-    quickstart = true;
-    quickmode = true;
+    quickstart = false;
+    quickmode = false;
 
     button_positions = [];
     for (let i = 0; i < 3; i++) {
@@ -593,7 +593,7 @@ function tap(x, y, tapId) {
             y -= SCREEN_HEIGHT;
 
             let tappedHead = findTappedHead(x, y);
-            tappedHead = -2;
+
             if (tappedHead == -1) return;
             if (tappedHead == -2 || game.level.heads[tappedHead].isTarget) {
                 playHeadSound(game.level.lookingFor, true);
@@ -1160,7 +1160,7 @@ function generateSecondSpeedyGroup(level) {
 
 function generateCircleSpeedyGroup(level) {
     let center = [SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2];
-    let centerCount = hardMode ? 20 : 12;
+    let centerCount = 12;
 
     let maxSpeed = 64;
 

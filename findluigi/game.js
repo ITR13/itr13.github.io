@@ -1043,14 +1043,14 @@ function generateCircleGroup(level, hardMode) {
 
     if (hardMode) {
         if (level % 2 == 0) {
-            return generateCircles([4, 6, 8, 10, 16], [20, 40, 60, 80, 100], 150, 20, level < 5);
+            return generateCircles([4, 6, 8, 10, 16], [20, 40, 60, 80, 100], 150, level < 5);
         }
-        return generateCircles2([8, 12, 16], [30, 60, 90], 150, 20, level < 5);
+        return generateCircles2([8, 12, 16], [30, 60, 90], 150, level < 5);
     }
     if (level % 2 == 0) {
-        return generateCircles([6, 10, 16], [30, 60, 90], 150, 20, level < 5);
+        return generateCircles([6, 10, 16], [30, 60, 90], 150, level < 5);
     }
-    return generateCircles2([4, 8, 12], [30, 60, 90], 150, 20, level < 5);
+    return generateCircles2([4, 8, 12], [30, 60, 90], 150, level < 5);
 }
 
 
@@ -1119,7 +1119,7 @@ function generateCircleSpeedyGroup(level) {
     if (level == 0) {
         return generateWheels([16], [72], [center], maxSpeed);
     } else if (level == 9) {
-        return generateCircles2([8, 12, 16], [30, 60, 90], 150, 20, false);
+        return generateCircles2([8, 12, 16], [30, 60, 90], 150, false);
     }
 
     let offset = 64;
@@ -1137,7 +1137,7 @@ function generateCircleSpeedyGroup(level) {
         case 0:
             return generateWheels([centerCount, outerCount, outerCount, outerCount, outerCount], [64, 24, 24, 24, 24], [center, tl, tr, bl, br], maxSpeed, level < 5);
         case 1:
-            return generateCircles2([4, 8, 12], [30, 60, 90], 150, 20, level < 5);
+            return generateCircles2([4, 8, 12], [30, 60, 90], 150, level < 5);
         case 2: {
             let level = generateSquare(5, 4, null, 2);
             setDirectionMovement(level, 32, -45, [40, 40, 16, 16]);
@@ -1145,7 +1145,7 @@ function generateCircleSpeedyGroup(level) {
             return level;
         }
         case 3: {
-            return generateCircles([6, 10, 16], [30, 60, 90], 150, 20, level < 5);
+            return generateCircles([6, 10, 16], [30, 60, 90], 150, level < 5);
         }
     }
 }

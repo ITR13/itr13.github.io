@@ -36,6 +36,9 @@ const COLORS = [
     '#E3B220',
 ]
 
+const SLIDER_START = 70;
+const SLIDER_END = 185;
+
 // Dumb stuff
 function isOnPhone() {
     return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -54,8 +57,9 @@ function getUserNumber() {
 
 let gameSettings = {
     pixelart: !isOnPhone(),
-    canvasColors: false,
     highscores: [],
+    soundVolume: 0.25,
+    musicVolume: 0.25,
 }
 {
     const storedSettings = localStorage.getItem("settings");
@@ -67,7 +71,7 @@ let gameSettings = {
 instance = litecanvas({
     loop: {
         init, update, draw,
-        tap,
+        tap, tapping,
     },
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT * 2,
@@ -90,54 +94,46 @@ function init() {
     sound_effects = {}
     HEAD_ORDER.forEach(head => sound_effects[head] = { 'fail': [], 'win': [] });
 
-    images_converted = {}
-    images_original = {}
-    images = gameSettings.canvasColors ? images_converted : images_original;
+    images = {}
 
     loadImage("assets/sprites/posters.png", (image, { convertColors, splitFrames }) => {
-        images_original.posters = splitFrames(image, 256, 192, 0, 0)
-        images_converted.posters = splitFrames(convertColors(image), 256, 192, 0, 0)
+        images.posters = splitFrames(image, 256, 192, 0, 0)
     })
     loadImage("assets/sprites/heads.png", (image, { convertColors, splitFrames }) => {
-        images_original.heads = splitFrames(image, 32, 32, 0, 0)
-        images_converted.heads = splitFrames(convertColors(image), 32, 32, 0, 0)
+        images.heads = splitFrames(image, 32, 32, 0, 0)
     })
     loadImage("assets/sprites/numbers.png", (image, { convertColors, splitFrames }) => {
-        images_original.numbers = splitFrames(image, 17, 17, 0, 0)
-        images_converted.numbers = splitFrames(convertColors(image), 17, 17, 0, 0)
+        images.numbers = splitFrames(image, 17, 17, 0, 0)
     })
     loadImage("assets/sprites/stars.png", (image, { convertColors, splitFrames }) => {
-        images_original.stars = splitFrames(image, 28, 28, 0, 0)
-        images_converted.stars = splitFrames(convertColors(image), 28, 28, 0, 0)
-    })
-    loadImage("assets/sprites/level.png", (image, { convertColors, splitFrames }) => {
-        images_original.level = image
-        images_converted.level = convertColors(image)
+        images.stars = splitFrames(image, 28, 28, 0, 0)
     })
     loadImage("assets/sprites/menu.png", (image, { convertColors, splitFrames }) => {
-        images_original.menu_buttons = splitFrames(image, 128, 38, 0, 0)
-        images_converted.menu_buttons = splitFrames(convertColors(image), 128, 38, 0, 0)
+        images.menu_buttons = splitFrames(image, 128, 38, 0, 0)
     })
     loadImage("assets/sprites/settings.png", (image, { convertColors, splitFrames }) => {
-        images_original.settings_buttons = splitFrames(image, 128, 38, 0, 0)
-        images_converted.settings_buttons = splitFrames(convertColors(image), 128, 38, 0, 0)
+        images.settings_buttons = splitFrames(image, 128, 38, 0, 0)
+    })
+    loadImage("assets/sprites/settings_sliders.png", (image, { convertColors, splitFrames }) => {
+        images.settings_sliders = splitFrames(image, 256, 38, 0, 0)
     })
     loadImage("assets/sprites/timer.png", (image, { convertColors, splitFrames }) => {
-        images_original.timer = splitFrames(image, 32, 32, 0, 0)
-        images_converted.timer = splitFrames(convertColors(image), 32, 32, 0, 0)
+        images.timer = splitFrames(image, 32, 32, 0, 0)
+    })
+
+    loadImage("assets/sprites/level.png", (image, { convertColors, splitFrames }) => {
+        images.level = image
     })
     loadImage("assets/sprites/time.png", (image, { convertColors, splitFrames }) => {
-        images_original.time = image
-        images_converted.time = convertColors(image)
+        images.time = image
     })
     loadImage("assets/sprites/continue.png", (image, { convertColors, splitFrames }) => {
-        images_original.continue = image
-        images_converted.continue = convertColors(image)
+        images.continue = image
     })
     loadImage("assets/sprites/highscore.png", (image, { convertColors, splitFrames }) => {
-        images_original.highscore = image
-        images_converted.highscore = convertColors(image)
+        images.highscore = image
     })
+
 
     let failSoundsPerHead = [4, 5, 3, 4]
     let winSoundsPerHead = [4, 2, 1, 3]
@@ -148,6 +144,7 @@ function init() {
             loadSound(
                 "assets/audio/" + headName + "/fail" + i + ".wav",
                 (sound) => {
+                    sound.volume = gameSettings.soundVolume;
                     sound_effects[headName]['fail'].push(sound);
                 }
             )
@@ -156,6 +153,7 @@ function init() {
             loadSound(
                 "assets/audio/" + headName + "/win" + i + ".wav",
                 (sound) => {
+                    sound.volume = gameSettings.soundVolume;
                     sound_effects[headName]['win'].push(sound);
                 }
             )
@@ -168,6 +166,7 @@ function init() {
         loadSound(
             "assets/audio/" + name + ".mp3",
             (sound) => {
+                sound.volume = gameSettings.soundVolume;
                 sound_effects[name] = sound;
             }
         )
@@ -176,6 +175,7 @@ function init() {
         loadSound(
             "assets/audio/" + name + ".wav",
             (sound) => {
+                sound.volume = gameSettings.soundVolume;
                 sound_effects[name] = sound;
             }
         )
@@ -188,6 +188,8 @@ function init() {
             bgm.stop();
         },
     });
+    playBgmInMenuFor = 0.0;
+    playSeInMenuTimeout = 0.0;
 
     TOTAL_LOADING = LOADING
 
@@ -200,6 +202,8 @@ function init() {
         let y = SCREEN_HEIGHT + SCREEN_HEIGHT * (i + 1) / 4;
         button_positions.push({ x: x, y: y });
     }
+
+    slider_heights = [SCREEN_HEIGHT / 3, SCREEN_HEIGHT * 2 / 3];
 }
 
 function clearGame(generateLevels) {
@@ -223,6 +227,13 @@ function clearGame(generateLevels) {
 
 function update(dt) {
     stateTimer += dt;
+    if (playBgmInMenuFor > 0) {
+        playBgmInMenuFor -= dt;
+        if (playBgmInMenuFor <= 0) {
+            bgm.fade(gameSettings.musicVolume, 0.0, 1000);
+        }
+    }
+    playSeInMenuTimeout -= dt;
 
     switch (state) {
         case S_Loading:
@@ -398,6 +409,10 @@ function drawInfo() {
             drawStars();
             drawTimer();
             break;
+        case S_Settings:
+            drawSlider(0, gameSettings.soundVolume);
+            drawSlider(1, gameSettings.musicVolume);
+            break;
         case S_Continue:
             break;
     }
@@ -484,6 +499,21 @@ function drawTimer() {
     }
 }
 
+function drawSlider(index, percentage) {
+    let y = slider_heights[index];
+    image(0, y, images.settings_sliders[index * 2]);
+    push();
+    const filledRegion = path();
+    let width = lerp(SLIDER_START, SLIDER_END, percentage);
+    if (percentage <= 0) width = 60;
+    else if (percentage >= 1) width = 195;
+
+    filledRegion.rect(0, 0, width, SCREEN_HEIGHT);
+    clip(filledRegion);
+    image(0, y, images.settings_sliders[index * 2 + 1]);
+    pop();
+}
+
 function drawBoard() {
     switch (state) {
         case S_Menu:
@@ -496,14 +526,7 @@ function drawBoard() {
             for (let i = 0; i < button_positions.length; i++) {
                 let pos = button_positions[i];
                 let index = i * 2;
-                switch (i) {
-                    case 0:
-                        if (gameSettings.pixelart) index++;
-                        break;
-                    case 1:
-                        if (gameSettings.canvasColors) index++;
-                        break;
-                }
+                if (i == 0 && gameSettings.pixelart) index++;
                 image(pos.x, pos.y, images.settings_buttons[index]);
             }
             break;
@@ -534,7 +557,7 @@ function drawBoard() {
 }
 
 function tap(x, y, tapId) {
-    if (x < 0 || x >= SCREEN_WIDTH || y < SCREEN_HEIGHT || y >= SCREEN_HEIGHT * 2) return;
+    if (x < 0 || x >= SCREEN_WIDTH || y < 0 || y >= SCREEN_HEIGHT * 2) return;
 
     switch (state) {
         case S_Menu:
@@ -558,24 +581,59 @@ function tap(x, y, tapId) {
             }
             break;
         case S_Settings:
-            for (let i = 0; i < button_positions.length; i++) {
-                let pos = button_positions[i];
-                if (x < pos.x - 2 || x >= pos.x + 130 || y < pos.y - 2 || y >= pos.y + 40) continue;
-                switch (i) {
-                    case 0:
-                        gameSettings.pixelart = !gameSettings.pixelart;
-                        localStorage.setItem("settings", JSON.stringify(gameSettings));
-                        // Restart browser to apply changes
-                        location.reload();
-                        return;
-                    case 1:
-                        images = images == images_original ? images_converted : images_original;
-                        gameSettings.canvasColors = images == images_converted;
-                        localStorage.setItem("settings", JSON.stringify(gameSettings));
-                        return;
-                    case 2:
-                        setState(S_Menu);
-                        return;
+            if (y >= SCREEN_HEIGHT) {
+                for (let i = 0; i < button_positions.length; i++) {
+                    let pos = button_positions[i];
+                    if (x < pos.x - 2 || x >= pos.x + 130 || y < pos.y - 2 || y >= pos.y + 40) continue;
+                    switch (i) {
+                        case 0:
+                            gameSettings.pixelart = !gameSettings.pixelart;
+                            localStorage.setItem("settings", JSON.stringify(gameSettings));
+                            // Restart browser to apply changes
+                            location.reload();
+                            return;
+                        case 1:
+                            const chosetoClear = confirm("Clear highscores & settings?");
+                            if (chosetoClear) {
+                                localStorage.clear();
+                                location.reload();
+                            }
+                            return;
+                        case 2:
+                            setState(S_Menu);
+                            return;
+                    }
+                }
+            } else {
+                let percentage = (x - SLIDER_START) / (SLIDER_END - SLIDER_START);
+
+                if (y >= slider_heights[0] - 2 && y <= slider_heights[0] + 40) {
+                    if (percentage <= -0.1) gameSettings.soundVolume = round((gameSettings.soundVolume - 0.1) * 10) / 10;
+                    else if (percentage >= 1.1) gameSettings.soundVolume = round((gameSettings.soundVolume + 0.1) * 10) / 10;
+                    else gameSettings.soundVolume = percentage;
+                    gameSettings.soundVolume = clamp(gameSettings.soundVolume, 0, 1);
+
+                    changeExistingSoundVolumes(sound_effects, gameSettings.soundVolume);
+                    playSeInMenuTimeout = 1;
+                    let selectedSounds = sound_effects[HEAD_ORDER[randi(0, 3)]]["win"];
+                    selectedSounds[randi(0, selectedSounds.length - 1)].play();
+
+                    localStorage.setItem("settings", JSON.stringify(gameSettings));
+                }
+
+                if (y >= slider_heights[1] - 2 && y <= slider_heights[1] + 40) {
+                    if (percentage <= -0.1) gameSettings.musicVolume = round((gameSettings.musicVolume - 0.1) * 10) / 10;
+                    else if (percentage >= 1.1) gameSettings.musicVolume = round((gameSettings.musicVolume + 0.1) * 10) / 10;
+                    else gameSettings.musicVolume = percentage;
+                    gameSettings.musicVolume = clamp(gameSettings.musicVolume, 0, 1);
+
+                    playBgmInMenuFor = 5.0;
+                    bgm.volume(gameSettings.musicVolume);
+                    if (!bgm.playing()) {
+                        bgm.play();
+                    }
+
+                    localStorage.setItem("settings", JSON.stringify(gameSettings));
                 }
             }
         case S_Continue:
@@ -593,6 +651,7 @@ function tap(x, y, tapId) {
             break;
         case S_Searching:
             y -= SCREEN_HEIGHT;
+            if (y < 0) return;
 
             let tappedHead = findTappedHead(x, y);
 
@@ -615,6 +674,45 @@ function tap(x, y, tapId) {
             }
             return;
     }
+}
+
+function tapping(x, y, tapId) {
+    // Only used for sliders in settings
+    if (state != S_Settings) return;
+    let percentage = (x - SLIDER_START) / (SLIDER_END - SLIDER_START);
+
+    if (y >= slider_heights[0] - 2 && y <= slider_heights[0] + 40) {
+        if (percentage <= -0.1) return;
+        else if (percentage >= 1.1) return;
+        else gameSettings.soundVolume = percentage;
+        gameSettings.soundVolume = clamp(gameSettings.soundVolume, 0, 1);
+
+        changeExistingSoundVolumes(sound_effects, gameSettings.soundVolume);
+        if (playSeInMenuTimeout <= 0) {
+            playSeInMenuTimeout = 1;
+            let selectedSounds = sound_effects[HEAD_ORDER[randi(0, 3)]]["win"];
+            selectedSounds[randi(0, selectedSounds.length - 1)].play();
+        }
+    }
+
+    if (y >= slider_heights[1] - 2 && y <= slider_heights[1] + 40) {
+        if (percentage <= -0.1) return;
+        else if (percentage >= 1.1) return;
+        else gameSettings.musicVolume = percentage;
+        gameSettings.musicVolume = clamp(gameSettings.musicVolume, 0, 1);
+
+        playBgmInMenuFor = 5.0;
+        bgm.volume(gameSettings.musicVolume);
+        if (!bgm.playing()) {
+            bgm.play();
+        }
+    }
+}
+
+function untap(x, y, tapId) {
+    // Only used for sliders in settings
+    if (state != S_Settings) return;
+    localStorage.setItem("settings", JSON.stringify(gameSettings));
 }
 
 function findTappedHead(x, y) {
@@ -672,7 +770,7 @@ function setState(newState) {
             break;
         case S_NextStage:
             if (!bgm.playing()) {
-                bgm.volume(1.0);
+                bgm.volume(gameSettings.musicVolume);
                 bgm.play();
             }
             game.currentLevel++;
@@ -686,7 +784,7 @@ function setState(newState) {
             sound_effects[soundName].play()
             break;
         case S_GameOver:
-            bgm.fade(1.0, 0.0, 1000);
+            bgm.fade(gameSettings.musicVolume, 0.0, 1000);
             game.highscore = max(game.highscore, game.stars);
             gameSettings.highscores.push(game.stars);
             gameSettings.highscores.sort((a, b) => b - a);
@@ -1900,5 +1998,23 @@ function shuffle(array, fromIndex = 0) {
     for (let i = array.length - 1; i > fromIndex; i--) {
         const j = randi(fromIndex, i);
         [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function changeExistingSoundVolumes(obj, volume) {
+    for (const key in obj) {
+        if (Array.isArray(obj[key])) {
+            obj[key].forEach(item => {
+                if (item instanceof HTMLMediaElement) {
+                    item.volume = volume;
+                } else if (typeof item === 'object') {
+                    changeExistingSoundVolumes(item, volume);
+                }
+            });
+        } else if (obj[key] instanceof HTMLMediaElement) {
+            obj[key].volume = volume;
+        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+            changeExistingSoundVolumes(obj[key], volume);
+        }
     }
 }

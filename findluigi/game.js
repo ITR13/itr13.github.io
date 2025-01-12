@@ -120,6 +120,9 @@ function init() {
     loadImage("assets/sprites/timer.png", (image, { convertColors, splitFrames }) => {
         images.timer = splitFrames(image, 32, 32, 0, 0)
     })
+    loadImage("assets/sprites/time_bonus.png", (image, { convertColors, splitFrames }) => {
+        images.time_bonus = splitFrames(image, 46, 17, 0, 0)
+    })
 
     loadImage("assets/sprites/level.png", (image, { convertColors, splitFrames }) => {
         images.level = image
@@ -531,28 +534,72 @@ function drawBoard() {
             }
             break;
         case S_NextStage:
+            drawTimeBonusText();
             break;
         case S_Searching:
-            if (game.level.flashes && (stateTimer % 1) > 0.1) return;
-
-            game.level.heads.forEach(head => {
-                let pos = head.getPosition ? head.getPosition(stateTimer) : head;
-
-                let x = floor(pos.x - HEAD_CENTER);
-                let y = floor(pos.y - HEAD_CENTER + SCREEN_HEIGHT);
-                image(x, y, images.heads[head.sprite])
-            });
+            drawLevel();
             break;
-        case S_Victory:
         case S_GameOver:
+            if (stateTimer < 1) {
+                drawLevel(false);
+            }
+        // fallthrough
+        case S_Victory:
             let head = game.level.targetHead;
 
             let x = floor(head.x - HEAD_CENTER);
             let y = floor(head.y - HEAD_CENTER + SCREEN_HEIGHT);
             image(x, y, images.heads[head.sprite]);
+            drawTimeBonusText();
             break;
         case S_Continue:
             break;
+    }
+}
+
+function drawLevel(useGetPos=true) {
+    if (game.level.flashes && (stateTimer % 1) > 0.1) return;
+    game.level.heads.forEach(head => {
+        let pos = head.getPosition && useGetPos ? head.getPosition(stateTimer) : head;
+
+        let x = floor(pos.x - HEAD_CENTER);
+        let y = floor(pos.y - HEAD_CENTER + SCREEN_HEIGHT);
+        image(x, y, images.heads[head.sprite])
+    });
+    for (var i = game.level.blinkingHeads.length - 1; i >= 0; i--) {
+        let head = game.level.blinkingHeads[i].head;
+        let time = ELAPSED - game.level.blinkingHeads[i].time;
+        if (time >= 1) {
+            game.level.blinkingHeads.slice(i, 1);
+            continue;
+        }
+        if (time % 0.25 <= 0.125) continue
+
+        let x = floor(head.x - HEAD_CENTER);
+        let y = floor(head.y - HEAD_CENTER + SCREEN_HEIGHT);
+        image(x, y, images.heads[head.sprite % 4])
+    }
+    drawTimeBonusText();
+}
+
+function drawTimeBonusText() {
+    let bonuses = game.level.timeBonusTexts;
+    for (let i = bonuses.length - 1; i >= 0; i--) {
+        let time = ELAPSED - bonuses[i].time;
+        if (time >= 1.5) {
+            bonuses.splice(i, 1);
+            continue;
+        } else if (time > 0.3) {
+            time = 1;
+        } else {
+            time /= 0.3;
+        }
+
+        let startY = bonuses[i].startY;
+        let spriteIndex = bonuses[i].spriteIndex;
+        let x = bonuses[i].x;
+        let y = startY + time * (spriteIndex == 0 ? -26 : 26);
+        image(x, y + SCREEN_HEIGHT, images.time_bonus[spriteIndex]);
     }
 }
 
@@ -660,17 +707,42 @@ function tap(x, y, tapId) {
                 playHeadSound(game.level.lookingFor, true);
                 game.countdownTimer += 5;
                 game.countdownTimer = clamp(game.countdownTimer, 0, 50.99);
+
                 if (quickmode) {
                     game.stars++;
                     setState(S_NextStage);
                 }
                 else setState(S_Victory);
+
+                game.level.timeBonusTexts.push({
+                    time: ELAPSED,
+                    x: game.level.targetHead.x - 23,
+                    startY: game.level.targetHead.y - 8,
+                    spriteIndex: 0,
+                })
             } else if (tappedHead >= 0) {
                 playHeadSound(game.level.lookingFor, false);
                 sound_effects['incorrect'].play()
                 game.countdownTimer -= 10;
                 game.smoothTimer -= 10;
-                game.level.heads.splice(tappedHead, 1);
+                let head = game.level.heads.splice(tappedHead, 1)[0];
+
+                if (head.getPosition) {
+                    let pos = head.getPosition(oldStateTimer);
+                    head.x = pos.x;
+                    head.y = pos.y;
+                }
+
+                game.level.timeBonusTexts.push({
+                    time: ELAPSED,
+                    x: head.x - 23,
+                    startY: head.y - 8,
+                    spriteIndex: 1,
+                })
+                game.level.blinkingHeads.push({
+                    time: ELAPSED,
+                    head: head,
+                })
             }
             return;
     }
@@ -799,7 +871,7 @@ function setState(newState) {
             }
             game.level.heads.forEach(head => {
                 if (head.getPosition) {
-                    pos = head.getPosition(oldStateTimer);
+                    let pos = head.getPosition(oldStateTimer);
                     head.x = pos.x;
                     head.y = pos.y;
                 }
@@ -1457,6 +1529,8 @@ function levelTemplate() {
         heads: [],
         longIntro: false,
         flashes: false,
+        timeBonusTexts: [],
+        blinkingHeads: [],
         timescale: 1,
     };
 }

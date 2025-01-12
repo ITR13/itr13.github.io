@@ -557,7 +557,7 @@ function drawBoard() {
     }
 }
 
-function drawLevel(useGetPos=true) {
+function drawLevel(useGetPos = true) {
     if (game.level.flashes && (stateTimer % 1) > 0.1) return;
     game.level.heads.forEach(head => {
         let pos = head.getPosition && useGetPos ? head.getPosition(stateTimer) : head;
@@ -728,7 +728,7 @@ function tap(x, y, tapId) {
                 let head = game.level.heads.splice(tappedHead, 1)[0];
 
                 if (head.getPosition) {
-                    let pos = head.getPosition(oldStateTimer);
+                    let pos = head.getPosition(stateTimer);
                     head.x = pos.x;
                     head.y = pos.y;
                 }
@@ -937,8 +937,9 @@ function preGenerateLevels() {
         return array;
     }
 
-    function generateRotated(advanced) {
+    function generateRotated(advanced, spriteSwap) {
         let generators = advanced ? advancedGenerators : startGenerators;
+        let offset = spriteSwap ? 5 * 4 : 0;
 
         var array = new Array(generators.length * 10);
         for (var i = 0; i < generators.length; i++) {
@@ -947,8 +948,8 @@ function preGenerateLevels() {
                 let cJ = j;
                 array[i * 10 + j] = () => {
                     let level = generators[cI](cJ, false);
-                    level.heads.forEach(head => head.sprite = head.sprite + randi(0, 3) * 4);
-                    level.timescale = 1.15;
+                    level.heads.forEach(head => head.sprite = head.sprite + randi(0, 3) * 4 + offset);
+                    level.timescale = spriteSwap ? 1 : 1.15;
                     level.longIntro = cJ == 0;
                     return level;
                 }
@@ -1040,27 +1041,31 @@ function preGenerateLevels() {
     }
 
     const fixedEasy = [
+        generateRotated(true, true),
         generateBasic(false, false),
         generateBasic(true, false),
-        generateRotated(false),
+        generateRotated(false, false),
     ];
 
     const fixedMedium = [
         generateBasic(false, true),
         generateBasic(true, true),
-        generateRotated(true),
+        generateRotated(true, false),
         generateSpeedup(1.5, false),
         generateOutlines(false),
+        generateRotated(false, true),
     ]
 
     const fixedHard = [
         generateSpeedup(2.5, false),
         generateSpeedup(2, true),
         generateOutlines(true),
+        generateRotated(true, true),
         modifyUnknownPoster(generateBasic(true, false)),
         modifyUnknownPoster(generateFlashes()),
         modifyUnknownPoster(generateSpeedup(1.5, false)),
-        modifyUnknownPoster(generateRotated(true)),
+        modifyUnknownPoster(generateRotated(true, false)),
+        modifyUnknownPoster(generateRotated(false, true)),
     ]
 
     shuffle(fixedEasy, 1);
@@ -1087,7 +1092,18 @@ function preGenerateLevels() {
         fixedEasy,
         part2,
         part3,
-        part3
+
+        // Full shuffles
+        part3,
+        part3,
+        part3,
+        part3,
+        part3,
+        part3,
+        part3,
+        part3,
+        part3,
+        part3,
     );
 
     let levelsAtGroup = [];
@@ -1096,7 +1112,7 @@ function preGenerateLevels() {
         levelsAtGroup.push(totalLevels);
         totalLevels += overgroups[i].length;
     }
-    console.log(totalLevels);
+    levelsAtGroup.push(totalLevels);
 
     levelGenerators = new Array(totalLevels);
     let levelIndex = 0;
@@ -1107,7 +1123,10 @@ function preGenerateLevels() {
         }
     }
 
-    shuffle(levelGenerators, levelsAtGroup[levelsAtGroup.length - 1]);
+    // Shuffle full shuffles
+    for (var i = overgroups.length - 10; i < overgroups.length; i++) {
+        shuffle(levelGenerators, levelsAtGroup[i], levelsAtGroup[i + 1]);
+    }
 
     return levelGenerators;
 }
@@ -1240,13 +1259,13 @@ function generateLineGroup(level, hardMode) {
     let fill = generateFill(hardMode ? 200 : 120, false, hardMode);
     switch ((level - 1) % 3) {
         case 0:
-            setVerticalMovementPerType(fill, -96, 96);
+            setVerticalMovementPerType(fill, -80, 80);
             setPerTypeOffset(fill, 16, 4, 0);
             break;
         case 1:
             return generateHiddenLine(64, hardMode ? 16 : 12, 8);
         case 2:
-            setVerticalMovement(fill, -96, 96);
+            setVerticalMovement(fill, -80, 80);
             setPerTypeOffset(fill, 16, 4, 0);
             break;
     }
@@ -1345,11 +1364,11 @@ function generateBasicSpeedyGroup(level) {
             setPerTypeOffset(fill2, 8, 0.2, 0);
             return fill2;
         case 3:
-            setVerticalMovementPerType(fill, -96, 96);
+            setVerticalMovementPerType(fill, -80, 80);
             setPerTypeOffset(fill, 16, 4, 0);
             return fill;
         case 4:
-            setVerticalMovement(fill, -96, 96);
+            setVerticalMovement(fill, -80, 80);
             setPerTypeOffset(fill, 16, 4, 0);
             return fill;
     }
@@ -2068,8 +2087,9 @@ function setSquareOffset(level, distance, speed, angleDeg) {
     });
 }
 
-function shuffle(array, fromIndex = 0) {
-    for (let i = array.length - 1; i > fromIndex; i--) {
+function shuffle(array, fromIndex = 0, endIndex = -1) {
+    if (endIndex < 0) endIndex = array.length - 1;
+    for (let i = endIndex; i > fromIndex; i--) {
         const j = randi(fromIndex, i);
         [array[i], array[j]] = [array[j], array[i]];
     }

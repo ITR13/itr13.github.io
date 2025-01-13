@@ -1041,7 +1041,6 @@ function preGenerateLevels() {
     }
 
     const fixedEasy = [
-        generateRotated(true, true),
         generateBasic(false, false),
         generateBasic(true, false),
         generateRotated(false, false),

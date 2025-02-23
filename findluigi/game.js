@@ -64,7 +64,23 @@ let gameSettings = {
 {
     const storedSettings = localStorage.getItem("settings");
     if (storedSettings) {
-        gameSettings = Object.assign(gameSettings, JSON.parse(storedSettings));
+        try {
+            gameSettings = Object.assign(gameSettings, JSON.parse(storedSettings));
+        } catch (e) {
+            console.error(e)
+        }
+    }
+}
+
+let savedGame = null;
+{
+    const storedGame = localStorage.getItem("SavedGame");
+    if (storedGame) {
+        try {
+            savedGame = JSON.parse(storedGame);
+        } catch (e) {
+            console.error(e);
+        }
     }
 }
 
@@ -211,8 +227,10 @@ function init() {
 
 function clearGame(generateLevels) {
     let levelGenerators = [];
+    currSeed = null;
     if (generateLevels) {
-        levelGenerators = preGenerateLevels();
+        currSeed = Date.now();
+        levelGenerators = preGenerateLevels(currSeed);
     }
 
     game = {
@@ -220,12 +238,61 @@ function clearGame(generateLevels) {
         stars: 0,
         countdownTimer: 10.99,
         smoothTimer: 10.99,
+        seed: currSeed,
         level: {},
         levelGenerators: levelGenerators,
         practiceMode: false,
         continuesUsed: 0,
         highscore: 0,
+
+        timeSinceLastSave: 0,
     }
+}
+
+function saveGame(game) {
+    if (game == null) {
+        localStorage.removeItem("SavedGame");
+        savedGame = null;
+        return;
+    }
+
+    savedGame = {
+        currentLevel: game.currentLevel - 1, // We add one after loading the game, so we need to subtract first
+        stars: game.stars,
+        countdownTimer: game.countdownTimer - 0.1, // Subtract a tiny bit every time so people can't just reload within a second
+        practiceMode: game.practiceMode,
+        seed: game.seed,
+        continuesUsed: game.continuesUsed,
+        highscore: game.highscore,
+    }
+
+    localStorage.setItem("SavedGame", JSON.stringify(savedGame));
+}
+
+function loadGame(savedGame) {
+    let levelGenerators = preGenerateLevels(savedGame.seed);
+    // Reset seed after generating so people can't cheat by reloading
+    // NB: This will allow people to reload to get a different poster though,
+    // but people can choose not to do it for the additional challenge :)
+    seed(Date.now());
+
+    game = {
+        currentLevel: savedGame.currentLevel,
+        stars: savedGame.stars,
+        countdownTimer: savedGame.countdownTimer,
+        smoothTimer: savedGame.countdownTimer,
+        seed: savedGame.seed,
+        level: {},
+        levelGenerators: levelGenerators,
+        practiceMode: savedGame.practiceMode,
+        continuesUsed: savedGame.continuesUsed,
+        highscore: savedGame.highscore,
+
+        timeSinceLastSave: 0,
+    }
+
+    // Subtract .1 so you can't just reload within .1 seconds.
+    saveGame(game);
 }
 
 function update(dt) {
@@ -264,6 +331,12 @@ function update(dt) {
             let deltaTimer = game.countdownTimer - game.smoothTimer;
             game.smoothTimer += min(abs(deltaTimer), 10 * unscaledDeltaTime) * sign(deltaTimer);
 
+            game.timeSinceLastSave += unscaledDeltaTime;
+            if (game.timeSinceLastSave > 1) {
+                game.timeSinceLastSave -= 1;
+                saveGame(game);
+            }
+
             if (game.countdownTimer < 0) {
                 setState(S_GameOver);
                 return
@@ -295,6 +368,10 @@ function animateLevelEnd(nextState) {
         sound_effects['time_increase'].play()
     } else if (stateCounter == 4) {
         setState(nextState);
+        // Special case, if you're not in practice mode losing will reset your savegame
+        if (nextState == S_Menu) {
+            saveGame(null);
+        }
         return;
     }
 }
@@ -522,7 +599,11 @@ function drawBoard() {
         case S_Menu:
             for (let i = 0; i < button_positions.length; i++) {
                 let pos = button_positions[i];
-                image(pos.x, pos.y, images.menu_buttons[i]);
+                if (i == 0 && savedGame == null) {
+                    image(pos.x, pos.y, images.menu_buttons[i * 2 + 1]);
+                } else {
+                    image(pos.x, pos.y, images.menu_buttons[i * 2]);
+                }
             }
             break;
         case S_Settings:
@@ -613,8 +694,10 @@ function tap(x, y, tapId) {
                 if (x < pos.x - 2 || x >= pos.x + 130 || y < pos.y - 2 || y >= pos.y + 40) continue;
                 switch (i) {
                     case 0:
-                        clearGame(true);
-                        setState(S_NextStage);
+                        if (savedGame) {
+                            loadGame(savedGame);
+                            setState(S_NextStage);
+                        }
                         return;
                     case 1:
                         clearGame(true);
@@ -692,8 +775,10 @@ function tap(x, y, tapId) {
                 game.countdownTimer = 10.9;
                 game.smoothTimer = 10.9;
                 setState(S_NextStage);
+                saveGame(game);
             } else if (y >= 291 && y <= 334) {
                 setState(S_Menu);
+                saveGame(null);
             }
             break;
         case S_Searching:
@@ -854,6 +939,7 @@ function setState(newState) {
             document.title = "Find Luigi - Level " + game.currentLevel;
             let soundName = game.level.longIntro && !quickmode ? 'drumroll_long' : 'drumroll_short';
             sound_effects[soundName].play()
+            saveGame(game);
             break;
         case S_GameOver:
             bgm.fade(gameSettings.musicVolume, 0.0, 1000);
@@ -863,6 +949,7 @@ function setState(newState) {
             gameSettings.highscores = gameSettings.highscores.slice(0, 6);
             localStorage.setItem("settings", JSON.stringify(gameSettings));
             sound_effects['miniover'].play();
+            saveGame(game);
         // fallthrough
         case S_Victory:
             if (newState == S_Victory) {
@@ -890,7 +977,9 @@ function playHeadSound(head, wasCaught) {
 
 
 
-function preGenerateLevels() {
+function preGenerateLevels(seedToUse) {
+    seed(seedToUse);
+
     // Args: Level, Hardmode
     const startGenerators = [
         generateBasicGroup,
@@ -1050,9 +1139,9 @@ function preGenerateLevels() {
         generateBasic(false, true),
         generateBasic(true, true),
         generateRotated(true, false),
+        generateRotated(false, true),
         generateSpeedup(1.5, false),
         generateOutlines(false),
-        generateRotated(false, true),
     ]
 
     const fixedHard = [

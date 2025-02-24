@@ -1,0 +1,37 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Tic-Tac-Toe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="score-container">
+        <div class="score player-score">
+            <div>PLAYER</div>
+            <div id="player-score">0</div>
+        </div>
+        <div class="turn-indicator" id="turn-indicator">PLAYER'S TURN</div>
+        <div class="score ai-score">
+            <div>AI</div>
+            <div id="ai-score">0</div>
+        </div>
+    </div>
+
+    <div class="grid-wrapper">
+        <div class="grid-lines">
+            <div class="horizontal"></div>
+            <div class="horizontal"></div>
+            <div class="vertical"></div>
+            <div class="vertical"></div>
+        </div>
+        <div class="grid-container" id="grid-container"></div>
+    </div>
+
+    <div id="effects-container"></div>
+    <script src="game.js"></script>
+</body>
+</html>

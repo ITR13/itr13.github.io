@@ -47,9 +47,7 @@ class InfiniteTicTacToe {
     }
 
     setupDifficultySelector() {
-        console.log("hi?");
         document.querySelectorAll('.tab').forEach(tab => {
-            console.log(tab);
             tab.addEventListener('click', () => {
                 document.querySelector('.tab.active').classList.remove('active');
                 tab.classList.add('active');
@@ -301,7 +299,6 @@ class InfiniteTicTacToe {
                 setTimeout(() => confetti.remove(), 2000);
             }
         } else {
-            console.log(this.effectsContainer);
             const robot = document.createElement('div');
             robot.className = 'ai-victory';
             robot.textContent = '🤖';
@@ -430,6 +427,8 @@ class InfiniteTicTacToe {
 
         if (this.difficulty == 'easy') {
             return this.selectRandom(emptyCells);
+        } else if (this.difficulty == 'hard') {
+            return this.selectRandom(this.bruteforceMoves());
         }
 
         function areOpposite(a, b) {
@@ -469,7 +468,6 @@ class InfiniteTicTacToe {
                 potentialOpposites.push(...neighbors(index, cournerTiles));
             } else if (sideTiles.includes(index)) {
                 let oppositeIndex = opposite(index, sideTiles);
-                console.log(index, oppositeIndex);
                 potentialOpposites.push(oppositeIndex);
             }
         }
@@ -492,6 +490,99 @@ class InfiniteTicTacToe {
         }
 
         return this.selectRandom(emptyCells);
+    }
+
+    bruteforceMoves() {
+        function checkWinForMoves(moves) {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+            return winPatterns.some(pattern =>
+                pattern.every(i => moves.includes(i))
+            );
+        }
+
+        function getEmptyCells(aiMoves, humanMoves) {
+            const occupied = new Set([...aiMoves, ...humanMoves]);
+            return Array.from({ length: 9 }, (_, i) => i)
+                .filter(i => !occupied.has(i));
+        }
+
+        function dfs(aiMoves, humanMoves, depth, isAiTurn) {
+            if (depth <= 0) return false;
+
+            if (isAiTurn) {
+                const empty = getEmptyCells(aiMoves, humanMoves);
+                for (const move of empty) {
+                    const newAi = [...aiMoves, move];
+                    if (newAi.length > 3) newAi.shift();
+
+                    if (checkWinForMoves(newAi) ||
+                        dfs(newAi, humanMoves, depth - 1, false)) {
+                        return true;
+                    }
+                }
+                return false;
+            } else {
+                const empty = getEmptyCells(aiMoves, humanMoves);
+                for (const move of empty) {
+                    const newHuman = [...humanMoves, move];
+                    if (newHuman.length > 3) newHuman.shift();
+
+                    if (checkWinForMoves(newHuman) ||
+                        !dfs(aiMoves, newHuman, depth - 1, true)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+
+        const emptyCells = this.cells
+            .map((cell, index) => cell ? null : index)
+            .filter(i => i !== null);
+
+        const depthLimit = 8 - (this.aiPieces.length + this.humanPieces.length);
+        const winningMoves = [];
+        const nonLosingMoves = [];
+        const allMoves = [];
+
+        for (const move of emptyCells) {
+            const simulatedAi = [...this.aiPieces, move];
+            if (simulatedAi.length > 3) simulatedAi.shift();
+
+            if (checkWinForMoves(simulatedAi)) {
+                winningMoves.push(move);
+                continue;
+            }
+
+            let humanCanWin = false;
+            const tempHuman = [...this.humanPieces];
+
+            for (const humanMove of emptyCells.filter(m => m !== move)) {
+                const simulatedHuman = [...tempHuman, humanMove];
+                if (simulatedHuman.length > 3) simulatedHuman.shift();
+
+                if (checkWinForMoves(simulatedHuman)) {
+                    humanCanWin = true;
+                    break;
+                }
+            }
+
+            if (!humanCanWin) {
+                const canWin = dfs(simulatedAi, this.humanPieces, depthLimit - 1, false);
+                if (canWin) winningMoves.push(move);
+                else nonLosingMoves.push(move);
+            }
+
+            allMoves.push(move);
+        }
+
+        if (winningMoves.length > 0) return winningMoves;
+        if (nonLosingMoves.length > 0) return nonLosingMoves;
+        return allMoves;
     }
 
     selectRandom(cells) {

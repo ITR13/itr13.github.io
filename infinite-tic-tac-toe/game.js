@@ -13,6 +13,9 @@ class InfiniteTicTacToe {
         this.initGrid();
         this.gridContainer.addEventListener('mousemove', this.handleMouseMove.bind(this));
         this.gridContainer.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
+        this.difficulty = 'easy';
+        this.setupDifficultySelector();
+        this.updateScores();
 
         if (this.currentPlayer === this.aiSymbol) this.aiMove();
     }
@@ -41,6 +44,18 @@ class InfiniteTicTacToe {
         this.preview.className = 'preview';
         this.gridContainer.appendChild(this.preview);
         this.hidePreview();
+    }
+
+    setupDifficultySelector() {
+        console.log("hi?");
+        document.querySelectorAll('.tab').forEach(tab => {
+            console.log(tab);
+            tab.addEventListener('click', () => {
+                document.querySelector('.tab.active').classList.remove('active');
+                tab.classList.add('active');
+                this.difficulty = tab.dataset.difficulty;
+            });
+        });
     }
 
     async updatePreviewPosition(index) {
@@ -120,6 +135,7 @@ class InfiniteTicTacToe {
             this.handleDraw();
         } else {
             this.currentPlayer = this.aiSymbol;
+            this.updateScores();
             this.aiMove();
         }
     }
@@ -193,7 +209,7 @@ class InfiniteTicTacToe {
 
     drawWinLine(symbol) {
         const pattern = this.getWinningPattern(symbol);
-        console.log(pattern);
+
         if (!pattern) return;
 
         const [a, , c] = pattern;
@@ -352,6 +368,7 @@ class InfiniteTicTacToe {
             this.handleWin('ai');
         } else {
             this.currentPlayer = this.humanSymbol;
+            this.updateScores();
             if (this.humanPieces.length >= 3) {
                 this.shakeScale(this.humanPieces[0], true);
             }
@@ -407,7 +424,13 @@ class InfiniteTicTacToe {
             }
         }
 
+        let emptyCells = this.cells
+            .map((cell, index) => cell ? null : index)
+            .filter(i => i !== null);
 
+        if (this.difficulty == 'easy') {
+            return this.selectRandom(emptyCells);
+        }
 
         function areOpposite(a, b) {
             return 8 - a == b;
@@ -456,10 +479,6 @@ class InfiniteTicTacToe {
             return this.selectRandom(potentialOpposites);
         }
 
-        let emptyCells = this.cells
-            .map((cell, index) => cell ? null : index)
-            .filter(i => i !== null);
-
         let potentialTiles = [];
         for (var i = 0; i < outerTiles.length; i += 2) {
             let line = [outerTiles[i], outerTiles[i + 1], outerTiles[(i + 2) % outerTiles.length]];
@@ -487,4 +506,4 @@ class InfiniteTicTacToe {
     }
 }
 
-new InfiniteTicTacToe();
+document.addEventListener('DOMContentLoaded', () => new InfiniteTicTacToe());

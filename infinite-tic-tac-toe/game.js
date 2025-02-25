@@ -47,14 +47,24 @@ class InfiniteTicTacToe {
     }
 
     setupDifficultySelector() {
-        document.querySelectorAll('.tab').forEach(tab => {
+        const tabs = document.querySelectorAll('.tab');
+        const savedDifficulty = localStorage.getItem('selectedDifficulty') || 'easy';
+    
+        tabs.forEach(tab => {
+            if (tab.dataset.difficulty === savedDifficulty) {
+                tab.classList.add('active');
+                this.difficulty = savedDifficulty;
+            }
+    
             tab.addEventListener('click', () => {
-                document.querySelector('.tab.active').classList.remove('active');
+                document.querySelector('.tab.active')?.classList.remove('active');
                 tab.classList.add('active');
                 this.difficulty = tab.dataset.difficulty;
+                localStorage.setItem('selectedDifficulty', this.difficulty);
             });
         });
     }
+    
 
     async updatePreviewPosition(index) {
         if (!this.gameActive) {

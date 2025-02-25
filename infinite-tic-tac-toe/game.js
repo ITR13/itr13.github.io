@@ -1,3 +1,9 @@
+const winPatterns = [
+    [0, 1, 2], [3, 4, 5], [6, 7, 8],
+    [0, 3, 6], [1, 4, 7], [2, 5, 8],
+    [0, 4, 8], [2, 4, 6]
+];
+
 class InfiniteTicTacToe {
     constructor() {
         this.cells = Array(9).fill(null);
@@ -49,13 +55,13 @@ class InfiniteTicTacToe {
     setupDifficultySelector() {
         const tabs = document.querySelectorAll('.tab');
         const savedDifficulty = localStorage.getItem('selectedDifficulty') || 'easy';
-    
+
         tabs.forEach(tab => {
             if (tab.dataset.difficulty === savedDifficulty) {
                 tab.classList.add('active');
                 this.difficulty = savedDifficulty;
             }
-    
+
             tab.addEventListener('click', () => {
                 document.querySelector('.tab.active')?.classList.remove('active');
                 tab.classList.add('active');
@@ -64,7 +70,7 @@ class InfiniteTicTacToe {
             });
         });
     }
-    
+
 
     async updatePreviewPosition(index) {
         if (!this.gameActive) {
@@ -189,11 +195,6 @@ class InfiniteTicTacToe {
 
     checkWin(symbol) {
         const pieces = symbol === this.humanSymbol ? this.humanPieces : this.aiPieces;
-        const winPatterns = [
-            [0, 1, 2], [3, 4, 5], [6, 7, 8],
-            [0, 3, 6], [1, 4, 7], [2, 5, 8],
-            [0, 4, 8], [2, 4, 6]
-        ];
         return winPatterns.some(pattern => pattern.every(i => pieces.includes(i)));
     }
 
@@ -286,11 +287,6 @@ class InfiniteTicTacToe {
 
     getWinningPattern(symbol) {
         const pieces = symbol === this.humanSymbol ? this.humanPieces : this.aiPieces;
-        const winPatterns = [
-            [0, 1, 2], [3, 4, 5], [6, 7, 8],
-            [0, 3, 6], [1, 4, 7], [2, 5, 8],
-            [0, 4, 8], [2, 4, 6]
-        ];
         return winPatterns.find(pattern => pattern.every(i => pieces.includes(i)));
     }
 
@@ -383,17 +379,11 @@ class InfiniteTicTacToe {
     }
 
     chooseAiMove() {
-        if (this.humanPieces.length == 0) {
+        if (this.difficulty != 'easy' && this.humanPieces.length == 0) {
             return this.selectRandom([1, 3, 5, 7]);
         }
 
         function getMissingFromWin(pieces) {
-            const winPatterns = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8],
-                [0, 3, 6], [1, 4, 7], [2, 5, 8],
-                [0, 4, 8], [2, 4, 6]
-            ];
-
             const winPattern = winPatterns.find(pattern => pieces.every(i => pattern.includes(i)));
             if (winPattern == null) return -1;
             return winPattern.filter(item => !pieces.includes(item))[0];
@@ -504,11 +494,6 @@ class InfiniteTicTacToe {
 
     bruteforceMoves() {
         function checkWinForMoves(moves) {
-            const winPatterns = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8],
-                [0, 3, 6], [1, 4, 7], [2, 5, 8],
-                [0, 4, 8], [2, 4, 6]
-            ];
             return winPatterns.some(pattern =>
                 pattern.every(i => moves.includes(i))
             );
@@ -520,33 +505,53 @@ class InfiniteTicTacToe {
                 .filter(i => !occupied.has(i));
         }
 
+        const DfsResult = {
+            AiWin: 0,
+            HumanWin: 1,
+            DepthReached: 2,
+        };
+
         function dfs(aiMoves, humanMoves, depth, isAiTurn) {
-            if (depth <= 0) return false;
+            if (depth <= 0) return DfsResult.DepthReached;
 
             if (isAiTurn) {
+                let canDraw = false;
                 const empty = getEmptyCells(aiMoves, humanMoves);
                 for (const move of empty) {
                     const newAi = [...aiMoves, move];
                     if (newAi.length > 3) newAi.shift();
 
-                    if (checkWinForMoves(newAi) ||
-                        dfs(newAi, humanMoves, depth - 1, false)) {
-                        return true;
+                    if (checkWinForMoves(newAi)) {
+                        return DfsResult.AiWin;
+                    }
+
+                    let result = dfs(newAi, humanMoves, depth - 1, false);
+                    if (result === DfsResult.AiWin) {
+                        return DfsResult.AiWin;
+                    } else if (result === DfsResult.DepthReached) {
+                        canDraw = true;
                     }
                 }
-                return false;
+                return canDraw ? DfsResult.DepthReached : DfsResult.HumanWin;
             } else {
+                let canDraw = false;
                 const empty = getEmptyCells(aiMoves, humanMoves);
                 for (const move of empty) {
                     const newHuman = [...humanMoves, move];
                     if (newHuman.length > 3) newHuman.shift();
 
-                    if (checkWinForMoves(newHuman) ||
-                        !dfs(aiMoves, newHuman, depth - 1, true)) {
-                        return false;
+                    if (checkWinForMoves(newHuman)) {
+                        return DfsResult.HumanWin;
+                    }
+
+                    let result = dfs(aiMoves, newHuman, depth - 1, true);
+                    if (result === DfsResult.HumanWin) {
+                        return DfsResult.HumanWin;
+                    } else if (result === DfsResult.DepthReached) {
+                        canDraw = true;
                     }
                 }
-                return true;
+                return canDraw ? DfsResult.DepthReached : DfsResult.AiWin;
             }
         }
 
@@ -554,10 +559,10 @@ class InfiniteTicTacToe {
             .map((cell, index) => cell ? null : index)
             .filter(i => i !== null);
 
-        const depthLimit = 8 - (this.aiPieces.length + this.humanPieces.length);
-        const winningMoves = [];
+        const depthLimit = 13;
         const nonLosingMoves = [];
         const allMoves = [];
+        const winningMoves = [];
 
         for (const move of emptyCells) {
             const simulatedAi = [...this.aiPieces, move];
@@ -582,17 +587,17 @@ class InfiniteTicTacToe {
             }
 
             if (!humanCanWin) {
-                const canWin = dfs(simulatedAi, this.humanPieces, depthLimit - 1, false);
-                if (canWin) winningMoves.push(move);
-                else nonLosingMoves.push(move);
+                const result = dfs(simulatedAi, this.humanPieces, depthLimit - 1, false);
+                if (result === DfsResult.AiWin) winningMoves.push(move);
+                else if (result === DfsResult.DepthReached) nonLosingMoves.push(move);
+                allMoves.push(move);
             }
-
-            allMoves.push(move);
         }
 
         if (winningMoves.length > 0) return winningMoves;
         if (nonLosingMoves.length > 0) return nonLosingMoves;
-        return allMoves;
+        if (allMoves.length > 0) return allMoves;
+        return emptyCells;
     }
 
     selectRandom(cells) {

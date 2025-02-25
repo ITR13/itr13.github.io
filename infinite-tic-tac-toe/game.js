@@ -9,10 +9,12 @@ class InfiniteTicTacToe {
         this.effectsContainer = document.getElementById('effects-container');
         this.currentStartingPlayerIdentity = 'human';
         this.updateSymbols();
-        this.currentPlayer = this.humanSymbol;
+        this.currentPlayer = this.currentStartingPlayerIdentity === 'human' ? this.humanSymbol : this.aiSymbol;
         this.initGrid();
         this.gridContainer.addEventListener('mousemove', this.handleMouseMove.bind(this));
         this.gridContainer.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
+
+        if (this.currentPlayer === this.aiSymbol) this.aiMove();
     }
 
     updateSymbols() {
@@ -313,7 +315,7 @@ class InfiniteTicTacToe {
             .map((cell, index) => cell ? null : index)
             .filter(i => i !== null);
 
-        const chosenIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+        const chosenIndex = this.chooseAiMove();
 
         emptyCells = emptyCells.filter(i => i !== chosenIndex);
         for (let i = emptyCells.length - 1; i > 0; i--) {
@@ -354,6 +356,127 @@ class InfiniteTicTacToe {
                 this.shakeScale(this.humanPieces[0], true);
             }
         }
+    }
+
+    chooseAiMove() {
+        if (this.humanPieces.length == 0) {
+            return this.selectRandom([1, 3, 5, 7]);
+        }
+
+        function getMissingFromWin(pieces) {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+
+            const winPattern = winPatterns.find(pattern => pieces.every(i => pattern.includes(i)));
+            if (winPattern == null) return -1;
+            return winPattern.filter(item => !pieces.includes(item))[0];
+        }
+
+        if (this.aiPieces.length >= 2) {
+            const lastMoves = this.aiPieces.slice(-2);
+            const missing = getMissingFromWin(lastMoves);
+            if (missing != -1 && this.cells[missing] == null) {
+                return missing;
+            }
+        }
+
+        if (this.humanPieces.length >= 2) {
+            const lastMoves = this.humanPieces.slice(-2);
+            const missing = getMissingFromWin(lastMoves);
+            if (missing != -1 && this.cells[missing] == null) {
+                return missing;
+            }
+        }
+
+        if (this.humanPieces.length >= 3) {
+            const attackLine = [this.aiPieces.at(-1), this.humanPieces[0]];
+            const missing = getMissingFromWin(attackLine);
+            if (missing != -1 && this.cells[missing] == null) {
+                return missing;
+            }
+        }
+
+        if (this.aiPieces.length >= 2) {
+            const defenceLine = [this.aiPieces.at(0), this.humanPieces[-1]];
+            const missing = getMissingFromWin(defenceLine);
+            if (missing != -1 && this.cells[missing] == null) {
+                return missing;
+            }
+        }
+
+
+
+        function areOpposite(a, b) {
+            return 8 - a == b;
+        }
+
+        const outerTiles = [0, 1, 2, 5, 8, 7, 6, 3];
+        const cournerTiles = [0, 2, 8, 6];
+        const sideTiles = [1, 5, 7, 3];
+
+        function neighbors(n, arr) {
+            let index = arr.indexOf(n);
+            return [arr.at(index - 1), arr[(index + 1) % arr.length]];
+        }
+
+        function opposite(n, arr) {
+            let index = arr.indexOf(n);
+            return arr[(index + (arr.length >> 1)) % arr.length];
+        }
+
+        if (this.humanPieces.length == 1 && this.aiPieces.length == 1) {
+            let h = this.humanPieces[0];
+            let a = this.aiPieces[0];
+
+            if (areOpposite(a, h) || h == 4) {
+                return this.selectRandom(neighbors(a, outerTiles));
+            }
+            else {
+                return 4;
+            }
+        }
+
+        let potentialOpposites = [];
+        for (var i = 0; i < this.aiPieces.length; i++) {
+            let index = this.aiPieces[i];
+            if (cournerTiles.includes(index)) {
+                potentialOpposites.push(...neighbors(index, cournerTiles));
+            } else if (sideTiles.includes(index)) {
+                let oppositeIndex = opposite(index, sideTiles);
+                console.log(index, oppositeIndex);
+                potentialOpposites.push(oppositeIndex);
+            }
+        }
+
+        potentialOpposites = potentialOpposites.filter(index => this.cells[index] == null);
+        if (potentialOpposites.length > 0) {
+            return this.selectRandom(potentialOpposites);
+        }
+
+        let emptyCells = this.cells
+            .map((cell, index) => cell ? null : index)
+            .filter(i => i !== null);
+
+        let potentialTiles = [];
+        for (var i = 0; i < outerTiles.length; i += 2) {
+            let line = [outerTiles[i], outerTiles[i + 1], outerTiles[(i + 2) % outerTiles.length]];
+            if (line.every(index => this.cells[index] == null)) {
+                potentialTiles.push(...emptyCells.filter(index => !line.includes(index)));
+            }
+        }
+
+        if (potentialTiles.length > 0) {
+            return this.selectRandom(potentialTiles);
+        }
+
+        return this.selectRandom(emptyCells);
+    }
+
+    selectRandom(cells) {
+        return cells[Math.floor(Math.random() * cells.length)];
     }
 
     updateScores() {

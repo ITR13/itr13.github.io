@@ -1210,8 +1210,6 @@ function preGenerateLevels(seedToUse) {
 
         // Full shuffles
         part3,
-        part3,
-        part3,
     );
 
     let levelsAtGroup = [];
@@ -1232,11 +1230,10 @@ function preGenerateLevels(seedToUse) {
     }
 
     // Shuffle full shuffles
-    for (var i = overgroups.length - 3; i < overgroups.length; i++) {
+    for (var i = overgroups.length - 1; i < overgroups.length; i++) {
         shuffle(levelGenerators, levelsAtGroup[i], levelsAtGroup[i + 1]);
     }
 
-    // levelGenerators = levelGenerators.slice(10011);
     levelGenerators.push(() => generate2x2Fixed([0, 1, 2, 3], 0));
     levelGenerators.push(() => generate2x2Fixed([1, 2, 3], 2));
     levelGenerators.push(() => generate2x2Fixed([1, 3], 3));
@@ -1406,7 +1403,7 @@ function generateBouncyWaveGroup(level, hardMode) {
             return fill;
         }
         case 2:
-            return generateFill(hardMode ? 252 : 140);
+            return generateFill(140);
     }
 }
 
@@ -1444,7 +1441,7 @@ function generateCircleGroup(level, hardMode) {
         }
         return generateSquare(8, 7);
     } else if (level == 9) {
-        return generateFill(hardMode ? 252 : 120, false, false, 0, 0, [1]);
+        return generateFill(140, false, false, 0, 0, [1]);
     }
 
     if (hardMode) {

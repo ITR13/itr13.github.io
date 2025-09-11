@@ -7,6 +7,7 @@ const S_Searching = 4;
 const S_Victory = 5;
 const S_GameOver = 6;
 const S_Continue = 7;
+const S_Finale = 8;
 
 // Other constants
 const SCREEN_HEIGHT = 192; // NB: Two screens!
@@ -149,6 +150,9 @@ function init() {
     loadImage("assets/sprites/continue.png", (image, { convertColors, splitFrames }) => {
         images.continue = image
     })
+    loadImage("assets/sprites/finale.png", (image, { convertColors, splitFrames }) => {
+        images.finale = image
+    })
     loadImage("assets/sprites/highscore.png", (image, { convertColors, splitFrames }) => {
         images.highscore = image
     })
@@ -180,7 +184,7 @@ function init() {
     }
 
     let mp3s = ['highscore', 'miniover']
-    let wavs = ['correct', 'drumroll_short', 'drumroll_long', 'incorrect', 'time_increase']
+    let wavs = ['correct', 'drumroll_short', 'drumroll_long', 'incorrect', 'time_increase', 'finale']
     mp3s.forEach(name => {
         loadSound(
             "assets/audio/" + name + ".mp3",
@@ -319,6 +323,7 @@ function update(dt) {
         case S_Menu:
         case S_Settings:
         case S_Continue:
+        case S_Finale:
             break;
         case S_NextStage:
             if (quickmode) timescale(5);
@@ -412,6 +417,9 @@ function draw() {
         case S_Searching:
             cls(0);
             break;
+        case S_Finale:
+            image(0, 0, images.finale);
+            break;
     }
 
     push()
@@ -494,6 +502,7 @@ function drawInfo() {
             drawSlider(1, gameSettings.musicVolume);
             break;
         case S_Continue:
+        case S_Finale:
             break;
     }
 }
@@ -634,6 +643,7 @@ function drawBoard() {
             drawTimeBonusText();
             break;
         case S_Continue:
+        case S_Finale:
             break;
     }
 }
@@ -777,6 +787,12 @@ function tap(x, y, tapId) {
                 setState(S_NextStage);
                 saveGame(game);
             } else if (y >= 291 && y <= 334) {
+                setState(S_Menu);
+                saveGame(null);
+            }
+            break;
+        case S_Finale:
+            if (y >= 291 && y <= 334) {
                 setState(S_Menu);
                 saveGame(null);
             }
@@ -933,7 +949,8 @@ function setState(newState) {
             game.currentLevel++;
             let levelIndex = game.currentLevel - 1;
             if (levelIndex >= game.levelGenerators.length) {
-                throw "LevelIndex " + levelIndex + " is out of bounds for array 0->" + game.levelGenerators.length;
+                setState(S_Finale);
+                break;
             }
             game.level = game.levelGenerators[levelIndex]();
             document.title = "Find Luigi - Level " + game.currentLevel;
@@ -965,6 +982,16 @@ function setState(newState) {
             });
             break;
         case S_Continue:
+            break;
+        case S_Finale:
+            bgm.fade(gameSettings.musicVolume, 0.0, 1000);
+            game.highscore = max(game.highscore, game.stars);
+            gameSettings.highscores.push(game.stars);
+            gameSettings.highscores.sort((a, b) => b - a);
+            gameSettings.highscores = gameSettings.highscores.slice(0, 6);
+            localStorage.setItem("settings", JSON.stringify(gameSettings));
+            sound_effects['finale'].play();
+            saveGame(game);
             break;
     }
 }
@@ -1185,13 +1212,6 @@ function preGenerateLevels(seedToUse) {
         part3,
         part3,
         part3,
-        part3,
-        part3,
-        part3,
-        part3,
-        part3,
-        part3,
-        part3,
     );
 
     let levelsAtGroup = [];
@@ -1212,9 +1232,11 @@ function preGenerateLevels(seedToUse) {
     }
 
     // Shuffle full shuffles
-    for (var i = overgroups.length - 10; i < overgroups.length; i++) {
+    for (var i = overgroups.length - 3; i < overgroups.length; i++) {
         shuffle(levelGenerators, levelsAtGroup[i], levelsAtGroup[i + 1]);
     }
+
+    // levelGenerators = levelGenerators.slice(10011);
     levelGenerators.push(() => generate2x2Fixed([0, 1, 2, 3], 0));
     levelGenerators.push(() => generate2x2Fixed([1, 2, 3], 2));
     levelGenerators.push(() => generate2x2Fixed([1, 3], 3));
@@ -1655,6 +1677,31 @@ function generate2x2() {
     shuffle(order);
 
     for (let i = 0; i < 4; i++) {
+        let head = {
+            x: SCREEN_WIDTH / 2 - 32 * (i % 2) + 16,
+            y: SCREEN_HEIGHT / 2 - 32 * floor(i / 2) + 16,
+            sprite: order[i],
+            isTarget: order[i] == level.lookingFor,
+        };
+        level.heads.push(head);
+        if (head.isTarget) {
+            level.targetHead = head;
+        }
+    }
+
+    return level;
+}
+
+function generate2x2Fixed(order, lookFor) {
+    let level = levelTemplate();
+    level.lookingFor = lookFor;
+    level.poster = level.lookingFor;
+    level.longIntro = true;
+
+    order = order.slice();
+    shuffle(order);
+
+    for (let i = 0; i < order.length; i++) {
         let head = {
             x: SCREEN_WIDTH / 2 - 32 * (i % 2) + 16,
             y: SCREEN_HEIGHT / 2 - 32 * floor(i / 2) + 16,

@@ -7,61 +7,80 @@ layout: default
 <button class="fullscreen-btn" onclick="toggleFullscreen()">Full Screen</button>
 
 <p>
-<h1>Find Luigi!</h1>
-<p>A recreation of the game "Wanted" from Super Mario 64 DS, with additional patterns and challenges.</p>
-<h3>Instructions</h3>
-<p>
-    The top part of the screen will show a poster with the face of the person you need to find. Locate this person on
-    the bottom screen and click them.<br />
-    You start with 10 seconds to locate them, and gain 5 seconds each time you find the wanted person. If you click the
-    wrong person you lose 10 seconds, so choose wisely!<br />
-    If you fail to locate the wanted person, you can choose to continue playing.
-    Each time you continue you'll be set back more and more levels though!
-</p>
-<p>
-    The further you get, the more difficult the levels become. The easy levels end at level 100.<br />
-    Some levels will try to trick you, or force you to use reason, so beware!
-</p>
-<p>
-    If you need to pause the game you can switch to another tab.<br />
-    The game also saves your progress so you can continue from where you stopped playing next time if you wish to :)
-</p>
-<h3>Want to help?</h3>
-<p>Most sprites and sounds are ripped from the game except the following. If you can make a better replacement for them,
-    please send a PR:</p>
-<ul>
-    <li>Clock Ticking Sound</li>
-    <li>Gaining a star sound</li>
-    <li>Stars merging sound</li>
-    <li>"Correct" Sound Effect</li>
-    <li>Drumroll Short / end of Drumroll Long</li>
-    <li>Time increasing sound</li>
-</ul>
-<p>I would also not mind more levels if you have any interesting ideas.</p>
-<h3>Credits:</h3>
-<ul>
-    <li>Original Idea: <a href="https://en.wikipedia.org/wiki/Super_Mario_64">Somebody who worked on Super Mario
-            64</a>
-    </li>
-    <li>Implementation: ITR</li>
-    <li>Game Engine: <a href="https://github.com/litecanvas">Litecanvas</a></li>
-    <li>Asset Rips:
-        <ul>
-            <li>ITR</li>
-            <li><a href="https://www.spriters-resource.com/submitter/TJ+the+Kid/">TJ the Kid</a></li>
-            <li><a href="https://www.spriters-resource.com/submitter/Feever1999/">Feever1999</a></li>
-            <li><a href="https://www.spriters-resource.com/submitter/Storice/">Storice</a></li>
-            <li><a href="https://mfgg.net/index.php?act=user&param=01&uid=8">The Trasher</a></li>
-            <li><a href="https://www.sounds-resource.com/submitter/Mystie/">Mystie</a></li>
-            <li><a href="https://www.sounds-resource.com/submitter/Inthegrave/">Inthegrave</a></li>
-            <li><a
-                    href="https://downloads.khinsider.com/game-soundtracks/album/super-mario-64-ds-2004-nds">khinsider</a>
-            </li>
-        </ul>
-    </li>
-</ul>
+    <h1>Find Luigi!</h1>
+    <p>A recreation of the game "Wanted" from Super Mario 64 DS, with additional
+        patterns and challenges.</p>
+    <h3>Instructions</h3>
+    <p>
+        The top part of the screen will show a poster with the face of the
+        person you need to find. Locate this person on
+        the bottom screen and click them.<br />
+        You start with 10 seconds to locate them, and gain 5 seconds each time
+        you find the wanted person. If you click the
+        wrong person you lose 10 seconds, so choose wisely!<br />
+        If you fail to locate the wanted person, you can choose to continue
+        playing.
+        Each time you continue you'll be set back more and more levels though!
+    </p>
+    <p>
+        The further you get, the more difficult the levels become. The easy
+        levels end at level 100.<br />
+        Some levels will try to trick you, or force you to use reason, so
+        beware!
+    </p>
+    <p>
+        If you need to pause the game you can switch to another tab.<br />
+        The game also saves your progress so you can continue from where you
+        stopped playing next time if you wish to :)
+    </p>
+    <h3>Want to help?</h3>
+    <p>Most sprites and sounds are ripped from the game except the following. If
+        you can make a better replacement for them,
+        please send a PR:</p>
+    <ul>
+        <li>Clock Ticking Sound</li>
+        <li>Gaining a star sound</li>
+        <li>Stars merging sound</li>
+        <li>"Correct" Sound Effect</li>
+        <li>Drumroll Short / end of Drumroll Long</li>
+        <li>Time increasing sound</li>
+    </ul>
+    <p>I would also not mind more levels if you have any interesting ideas.</p>
+    <h3>Credits:</h3>
+    <ul>
+        <li>Original Idea: <a
+                href="https://en.wikipedia.org/wiki/Super_Mario_64">Somebody who
+                worked on Super Mario
+                64</a>
+        </li>
+        <li>Implementation: ITR</li>
+        <li>Game Engine: <a
+                href="https://github.com/litecanvas">Litecanvas</a></li>
+        <li>Asset Rips:
+            <ul>
+                <li>ITR</li>
+                <li><a
+                        href="https://www.spriters-resource.com/submitter/TJ+the+Kid/">TJ
+                        the Kid</a></li>
+                <li><a
+                        href="https://www.spriters-resource.com/submitter/Feever1999/">Feever1999</a></li>
+                <li><a
+                        href="https://www.spriters-resource.com/submitter/Storice/">Storice</a></li>
+                <li><a
+                        href="https://mfgg.net/index.php?act=user&param=01&uid=8">The
+                        Trasher</a></li>
+                <li><a
+                        href="https://www.sounds-resource.com/submitter/Mystie/">Mystie</a></li>
+                <li><a
+                        href="https://www.sounds-resource.com/submitter/Inthegrave/">Inthegrave</a></li>
+                <li><a
+                        href="https://downloads.khinsider.com/game-soundtracks/album/super-mario-64-ds-2004-nds">khinsider</a>
+                </li>
+            </ul>
+        </li>
+    </ul>
 
-<script>
+    <script>
     function toggleFullscreen() {
         const iframe = document.getElementById('gameFrame');
         if (!document.fullscreenElement) {

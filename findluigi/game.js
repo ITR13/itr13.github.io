@@ -1215,6 +1215,10 @@ function preGenerateLevels(seedToUse) {
     for (var i = overgroups.length - 10; i < overgroups.length; i++) {
         shuffle(levelGenerators, levelsAtGroup[i], levelsAtGroup[i + 1]);
     }
+    levelGenerators.push(() => generate2x2Fixed([0, 1, 2, 3], 0));
+    levelGenerators.push(() => generate2x2Fixed([1, 2, 3], 2));
+    levelGenerators.push(() => generate2x2Fixed([1, 3], 3));
+    levelGenerators.push(() => generate2x2Fixed([1], 1));
 
     return levelGenerators;
 }

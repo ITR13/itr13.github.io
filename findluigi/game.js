@@ -1003,9 +1003,10 @@ function playHeadSound(head, wasCaught) {
 }
 
 function preGenerateLevels_safe(seedToUse) {
+    console.log(`Generating seed ${seedToUse}`)
     const startTime = Date.now();
     var seed = seedToUse;
-    while (Date.now() - startTime < 10000) {
+    while (Date.now() - startTime < 5000) {
         try {
             return preGenerateLevels(seed);
         } catch {
@@ -1020,7 +1021,6 @@ function preGenerateLevels_safe(seedToUse) {
 function preGenerateLevels(seedToUse) {
     seed(seedToUse);
 
-    // Args: Level, Hardmode
     const startGenerators = [
         generateBasicGroup,
         generateDirectionalGroup,
@@ -1039,28 +1039,60 @@ function preGenerateLevels(seedToUse) {
         generateBasicSpeedyGroup,
         generateSecondSpeedyGroup,
         generateCircleSpeedyGroup,
-    ]
+    ];
     shuffle(speedyGenerators);
 
     const visualGenerators = [
         generateVisualGroup1,
         generateVisualGroup2,
-    ]
+    ];
 
+    // Logging that magically fixes function :)
+    function logLevel(level, context) {
+        if (level === undefined) {
+            console.warn(`[${context}] returned undefined`);
+        } else if (!level) {
+            console.warn(`[${context}] not truthy`);
+        } else if (!level.heads) {
+            console.warn(`[${context}] level.heads not truthy`);
+        } else {
+            level.heads.forEach((head, i) => {
+                if (head.sprite === undefined) {
+                    console.warn(`[${context}] head.sprite undefined at index ${i}`);
+                }
+            });
+        }
+    }
 
+    function deepCheckArray(name, arr, path = name) {
+        arr.forEach((val, i) => {
+            if (val === undefined) {
+                console.warn(`[${path}] undefined at index ${i}`);
+            } else if (Array.isArray(val)) {
+                deepCheckArray(name, val, `${path}[${i}]`);
+            }
+        });
+    }
+
+    // Core generator functions
     function generateBasic(advanced, hardMode) {
         let generators = advanced ? advancedGenerators : startGenerators;
-
         var array = new Array(generators.length * 10);
         for (var i = 0; i < generators.length; i++) {
             let cI = i;
             for (var j = 0; j < 10; j++) {
                 let cJ = j;
                 array[i * 10 + j] = () => {
-                    let level = generators[cI](cJ, hardMode);
-                    level.longIntro = cJ == 0;
+                    let gen = generators[cI];
+                    if (!gen) {
+                        console.warn(`[generateBasic] generator undefined at index ${cI}`, { advanced, hardMode });
+                        return undefined;
+                    }
+                    let level = gen(cJ, hardMode);
+                    logLevel(level, `generateBasic(${advanced},${hardMode}) i=${cI} j=${cJ} gen=${gen.name}`);
+                    if (level) level.longIntro = cJ == 0;
                     return level;
-                }
+                };
             }
         }
         return array;
@@ -1069,19 +1101,28 @@ function preGenerateLevels(seedToUse) {
     function generateRotated(advanced, spriteSwap) {
         let generators = advanced ? advancedGenerators : startGenerators;
         let offset = spriteSwap ? 5 * 4 : 0;
-
         var array = new Array(generators.length * 10);
         for (var i = 0; i < generators.length; i++) {
             let cI = i;
             for (var j = 0; j < 10; j++) {
                 let cJ = j;
                 array[i * 10 + j] = () => {
-                    let level = generators[cI](cJ, false);
-                    level.heads.forEach(head => head.sprite = head.sprite + randi(0, 3) * 4 + offset);
-                    level.timescale = spriteSwap ? 1 : 1.15;
-                    level.longIntro = cJ == 0;
+                    let gen = generators[cI];
+                    if (!gen) {
+                        console.warn(`[generateRotated] generator undefined at index ${cI}`, { advanced, spriteSwap });
+                        return undefined;
+                    }
+                    let level = gen(cJ, false);
+                    logLevel(level, `generateRotated(${advanced},${spriteSwap}) i=${cI} j=${cJ} gen=${gen.name}`);
+                    if (level && level.heads) {
+                        level.heads.forEach(head => head.sprite += randi(0, 3) * 4 + offset);
+                    }
+                    if (level) {
+                        level.timescale = spriteSwap ? 1 : 1.15;
+                        level.longIntro = cJ == 0;
+                    }
                     return level;
-                }
+                };
             }
         }
         return array;
@@ -1094,11 +1135,19 @@ function preGenerateLevels(seedToUse) {
             for (var j = 0; j < 10; j++) {
                 let cJ = j;
                 array[i * 10 + j] = () => {
-                    let level = visualGenerators[cI](cJ, false);
-                    level.heads.forEach(head => head.sprite = head.sprite + 4 * 4);
-                    level.longIntro = cJ == 0;
+                    let gen = visualGenerators[cI];
+                    if (!gen) {
+                        console.warn(`[generateOutlines] generator undefined at index ${cI}`);
+                        return undefined;
+                    }
+                    let level = gen(cJ, false);
+                    logLevel(level, `generateOutlines() i=${cI} j=${cJ} gen=${gen.name}`);
+                    if (level && level.heads) {
+                        level.heads.forEach(head => head.sprite += 4 * 4);
+                        level.longIntro = cJ == 0;
+                    }
                     return level;
-                }
+                };
             }
         }
         return array;
@@ -1111,11 +1160,19 @@ function preGenerateLevels(seedToUse) {
             for (var j = 0; j < 10; j++) {
                 let cJ = j;
                 array[i * 10 + j] = () => {
-                    let level = speedyGenerators[cI](cJ, hardMode);
-                    level.timescale = timescale;
-                    level.longIntro = cJ == 0;
+                    let gen = speedyGenerators[cI];
+                    if (!gen) {
+                        console.warn(`[generateSpeedup] generator undefined at index ${cI}`, { timescale, hardMode });
+                        return undefined;
+                    }
+                    let level = gen(cJ, hardMode);
+                    logLevel(level, `generateSpeedup(${timescale},${hardMode}) i=${cI} j=${cJ} gen=${gen.name}`);
+                    if (level) {
+                        level.timescale = timescale;
+                        level.longIntro = cJ == 0;
+                    }
                     return level;
-                }
+                };
             }
         }
         return array;
@@ -1126,12 +1183,15 @@ function preGenerateLevels(seedToUse) {
         for (var i = 0; i < 10; i++) {
             let cI = i;
             array[i] = () => {
-                let level = generateStaticGroup(cI)
-                level.timescale = 1;
-                level.longIntro = cI == 0;
-                level.flashes = true;
+                let level = generateStaticGroup(cI);
+                logLevel(level, `generateFlashes() i=${cI}`);
+                if (level) {
+                    level.timescale = 1;
+                    level.longIntro = cI == 0;
+                    level.flashes = true;
+                }
                 return level;
-            }
+            };
         }
         return array;
     }
@@ -1139,41 +1199,44 @@ function preGenerateLevels(seedToUse) {
     function modifyUnknownPoster(array) {
         for (let i = 0; i < array.length; i++) {
             let original = array[i];
+            if (!original) {
+                console.warn(`[modifyUnknownPoster] original function undefined at index ${i}`);
+                continue;
+            }
             array[i] = () => {
                 let level = original();
+                logLevel(level, `modifyUnknownPoster() index=${i}`);
+                if (!level || !level.heads) return level;
 
-                let counts = [0, 0, 0, 0]
+                let counts = [0, 0, 0, 0];
                 level.heads.forEach(head => counts[head.sprite % 4]++);
-
-                let largest = counts.reduce((maxIndex, currentValue, currentIndex, array) =>
-                    currentValue > array[maxIndex] ? currentIndex : maxIndex, 0);
+                let largest = counts.reduce((maxIndex, val, idx, arr) => val > arr[maxIndex] ? idx : maxIndex, 0);
 
                 for (let j = 0; j < 4; j++) {
                     if (counts[j] >= 2 || j == level.lookingFor) continue;
-                    // This is so ugly, lol
                     for (let k = 2 - counts[j]; k > 0; k--) {
                         for (let l = 0; l < level.heads.length; l++) {
                             let head = level.heads[l];
                             if ((head.sprite % 4) != largest) continue;
-                            head.sprite = floor(head.sprite / 4) + j;
+                            head.sprite = Math.floor(head.sprite / 4) + j;
                             break;
                         }
                     }
                 }
-
                 level.poster = 4;
                 return level;
-            }
+            };
         }
-
         return array;
     }
 
+    // Level groups that we want to keep in a certain order
     const fixedEasy = [
         generateBasic(false, false),
         generateBasic(true, false),
         generateRotated(false, false),
     ];
+    deepCheckArray("fixedEasy", fixedEasy);
 
     const fixedMedium = [
         generateBasic(false, true),
@@ -1182,7 +1245,8 @@ function preGenerateLevels(seedToUse) {
         generateRotated(false, true),
         generateSpeedup(1.5, false),
         generateOutlines(false),
-    ]
+    ];
+    deepCheckArray("fixedMedium", fixedMedium);
 
     const fixedHard = [
         generateSpeedup(2.5, false),
@@ -1194,7 +1258,8 @@ function preGenerateLevels(seedToUse) {
         modifyUnknownPoster(generateSpeedup(1.5, false)),
         modifyUnknownPoster(generateRotated(true, false)),
         modifyUnknownPoster(generateRotated(false, true)),
-    ]
+    ];
+    deepCheckArray("fixedHard", fixedHard);
 
     shuffle(fixedEasy, 1);
     shuffle(fixedMedium);
@@ -1203,54 +1268,56 @@ function preGenerateLevels(seedToUse) {
     const randomEasy = fixedEasy.flat();
     const randomMedium = randomEasy.concat(fixedMedium.flat());
     const randomHard = randomMedium.concat(fixedHard);
-    shuffle(randomEasy);
-    shuffle(randomMedium);
-    shuffle(randomHard);
+
+    deepCheckArray("randomEasy", randomEasy);
+    deepCheckArray("randomMedium", randomMedium);
+    deepCheckArray("randomHard", randomHard);
 
     const splitEasy = splitArray(randomEasy, 10);
     const splitMedium = splitArray(randomMedium, 10);
 
     let part2 = fixedMedium.concat(splitEasy);
-    shuffle(part2, 1);
-
     let part3 = fixedHard.concat(splitMedium);
-    shuffle(part3, 1);
+
+    deepCheckArray("part2", part2);
+    deepCheckArray("part3", part3);
 
     let overgroups = fixedEasy.concat(
         fixedEasy,
         part2,
         part3,
-
-        // Full shuffles
-        part3,
+        part3
     );
 
+    deepCheckArray("overgroups", overgroups);
+
+    // Flatten array into final level array
     let levelsAtGroup = [];
     let totalLevels = 0;
     for (var i = 0; i < overgroups.length; i++) {
         levelsAtGroup.push(totalLevels);
-        totalLevels += overgroups[i].length;
+        totalLevels += overgroups[i]?.length || 0;
     }
     levelsAtGroup.push(totalLevels);
 
-    levelGenerators = new Array(totalLevels);
+    let levelGenerators = new Array(totalLevels);
     let levelIndex = 0;
     for (var i = 0; i < overgroups.length; i++) {
         for (var j = 0; j < overgroups[i].length; j++) {
-            levelGenerators[levelIndex] = overgroups[i][j];
-            levelIndex++;
+            if (!overgroups[i][j]) {
+                console.warn(`[flatten] overgroups[${i}][${j}] undefined`);
+            }
+            levelGenerators[levelIndex++] = overgroups[i][j];
         }
     }
 
-    // Shuffle full shuffles
-    for (var i = overgroups.length - 1; i < overgroups.length; i++) {
-        shuffle(levelGenerators, levelsAtGroup[i], levelsAtGroup[i + 1]);
-    }
-
+    // Add final fixed 2x2 levels
     levelGenerators.push(() => generate2x2Fixed([0, 1, 2, 3], 0));
     levelGenerators.push(() => generate2x2Fixed([1, 2, 3], 2));
     levelGenerators.push(() => generate2x2Fixed([1, 3], 3));
     levelGenerators.push(() => generate2x2Fixed([1], 1));
+
+    deepCheckArray("final levelGenerators", levelGenerators);
 
     return levelGenerators;
 }

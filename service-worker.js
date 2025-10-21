@@ -1,4 +1,4 @@
-const CACHE_NAME = "dynamic-cache-v2";
+const CACHE_NAME = "dynamic-cache-v3";
 
 const ALLOWED_ORIGINS = [
     self.location.origin,
@@ -16,6 +16,18 @@ self.addEventListener("activate", event => {
         )
     );
     self.clients.claim();
+});
+
+self.addEventListener("activate", event => {
+    event.waitUntil(
+        caches.keys().then(keys => {
+            return Promise.all(
+                keys
+                    .filter(key => key !== CACHE_NAME) // keep the current cache only
+                    .map(key => caches.delete(key))
+            );
+        })
+    );
 });
 
 self.addEventListener("fetch", event => {

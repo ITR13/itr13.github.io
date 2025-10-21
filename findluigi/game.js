@@ -234,7 +234,7 @@ function clearGame(generateLevels) {
     currSeed = null;
     if (generateLevels) {
         currSeed = Date.now();
-        levelGenerators = preGenerateLevels(currSeed);
+        levelGenerators = preGenerateLevels_safe(currSeed);
     }
 
     game = {
@@ -274,7 +274,7 @@ function saveGame(game) {
 }
 
 function loadGame(savedGame) {
-    let levelGenerators = preGenerateLevels(savedGame.seed);
+    let levelGenerators = preGenerateLevels_safe(savedGame.seed);
     // Reset seed after generating so people can't cheat by reloading
     // NB: This will allow people to reload to get a different poster though,
     // but people can choose not to do it for the additional challenge :)
@@ -1002,6 +1002,19 @@ function playHeadSound(head, wasCaught) {
     sound.play();
 }
 
+function preGenerateLevels_safe(seedToUse) {
+    const startTime = Date.now();
+    var seed = seedToUse;
+    while (Date.now() - startTime < 10000) {
+        try {
+            return preGenerateLevels(seed);
+        } catch {
+            console.error(`Failed to generate seed ${seed}`)
+            seed += 1;
+        }
+    }
+    return preGenerateLevels(1);
+}
 
 
 function preGenerateLevels(seedToUse) {

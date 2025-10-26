@@ -43,12 +43,17 @@ class CircleApproximation {
     }
 
     setupEventListeners() {
-        document.getElementById('updateConfigBtn').onclick = () => this.updateConfiguration();
         document.getElementById('startBtn').onclick = () => this.startOptimization();
         document.getElementById('pauseBtn').onclick = () => this.stopOptimization();
 
         this.imageInput = document.getElementById('imageInput');
         this.imageInput.addEventListener('change', (event) => this.handleImageUpload(event));
+
+        const candidateInput = document.getElementById('candidateInput');
+        const mutationInput = document.getElementById('mutationInput');
+        [candidateInput, mutationInput].forEach(input => {
+            input.addEventListener('change', () => this.updateConfiguration());
+        });
 
         window.addEventListener('resize', () => this.updateLayout());
     }
@@ -327,22 +332,28 @@ class CircleApproximation {
         const canvasCount = document.querySelectorAll('.canvas-container').length;
         const gap = 20;
 
-        if (window.innerWidth >= window.innerHeight) {
+        const availableHeight = window.innerHeight - 200;
+        const availableWidth = window.innerWidth;
+
+        let heightRatio = 1080 / 1940;
+
+        if (availableWidth >= availableHeight) {
             container.style.flexDirection = 'row';
         } else {
             container.style.flexDirection = 'column';
+            heightRatio = 2180 / 960;
         }
 
-        let scale = 1;
-        if (container.style.flexDirection === 'row') {
-            const totalWidth = 960 * canvasCount + gap * (canvasCount - 1);
-            scale = Math.min(window.innerWidth / totalWidth, 1);
-        } else {
-            const totalHeight = 1080 * canvasCount + gap * (canvasCount - 1);
-            scale = Math.min(window.innerHeight / totalHeight, 1);
+        let newHeight = (availableWidth) * heightRatio;
+        let newWidth = availableWidth;
+
+        if (newHeight > availableHeight) {
+            newHeight = availableHeight;
+            newWidth = availableHeight / heightRatio;
         }
 
-        container.style.transform = `scale(${scale})`;
+        container.style.width = newWidth + 'px';
+        container.style.height = newHeight + 'px';
     }
 }
 

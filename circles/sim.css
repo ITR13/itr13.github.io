@@ -20,7 +20,7 @@ body {
 
 .canvas-container {
     position: relative;
-    width: 960px;
+    width: 100%;
     aspect-ratio: 960 / 1080;
 }
 
@@ -51,6 +51,34 @@ canvas {
     display: flex;
     gap: 12px;
     margin: 20px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 700px) {
+    #controls {
+        justify-content: flex-start;
+    }
+}
+
+#controls>label {
+    flex: 0 0 auto;
+}
+
+.inputs {
+    display: flex;
+    gap: 12px;
+    flex: 0 0 auto;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.buttons {
+    display: flex;
+    gap: 12px;
+    flex: 0 0 auto;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 button {

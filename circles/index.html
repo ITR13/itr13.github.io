@@ -21,17 +21,20 @@
     </div>
 
     <div id="controls">
-        <label>
-            Candidate count:
-            <input id="candidateInput" type="number" min="1" max="50" value="10">
-        </label>
-        <label>
-            Mutations per candidate:
-            <input id="mutationInput" type="number" min="1" max="500" value="200">
-        </label>
-        <button id="updateConfigBtn">Update</button>
-        <button id="startBtn">Start</button>
-        <button id="pauseBtn">Pause</button>
+        <div class="inputs">
+            <label>
+                Candidates:
+                <input id="candidateInput" type="number" min="1" max="50" value="10">
+            </label>
+            <label>
+                Iterations:
+                <input id="mutationInput" type="number" min="1" max="500" value="200">
+            </label>
+        </div>
+        <div class="buttons">
+            <button id="startBtn">Start</button>
+            <button id="pauseBtn">Pause</button>
+        </div>
     </div>
 
     <div id="stats">

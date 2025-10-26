@@ -36,6 +36,10 @@ canvas {
     box-shadow: 0 0 10px #000;
 }
 
+#overlayCanvas {
+    pointer-events: none;
+}
+
 #imageInput {
     position: absolute;
     bottom: 10px;

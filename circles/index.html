@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circles</title>
+    <link rel="stylesheet" href="sim.css">
+</head>
+
+<body>
+    <div id="container">
+        <div class="canvas-container">
+            <canvas id="drawCanvas" width="960" height="1080"></canvas>
+            <canvas id="overlayCanvas" width="960" height="1080"></canvas>
+        </div>
+        <div class="canvas-container">
+            <canvas id="imgCanvas" width="960" height="1080"></canvas>
+            <input type="file" id="imageInput" accept="image/*">
+        </div>
+    </div>
+
+    <div id="controls">
+        <label>
+            Candidate count:
+            <input id="candidateInput" type="number" min="1" max="50" value="10">
+        </label>
+        <label>
+            Mutations per candidate:
+            <input id="mutationInput" type="number" min="1" max="500" value="200">
+        </label>
+        <button id="updateConfigBtn">Update</button>
+        <button id="startBtn">Start</button>
+        <button id="pauseBtn">Pause</button>
+    </div>
+
+    <div id="stats">
+        <div>Circles placed: <span id="circleCount">0</span></div>
+        <div>Fitness: <span id="totalFitness">0.00%</span></div>
+        <div>Seconds ran: <span id="secondsRan">0</span></div>
+    </div>
+
+    <script src="sim.js"></script>
+</body>
+
+</html>

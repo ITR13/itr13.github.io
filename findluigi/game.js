@@ -86,17 +86,11 @@ let savedGame = null;
 }
 
 instance = litecanvas({
-    loop: {
-        init, update, draw,
-        tap, tapping,
-    },
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT * 2,
     pixelart: gameSettings.pixelart,
-    pauseOnBlur: false,
 })
-instance.getcolor = index => COLORS[~~index % COLORS.length];
-
+pal(COLORS)
 
 use(pluginAssetLoader)
 
@@ -278,7 +272,7 @@ function loadGame(savedGame) {
     // Reset seed after generating so people can't cheat by reloading
     // NB: This will allow people to reload to get a different poster though,
     // but people can choose not to do it for the additional challenge :)
-    seed(Date.now());
+    rseed(Date.now());
 
     game = {
         currentLevel: savedGame.currentLevel,
@@ -423,9 +417,9 @@ function draw() {
     }
 
     push()
-    const bottomRegion = path();
-    bottomRegion.rect(0, SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT);
-    clip(bottomRegion);
+    clip((bottomRegion) => {
+        bottomRegion.rect(0, SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT);
+    });
     drawBoard()
     pop()
     drawInfo()
@@ -453,17 +447,18 @@ function drawInfo() {
             break;
         case S_NextStage: {
             push()
-            const region = path();
 
             let time = stateTimer / 0.55;
             if (game.level.longIntro && time < 3) {
                 time = 1 - abs((time % 2) - 1);
             }
 
-            let x = lerp(-FLASHLIGHT_SIZE_SMALL, SCREEN_WIDTH / 2, clamp(time, 0, 1));
-            region.arc(x, SCREEN_HEIGHT / 2, FLASHLIGHT_SIZE_SMALL, 0, TWO_PI);
-            region.arc(SCREEN_WIDTH - x, SCREEN_HEIGHT / 2, FLASHLIGHT_SIZE_SMALL, 0, TWO_PI);
-            clip(region);
+            clip((region) => {
+                let x = lerp(-FLASHLIGHT_SIZE_SMALL, SCREEN_WIDTH / 2, clamp(time, 0, 1));
+                region.arc(x, SCREEN_HEIGHT / 2, FLASHLIGHT_SIZE_SMALL, 0, TWO_PI);
+                region.arc(SCREEN_WIDTH - x, SCREEN_HEIGHT / 2, FLASHLIGHT_SIZE_SMALL, 0, TWO_PI);
+            });
+
             drawPosters();
             pop();
             drawStars();
@@ -472,9 +467,9 @@ function drawInfo() {
         }
         case S_Searching: {
             push()
-            const region = path();
-            region.arc(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, FLASHLIGHT_SIZE_SMALL, 0, TWO_PI);
-            clip(region);
+            clip((region) => {
+                region.arc(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, FLASHLIGHT_SIZE_SMALL, 0, TWO_PI);
+            });
             drawPosters();
             pop();
             drawStars();
@@ -485,10 +480,10 @@ function drawInfo() {
         case S_GameOver:
             if (stateTimer <= 0.85) {
                 push()
-                const region = path();
-                let radius = lerp(FLASHLIGHT_SIZE_SMALL, FLASHLIGHT_SIZE_LARGE, stateTimer / 0.85);
-                region.arc(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, radius, 0, TWO_PI);
-                clip(region);
+                clip((region) => {
+                    let radius = lerp(FLASHLIGHT_SIZE_SMALL, FLASHLIGHT_SIZE_LARGE, stateTimer / 0.85);
+                    region.arc(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, radius, 0, TWO_PI);
+                });
                 drawPosters();
                 pop();
             } else {
@@ -592,13 +587,12 @@ function drawSlider(index, percentage) {
     let y = slider_heights[index];
     image(0, y, images.settings_sliders[index * 2]);
     push();
-    const filledRegion = path();
-    let width = lerp(SLIDER_START, SLIDER_END, percentage);
-    if (percentage <= 0) width = 60;
-    else if (percentage >= 1) width = 195;
-
-    filledRegion.rect(0, 0, width, SCREEN_HEIGHT);
-    clip(filledRegion);
+    clip((filledRegion) => {
+        let width = lerp(SLIDER_START, SLIDER_END, percentage);
+        if (percentage <= 0) width = 60;
+        else if (percentage >= 1) width = 195;
+        filledRegion.rect(0, 0, width, SCREEN_HEIGHT);
+    });
     image(0, y, images.settings_sliders[index * 2 + 1]);
     pop();
 }
@@ -659,7 +653,7 @@ function drawLevel(useGetPos = true) {
     });
     for (var i = game.level.blinkingHeads.length - 1; i >= 0; i--) {
         let head = game.level.blinkingHeads[i].head;
-        let time = ELAPSED - game.level.blinkingHeads[i].time;
+        let time = T - game.level.blinkingHeads[i].time;
         if (time >= 1) {
             game.level.blinkingHeads.slice(i, 1);
             continue;
@@ -676,7 +670,7 @@ function drawLevel(useGetPos = true) {
 function drawTimeBonusText() {
     let bonuses = game.level.timeBonusTexts;
     for (let i = bonuses.length - 1; i >= 0; i--) {
-        let time = ELAPSED - bonuses[i].time;
+        let time = T - bonuses[i].time;
         if (time >= 1.5) {
             bonuses.splice(i, 1);
             continue;
@@ -816,7 +810,7 @@ function tap(x, y, tapId) {
                 else setState(S_Victory);
 
                 game.level.timeBonusTexts.push({
-                    time: ELAPSED,
+                    time: T,
                     x: game.level.targetHead.x - 23,
                     startY: game.level.targetHead.y - 8,
                     spriteIndex: 0,
@@ -835,13 +829,13 @@ function tap(x, y, tapId) {
                 }
 
                 game.level.timeBonusTexts.push({
-                    time: ELAPSED,
+                    time: T,
                     x: head.x - 23,
                     startY: head.y - 8,
                     spriteIndex: 1,
                 })
                 game.level.blinkingHeads.push({
-                    time: ELAPSED,
+                    time: T,
                     head: head,
                 })
             }
@@ -1019,7 +1013,7 @@ function preGenerateLevels_safe(seedToUse) {
 
 
 function preGenerateLevels(seedToUse) {
-    seed(seedToUse);
+    rseed(seedToUse);
 
     const startGenerators = [
         generateBasicGroup,

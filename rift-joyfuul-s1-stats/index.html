@@ -1,0 +1,251 @@
+---
+layout: default
+---
+
+<script src="https://unpkg.com/msgpack-lite/dist/msgpack.min.js"></script>
+
+<div class="search-container">
+    <input type="text" id="searchInput" placeholder="Search players or stats...">
+    <div id="searchResults" class="search-results"></div>
+</div>
+
+<div id="rankTableContainer"></div>
+
+<style>
+    .search-container {
+        margin: 20px;
+        position: relative;
+    }
+
+    #searchInput {
+        width: 100%;
+        padding: 8px;
+        font-size: 16px;
+    }
+
+    .search-results {
+        position: absolute;
+        background: white;
+        border: 1px solid #ccc;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 100;
+    }
+
+    .search-results div {
+        padding: 4px 8px;
+        cursor: pointer;
+    }
+
+    .search-results div:hover {
+        background: #eee;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    th,
+    td {
+        border: 1px solid #ccc;
+        padding: 4px 8px;
+        text-align: left;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        const rankTableContainer = document.getElementById('rankTableContainer');
+
+        const currentUrl = new URL(window.location.href);
+        const cleanUrl = currentUrl.origin + currentUrl.pathname;
+
+        // --- Caches ---
+        let uuidToUser = null;
+        let userToUuid = null;
+        let statNames = null;
+        const statCache = {};
+        const userCache = {};
+
+        // --- Helpers ---
+        const fetchBinary = async (url) => {
+            const res = await fetch(url);
+            const buf = await res.arrayBuffer();
+
+            const codec = msgpack.createCodec({ binarraybuffer: true });
+            const data = msgpack.decode(new Uint8Array(buf), { codec });
+
+            return data;
+        };
+
+        const uuidBytesToString = (arrayBuffer) => {
+            const bytes = new Uint8Array(arrayBuffer);
+
+            const hex = Array.from(bytes)
+                .map(byte => byte.toString(16).padStart(2, '0'))
+                .join('');
+
+            return [
+                hex.slice(0, 8),
+                hex.slice(8, 12),
+                hex.slice(12, 16),
+                hex.slice(16, 20),
+                hex.slice(20, 32)
+            ].join('-');
+        };
+
+        window.loadUserFromTable = loadUser;
+        window.loadStatFromTable = loadStat;
+
+        window.addEventListener('popstate', () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('user')) {
+                const uuid = params.get('user');
+                loadUser(uuid, true);
+            } else if (params.has('stat')) {
+                loadStat(params.get('stat'), true);
+            } else {
+                // No param: clear table
+                rankTableContainer.innerHTML = '';
+                searchInput.value = '';
+            }
+        });
+
+        // --- Load search-related data ---
+        async function loadSearchData() {
+            if (!userToUuid) {
+                const rawList = await fetchBinary('stats-bin/uuid_map.bin');
+                userToUuid = {};
+                uuidToUser = {};
+                rawList.forEach(([uuidBytes, name], i) => {
+                    const uuid = uuidBytesToString(uuidBytes);
+                    userToUuid[name] = uuid;
+                    uuidToUser[uuid] = name;
+                });
+            }
+            if (!statNames) {
+                statNames = await fetchBinary('stats-bin/stat_names.bin');
+            }
+        }
+        await loadSearchData();
+
+        // --- Debounced incremental search ---
+        let debounceTimer = null;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                const q = searchInput.value.toLowerCase();
+                if (!q) { searchResults.innerHTML = ''; return; }
+
+                const userMatches = Object.entries(userToUuid)
+                    .filter(([key, value]) => key.toLowerCase().includes(q.toLowerCase()))
+                    .slice(0, 10)
+                    .map(([key, value]) => ({ key, value }));
+                const statMatches = statNames.filter(s => s.toLowerCase().includes(q)).slice(0, 10);
+
+                searchResults.innerHTML = '';
+                userMatches.forEach(u => {
+                    const div = document.createElement('div');
+                    div.href = `${cleanUrl}?user=${u.value}`
+                    div.textContent = `Player: ${u.key}`;
+                    div.addEventListener('click', () => loadUser(u.value));
+                    searchResults.appendChild(div);
+                });
+                statMatches.forEach(s => {
+                    const div = document.createElement('div');
+                    div.href = `${cleanUrl}?stat=${s}`
+                    div.textContent = `Stat: ${s}`;
+                    div.addEventListener('click', () => loadStat(s));
+                    searchResults.appendChild(div);
+                });
+            }, 100);
+        });
+
+        const updateUrl = (param, value) => {
+            const url = new URL(window.location);
+            url.searchParams.delete("stat");
+            url.searchParams.delete("user");
+            url.searchParams.set(param, value);
+            window.history.pushState({}, '', url);
+        };
+
+        async function loadUser(uuid, skipUrlUpdate = false) {
+            const username = uuidToUser[uuid] || uuid;
+            if (!skipUrlUpdate) updateUrl('user', uuid);
+            searchResults.innerHTML = '';
+            searchInput.value = username;
+
+            if (!userCache[uuid]) {
+                userCache[uuid] = await fetchBinary(`stats-bin/user/${uuid}.bin`);
+            }
+            const data = userCache[uuid];
+
+            // Top1-5 counts
+            let topCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+            const rows = [];
+            for (const statKey in data) {
+                const [uuidBytes, score, rank, reverseRank] = data[statKey];
+                if (rank >= 1 && rank <= 5) topCounts[rank]++;
+                rows.push({ stat: statKey.replace(/-/g, ':'), score, rank, reverseRank });
+            }
+            rows.sort((a, b) => a.rank - b.rank || b.reverseRank - a.reverseRank);
+
+            let html = `<h2>Stats for ${username}</h2>`;
+            html += `<div>Top1: ${topCounts[1]} Top2: ${topCounts[2]} Top3: ${topCounts[3]} Top4: ${topCounts[4]} Top5: ${topCounts[5]}</div>`;
+            html += `<table><thead><tr><th>Rank</th><th>Stat</th><th>Score</th><th>Reverse Rank</th></tr></thead><tbody>`;
+            rows.forEach(r => {
+                const escapedStat = r.stat.replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
+                html += `<tr>
+            <td>${r.rank}</td>
+            <td><a href="${cleanUrl}?stat=${escapedStat}" onclick="loadStatFromTable('${r.stat}'); return false;">${r.stat}</a></td>
+            <td>${r.score}</td>
+            <td>${r.reverseRank}</td>
+        </tr>`;
+            });
+            html += `</tbody></table>`;
+            rankTableContainer.innerHTML = html;
+        }
+
+        async function loadStat(stat, skipUrlUpdate = false) {
+            if (!skipUrlUpdate) updateUrl('stat', stat);
+            searchResults.innerHTML = '';
+            searchInput.value = stat;
+
+            const safePath = stat.replace(/:/g, '-');
+            if (!statCache[safePath]) {
+                statCache[safePath] = await fetchBinary(`stats-bin/stat/${safePath}.bin`);
+            }
+            const data = statCache[safePath];
+
+            let html = `<h2>Stat: ${stat}</h2>`;
+            html += `<table><thead><tr><th>Rank</th><th>User</th><th>Score</th><th>Reverse Rank</th></tr></thead><tbody>`;
+            data.forEach(([uuidBytes, score, rank, reverseRank]) => {
+                const userUuid = uuidBytesToString(uuidBytes);
+                const username = uuidToUser[userUuid] || userUuid;
+                const escapedUserUuid = userUuid.replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
+
+                html += `<tr>
+            <td>${rank}</td>
+            <td><a href="${cleanUrl}?user=${escapedUserUuid}" onclick="loadUserFromTable('${userUuid}'); return false;">${username}</a></td>
+            <td>${score}</td>
+            <td>${reverseRank}</td>
+        </tr>`;
+            });
+            html += `</tbody></table>`;
+            rankTableContainer.innerHTML = html;
+        }
+
+        // --- Load initial state from URL ---
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('user')) {
+            const uuid = params.get('user');
+            loadUser(uuid);
+        }
+        else if (params.has('stat')) loadStat(params.get('stat'));
+    });
+</script>

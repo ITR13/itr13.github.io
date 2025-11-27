@@ -54,6 +54,34 @@ layout: default
         padding: 4px 8px;
         text-align: left;
     }
+
+    .info-boxes {
+        display: flex;
+        gap: 10px;
+        margin: 10px 0;
+        flex-wrap: wrap;
+    }
+
+    .info-box {
+        background: #222;
+        color: #fff;
+        padding: 10px;
+        border-radius: 8px;
+        text-align: center;
+        min-width: 80px;
+        flex: 1;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    }
+
+    .info-box .title {
+        font-weight: bold;
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+    }
+
+    .info-box .value {
+        font-size: 1.1rem;
+    }
 </style>
 
 <script>
@@ -134,6 +162,32 @@ layout: default
         }
         await loadSearchData();
 
+        // --- Load category data ---
+        let playerCategories = null;
+        let categoryNames = [];
+
+        async function loadCategoryData() {
+            const raw = await fetchBinary('stats-bin/player_categories.bin');
+            console.log(raw);
+            categoryNames = raw[0].slice(1);
+
+            const categoryData = raw[1];
+
+            playerCategories = {};
+            for (let i = 0; i < categoryData.length; i++) {
+                const row = categoryData[i];
+                const uuid = uuidBytesToString(row[0]);
+                const values = row.slice(1);
+                playerCategories[uuid] = categoryNames.map((name, idx) => ({
+                    category: name,
+                    value: values[idx]
+                }));
+            }
+        }
+
+        await loadCategoryData();
+
+
         // --- Debounced incremental search ---
         let debounceTimer = null;
         searchInput.addEventListener('input', () => {
@@ -195,8 +249,35 @@ layout: default
             }
             rows.sort((a, b) => a.rank - b.rank || b.reverseRank - a.reverseRank);
 
+            let categoryHtml = '';
+            if (playerCategories && playerCategories[uuid]) {
+                const sortedCats = [...playerCategories[uuid]]
+                    .filter(c => c.category !== 'Idler')
+                    .sort((a, b) => b.value - a.value);
+
+                categoryHtml += '<div class="info-boxes">';
+                sortedCats.forEach(c => {
+                    categoryHtml += `<div class="info-box">
+            <div class="title">${c.category}</div>
+            <div class="value">${(c.value * 100).toFixed(2)}%</div>
+        </div>`;
+                });
+                categoryHtml += '</div>';
+            }
+
+            // --- Top1-5 counts ---
+            let topCountsHtml = '<div class="info-boxes">';
+            for (let i = 1; i <= 5; i++) {
+                topCountsHtml += `<div class="info-box">
+        <div class="title">Top${i}</div>
+        <div class="value">${topCounts[i]}</div>
+    </div>`;
+            }
+            topCountsHtml += '</div>';
+
             let html = `<h2>Stats for ${username}</h2>`;
-            html += `<div>Top1: ${topCounts[1]} Top2: ${topCounts[2]} Top3: ${topCounts[3]} Top4: ${topCounts[4]} Top5: ${topCounts[5]}</div>`;
+            html += topCountsHtml;
+            html += categoryHtml;
             html += `<table><thead><tr><th>Rank</th><th>Stat</th><th>Score</th><th>Reverse Rank</th></tr></thead><tbody>`;
             rows.forEach(r => {
                 const escapedStat = r.stat.replace(/"/g, '&quot;').replace(/'/g, '&#x27;');

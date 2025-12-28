@@ -1,0 +1,25 @@
+---
+layout: default
+---
+<div id="canvas-container">
+    <iframe id="gameFrame" src="game.html" width="480" height="270"></iframe>
+</div>
+<button class="fullscreen-btn" onclick="toggleFullscreen()">Full Screen</button>
+
+<p>
+<h1>Aeons of Warfare</h1>
+<p>A game inspired by Age of War, because I felt like it.</p>
+<p>Then I stopped feeling like it and decided to not work on it anymore, yay. There's basically 0 balancing right now,
+    and a lot of features are half-implemented, so I don't think it will be very fun to play :)</p>
+<script>
+    function toggleFullscreen() {
+        const iframe = document.getElementById('gameFrame');
+        if (!document.fullscreenElement) {
+            iframe.requestFullscreen().catch(err => {
+                alert(`Error attempting to enable full-screen mode: ${err.message}`);
+            });
+        } else {
+            document.exitFullscreen();
+        }
+    }
+</script>

@@ -166,7 +166,7 @@ layout: default
 
             const evoLevel = row.base.evolution?.level ?? 101;
 
-            const rangeType = row.attackType == "area" ? "area" : row.rangeType;
+            const rangeType = row.base.attackType == "area" ? "area" : row.base.rangeType;
 
             return {
                 name: row.name,

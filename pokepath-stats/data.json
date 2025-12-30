@@ -1,0 +1,4822 @@
+{
+  "pokemon": {
+    "charmander": {
+      "id": 0,
+      "name": "charmander",
+      "color": "#ff8463",
+      "ability": "burn",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1100,
+        "scale": 0
+      },
+      "power": {
+        "base": 13,
+        "scale": 2
+      },
+      "critical": {
+        "base": 0.5,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 110,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1
+      ],
+      "evolution": {
+        "pokemon": "charmeleon",
+        "level": 16
+      }
+    },
+    "charmeleon": {
+      "id": 0,
+      "name": "charmeleon",
+      "color": "#d63900",
+      "ability": "burn",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 950,
+        "scale": -2
+      },
+      "power": {
+        "base": 25,
+        "scale": 2.4
+      },
+      "critical": {
+        "base": 2,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 130,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1
+      ],
+      "evolution": {
+        "pokemon": "charizard",
+        "level": 36
+      }
+    },
+    "charizard": {
+      "id": 0,
+      "name": "charizard",
+      "color": "#d63801",
+      "ability": "burn",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 940,
+        "scale": -2
+      },
+      "power": {
+        "base": 55,
+        "scale": 4.3
+      },
+      "critical": {
+        "base": 2,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 165,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "treecko": {
+      "id": 1,
+      "name": "treecko",
+      "color": "#b7d667",
+      "ability": "ambusher",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1200,
+        "scale": -2
+      },
+      "power": {
+        "base": 10,
+        "scale": 2
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0.2
+      },
+      "range": {
+        "base": 95,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        2
+      ],
+      "evolution": {
+        "pokemon": "grovyle",
+        "level": 16
+      }
+    },
+    "grovyle": {
+      "id": 1,
+      "name": "grovyle",
+      "color": "#368f0e",
+      "ability": "ambusher",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1200,
+        "scale": -3
+      },
+      "power": {
+        "base": 27,
+        "scale": 2.2
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0.25
+      },
+      "range": {
+        "base": 110,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        2
+      ],
+      "evolution": {
+        "pokemon": "sceptile",
+        "level": 36
+      }
+    },
+    "sceptile": {
+      "id": 1,
+      "name": "sceptile",
+      "color": "#9fcf6f",
+      "ability": "ambusher",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1150,
+        "scale": -3
+      },
+      "power": {
+        "base": 50,
+        "scale": 4.9
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0.3
+      },
+      "range": {
+        "base": 145,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        2
+      ]
+    },
+    "froaki": {
+      "id": 2,
+      "name": "froakie",
+      "color": "#20adbc",
+      "ability": "ninja",
+      "projectileSpeed": 7,
+      "ricochet": 3,
+      "speed": {
+        "base": 1000,
+        "scale": -1
+      },
+      "power": {
+        "base": 5,
+        "scale": 1
+      },
+      "critical": {
+        "base": 0.5,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 110,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        3
+      ],
+      "evolution": {
+        "pokemon": "frogadier",
+        "level": 16
+      }
+    },
+    "frogadier": {
+      "id": 2,
+      "name": "frogadier",
+      "color": "#4366b7",
+      "ability": "ninja",
+      "projectileSpeed": 7,
+      "ricochet": 4,
+      "speed": {
+        "base": 900,
+        "scale": -2
+      },
+      "power": {
+        "base": 8,
+        "scale": 1.2
+      },
+      "critical": {
+        "base": 1.5,
+        "scale": 0.2
+      },
+      "range": {
+        "base": 120,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        3
+      ],
+      "evolution": {
+        "pokemon": "greninja",
+        "level": 36
+      }
+    },
+    "greninja": {
+      "id": 2,
+      "name": "greninja",
+      "color": "#2657ba",
+      "ability": "ninja",
+      "projectileSpeed": 7,
+      "ricochet": 5,
+      "speed": {
+        "base": 800,
+        "scale": -5
+      },
+      "power": {
+        "base": 10,
+        "scale": 1.55
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0.4
+      },
+      "range": {
+        "base": 130,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        3
+      ]
+    },
+    "spoink": {
+      "id": 3,
+      "name": "spoink",
+      "color": "#aeb6bf",
+      "ability": "frisk",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1800,
+        "scale": -2
+      },
+      "power": {
+        "base": 30,
+        "scale": 3
+      },
+      "critical": {
+        "base": 2,
+        "scale": 0
+      },
+      "range": {
+        "base": 120,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        2,
+        4
+      ],
+      "evolution": {
+        "pokemon": "grumpig",
+        "level": 32
+      }
+    },
+    "grumpig": {
+      "id": 3,
+      "name": "grumpig",
+      "color": "#c797de",
+      "ability": "frisk",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1600,
+        "scale": -5
+      },
+      "power": {
+        "base": 70,
+        "scale": 6.2
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0
+      },
+      "range": {
+        "base": 140,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        2,
+        4
+      ]
+    },
+    "natu": {
+      "id": 4,
+      "name": "natu",
+      "color": "#9fcf6f",
+      "ability": "frisk",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1400,
+        "scale": -3
+      },
+      "power": {
+        "base": 20,
+        "scale": 2.7
+      },
+      "critical": {
+        "base": 1,
+        "scale": 0
+      },
+      "range": {
+        "base": 140,
+        "scale": 0.2,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "xatu",
+        "level": 25
+      }
+    },
+    "xatu": {
+      "id": 4,
+      "name": "xatu",
+      "color": "#5fb727",
+      "ability": "frisk",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1350,
+        "scale": -5.5
+      },
+      "power": {
+        "base": 35,
+        "scale": 4
+      },
+      "critical": {
+        "base": 1,
+        "scale": 0
+      },
+      "range": {
+        "base": 160,
+        "scale": 0.5,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "voltorb": {
+      "id": 5,
+      "name": "voltorb",
+      "color": "#d63901",
+      "ability": "stunMonoNerf",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 650,
+        "scale": -2
+      },
+      "power": {
+        "base": 4,
+        "scale": 1
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0
+      },
+      "range": {
+        "base": 100,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1
+      ],
+      "evolution": {
+        "pokemon": "electrode",
+        "level": 30
+      }
+    },
+    "electrode": {
+      "id": 5,
+      "name": "electrode",
+      "color": "#adb4bc",
+      "ability": "stunMonoNerf",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 650,
+        "scale": -3
+      },
+      "power": {
+        "base": 20,
+        "scale": 1.2
+      },
+      "critical": {
+        "base": 15,
+        "scale": 0
+      },
+      "range": {
+        "base": 115,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1
+      ]
+    },
+    "ekans": {
+      "id": 6,
+      "name": "ekans",
+      "color": "#b594df",
+      "ability": "poison",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1800,
+        "scale": -2
+      },
+      "power": {
+        "base": 12,
+        "scale": 2.2
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0
+      },
+      "range": {
+        "base": 110,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1
+      ],
+      "evolution": {
+        "pokemon": "arbok",
+        "level": 22
+      }
+    },
+    "arbok": {
+      "id": 6,
+      "name": "arbok",
+      "color": "#8c62bc",
+      "ability": "poison",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1800,
+        "scale": -3
+      },
+      "power": {
+        "base": 70,
+        "scale": 6
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 120,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1
+      ]
+    },
+    "machop": {
+      "id": 7,
+      "name": "machop",
+      "color": "#8cacb5",
+      "ability": "armorBreak",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1650,
+        "scale": -1
+      },
+      "power": {
+        "base": 9,
+        "scale": 4
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 100,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "machoke",
+        "level": 28
+      }
+    },
+    "machoke": {
+      "id": 7,
+      "name": "machoke",
+      "color": "#b595de",
+      "ability": "armorBreak",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1600,
+        "scale": -1
+      },
+      "power": {
+        "base": 30,
+        "scale": 6.5
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 110,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "machamp",
+        "level": 42
+      }
+    },
+    "machamp": {
+      "id": 7,
+      "name": "machamp",
+      "color": "#d7e6df",
+      "ability": "armorBreak",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1600,
+        "scale": -1
+      },
+      "power": {
+        "base": 70,
+        "scale": 17.5
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 125,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "mankey": {
+      "id": 8,
+      "name": "mankey",
+      "color": "#fff79c",
+      "ability": "armorBreak",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1300,
+        "scale": -2
+      },
+      "power": {
+        "base": 12,
+        "scale": 3.8
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0.3
+      },
+      "range": {
+        "base": 100,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        2,
+        4
+      ],
+      "evolution": {
+        "pokemon": "primeape",
+        "level": 28
+      }
+    },
+    "primeape": {
+      "id": 8,
+      "name": "primeape",
+      "color": "#fe845a",
+      "ability": "armorBreak",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1150,
+        "scale": -3
+      },
+      "power": {
+        "base": 55,
+        "scale": 6.5
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0.3
+      },
+      "range": {
+        "base": 100,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        2,
+        4
+      ]
+    },
+    "chimchar": {
+      "id": 9,
+      "name": "chimchar",
+      "color": "#df771e",
+      "ability": "burn",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1150,
+        "scale": -2
+      },
+      "power": {
+        "base": 15,
+        "scale": 2
+      },
+      "critical": {
+        "base": 1.4,
+        "scale": 0.2
+      },
+      "range": {
+        "base": 100,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1
+      ],
+      "evolution": {
+        "pokemon": "monferno",
+        "level": 16
+      }
+    },
+    "monferno": {
+      "id": 9,
+      "name": "monferno",
+      "color": "#ff962f",
+      "ability": "burn",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1050,
+        "scale": -3
+      },
+      "power": {
+        "base": 25,
+        "scale": 2.2
+      },
+      "critical": {
+        "base": 2,
+        "scale": 0.3
+      },
+      "range": {
+        "base": 115,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1
+      ],
+      "evolution": {
+        "pokemon": "infernape",
+        "level": 36
+      }
+    },
+    "infernape": {
+      "id": 9,
+      "name": "infernape",
+      "color": "#df8626",
+      "ability": "burn",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1000,
+        "scale": -5
+      },
+      "power": {
+        "base": 60,
+        "scale": 3
+      },
+      "critical": {
+        "base": 2.5,
+        "scale": 0.4
+      },
+      "range": {
+        "base": 120,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1
+      ]
+    },
+    "yamask": {
+      "id": 10,
+      "name": "yamask",
+      "color": "#708088",
+      "ability": "curse",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2770,
+        "scale": -1
+      },
+      "power": {
+        "base": 20,
+        "scale": 2.6
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0
+      },
+      "range": {
+        "base": 220,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "cross",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "cofagrigus",
+        "level": 34
+      }
+    },
+    "cofagrigus": {
+      "id": 10,
+      "name": "cofagrigus",
+      "color": "#ffef47",
+      "ability": "curse",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2500,
+        "scale": -6
+      },
+      "power": {
+        "base": 40,
+        "scale": 4
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0
+      },
+      "range": {
+        "base": 280,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "cross",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "riolu": {
+      "id": 11,
+      "name": "riolu",
+      "color": "#1e9ee6",
+      "ability": "splash",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1300,
+        "scale": -2
+      },
+      "power": {
+        "base": 7,
+        "scale": 2.2
+      },
+      "critical": {
+        "base": 1,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 110,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1
+      ],
+      "evolution": {
+        "pokemon": "lucario",
+        "level": 20
+      }
+    },
+    "lucario": {
+      "id": 11,
+      "name": "lucario",
+      "color": "#1fa7e7",
+      "ability": "splash",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 900,
+        "scale": -2
+      },
+      "power": {
+        "base": 20,
+        "scale": 3.8
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0.2
+      },
+      "range": {
+        "base": 160,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1
+      ]
+    },
+    "mareep": {
+      "id": 13,
+      "name": "mareep",
+      "color": "#ffe69e",
+      "ability": "stunArea",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 3945,
+        "scale": -1
+      },
+      "power": {
+        "base": 5,
+        "scale": 2
+      },
+      "critical": {
+        "base": 1,
+        "scale": 0
+      },
+      "range": {
+        "base": 130,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "area",
+      "costScale": "mid",
+      "tiles": [
+        1
+      ],
+      "evolution": {
+        "pokemon": "flaaffy",
+        "level": 15
+      }
+    },
+    "flaaffy": {
+      "id": 13,
+      "name": "flaaffy",
+      "color": "#fe8faf",
+      "ability": "stunArea",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 3700,
+        "scale": -1
+      },
+      "power": {
+        "base": 8,
+        "scale": 2.2
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0
+      },
+      "range": {
+        "base": 150,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "area",
+      "costScale": "mid",
+      "tiles": [
+        1
+      ],
+      "evolution": {
+        "pokemon": "ampharos",
+        "level": 30
+      }
+    },
+    "ampharos": {
+      "id": 13,
+      "name": "ampharos",
+      "color": "#fff600",
+      "ability": "stunArea",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 3500,
+        "scale": -1
+      },
+      "power": {
+        "base": 15,
+        "scale": 3.8
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0
+      },
+      "range": {
+        "base": 185,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "area",
+      "costScale": "mid",
+      "tiles": [
+        1
+      ]
+    },
+    "gulpin": {
+      "id": 14,
+      "name": "gulpin",
+      "color": "#8fff67",
+      "ability": "poison",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 3500,
+        "scale": -10
+      },
+      "power": {
+        "base": 13,
+        "scale": 0.5
+      },
+      "critical": {
+        "base": 0.5,
+        "scale": 0
+      },
+      "range": {
+        "base": 100,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "area",
+      "costScale": "mid",
+      "tiles": [
+        1
+      ],
+      "evolution": {
+        "pokemon": "swalot",
+        "level": 26
+      }
+    },
+    "swalot": {
+      "id": 14,
+      "name": "swalot",
+      "color": "#b796df",
+      "ability": "poison",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 3000,
+        "scale": -18
+      },
+      "power": {
+        "base": 20,
+        "scale": 1
+      },
+      "critical": {
+        "base": 1,
+        "scale": 0
+      },
+      "range": {
+        "base": 140,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "area",
+      "costScale": "mid",
+      "tiles": [
+        1
+      ]
+    },
+    "cryogonal": {
+      "id": 15,
+      "name": "cryogonal",
+      "color": "#607dcb",
+      "ability": "stunMono",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2400,
+        "scale": -5
+      },
+      "power": {
+        "base": 28,
+        "scale": 11.8
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0
+      },
+      "range": {
+        "base": 148,
+        "scale": 2,
+        "inner": 0
+      },
+      "rangeType": "xShape",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1
+      ]
+    },
+    "sableye": {
+      "id": 16,
+      "name": "sableye",
+      "color": "#8e67bf",
+      "ability": "curse",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 3850,
+        "scale": -31
+      },
+      "power": {
+        "base": 15,
+        "scale": 1.5
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0
+      },
+      "range": {
+        "base": 130,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        2,
+        4
+      ]
+    },
+    "drudiggon": {
+      "id": 17,
+      "name": "Druddigon",
+      "color": "#a42530",
+      "ability": "splash",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 3000,
+        "scale": -10
+      },
+      "power": {
+        "base": 2,
+        "scale": 9
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0
+      },
+      "range": {
+        "base": 100,
+        "scale": 1.3,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1
+      ]
+    },
+    "meowth": {
+      "id": 18,
+      "name": "meowth",
+      "color": "#d6bd62",
+      "ability": "greed",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1700,
+        "scale": -5
+      },
+      "power": {
+        "base": 18,
+        "scale": 1.4
+      },
+      "critical": {
+        "base": 10,
+        "scale": 0.3
+      },
+      "range": {
+        "base": 110,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        2
+      ],
+      "evolution": {
+        "pokemon": "persian",
+        "level": 28
+      }
+    },
+    "persian": {
+      "id": 18,
+      "name": "persian",
+      "color": "#fff79d",
+      "ability": "greed",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1600,
+        "scale": -10
+      },
+      "power": {
+        "base": 35,
+        "scale": 2.7
+      },
+      "critical": {
+        "base": 25,
+        "scale": 0.5
+      },
+      "range": {
+        "base": 130,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        2
+      ]
+    },
+    "sunkern": {
+      "id": 19,
+      "name": "sunkern",
+      "color": "#fff700",
+      "ability": "powerAura",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 0,
+        "scale": 0
+      },
+      "power": {
+        "base": 0,
+        "scale": 0
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0
+      },
+      "range": {
+        "base": 100,
+        "scale": 0.3,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "aura",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        2
+      ],
+      "evolution": {
+        "pokemon": "sunflora",
+        "level": 25
+      }
+    },
+    "sunflora": {
+      "id": 19,
+      "name": "sunflora",
+      "color": "#dfb700",
+      "ability": "powerAura",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 0,
+        "scale": 0
+      },
+      "power": {
+        "base": 0,
+        "scale": 0
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0
+      },
+      "range": {
+        "base": 100,
+        "scale": 0.7,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "aura",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        2
+      ]
+    },
+    "tangela": {
+      "id": 20,
+      "name": "tangela",
+      "color": "#6285ac",
+      "ability": "slow",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1850,
+        "scale": -2
+      },
+      "power": {
+        "base": 16,
+        "scale": 4
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0
+      },
+      "range": {
+        "base": 110,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        2
+      ],
+      "evolution": {
+        "pokemon": "tangrowth",
+        "level": 36
+      }
+    },
+    "tangrowth": {
+      "id": 20,
+      "name": "tangrowth",
+      "color": "#679fef",
+      "ability": "slow",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1750,
+        "scale": -2
+      },
+      "power": {
+        "base": 100,
+        "scale": 9.1
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0
+      },
+      "range": {
+        "base": 150,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        2
+      ]
+    },
+    "chikorita": {
+      "id": 21,
+      "name": "chikorita",
+      "color": "#d7efa6",
+      "ability": "heal",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2500,
+        "scale": -2
+      },
+      "power": {
+        "base": 14,
+        "scale": 2.1
+      },
+      "critical": {
+        "base": 2,
+        "scale": 0
+      },
+      "range": {
+        "base": 120,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        2
+      ],
+      "evolution": {
+        "pokemon": "bayleef",
+        "level": 16
+      }
+    },
+    "bayleef": {
+      "id": 21,
+      "name": "bayleef",
+      "color": "#fff700",
+      "ability": "heal",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2300,
+        "scale": -3
+      },
+      "power": {
+        "base": 40,
+        "scale": 5
+      },
+      "critical": {
+        "base": 2,
+        "scale": 0
+      },
+      "range": {
+        "base": 130,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        2
+      ],
+      "evolution": {
+        "pokemon": "meganium",
+        "level": 32
+      }
+    },
+    "meganium": {
+      "id": 21,
+      "name": "meganium",
+      "color": "#d7efa7",
+      "ability": "heal",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2000,
+        "scale": -3
+      },
+      "power": {
+        "base": 80,
+        "scale": 8.4
+      },
+      "critical": {
+        "base": 4,
+        "scale": 0
+      },
+      "range": {
+        "base": 130,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        2
+      ]
+    },
+    "hoppip": {
+      "id": 22,
+      "name": "hoppip",
+      "color": "#e73f67",
+      "ability": "ambusher",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 900,
+        "scale": -1
+      },
+      "power": {
+        "base": 15,
+        "scale": 1.3
+      },
+      "critical": {
+        "base": 1,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 130,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        2
+      ],
+      "evolution": {
+        "pokemon": "skiploom",
+        "level": 18
+      }
+    },
+    "skiploom": {
+      "id": 22,
+      "name": "skiploom",
+      "color": "#5fb627",
+      "ability": "ambusher",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 800,
+        "scale": -1
+      },
+      "power": {
+        "base": 20,
+        "scale": 1.5
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 140,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        2
+      ],
+      "evolution": {
+        "pokemon": "jumpluff",
+        "level": 27
+      }
+    },
+    "jumpluff": {
+      "id": 22,
+      "name": "jumpluff",
+      "color": "#4f9ed6",
+      "ability": "ambusher",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 600,
+        "scale": -1
+      },
+      "power": {
+        "base": 50,
+        "scale": 1.8
+      },
+      "critical": {
+        "base": 8,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 170,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        2
+      ]
+    },
+    "cottonee": {
+      "id": 23,
+      "name": "cottonee",
+      "color": "#bee293",
+      "ability": "heal",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1270,
+        "scale": -5
+      },
+      "power": {
+        "base": 11,
+        "scale": 1
+      },
+      "critical": {
+        "base": 2,
+        "scale": 0
+      },
+      "range": {
+        "base": 125,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        2
+      ],
+      "evolution": {
+        "pokemon": "whimsicott",
+        "level": 28
+      }
+    },
+    "whimsicott": {
+      "id": 23,
+      "name": "whimsicott",
+      "color": "#b7d667",
+      "ability": "heal",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1190,
+        "scale": -6
+      },
+      "power": {
+        "base": 25,
+        "scale": 2
+      },
+      "critical": {
+        "base": 2,
+        "scale": 0
+      },
+      "range": {
+        "base": 140,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        2
+      ]
+    },
+    "petilil": {
+      "id": 24,
+      "name": "petilil",
+      "color": "#aed162",
+      "ability": "doubleShot",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 3000,
+        "scale": -2
+      },
+      "power": {
+        "base": 12,
+        "scale": 2
+      },
+      "critical": {
+        "base": 2,
+        "scale": 0
+      },
+      "range": {
+        "base": 150,
+        "scale": 0.5,
+        "inner": 100
+      },
+      "rangeType": "donut",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        2
+      ],
+      "evolution": {
+        "pokemon": "lilligant",
+        "level": 28
+      }
+    },
+    "lilligant": {
+      "id": 24,
+      "name": "lilligant",
+      "color": "#fe6b39",
+      "ability": "tripleShot",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2000,
+        "scale": -3
+      },
+      "power": {
+        "base": 55,
+        "scale": 6
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0
+      },
+      "range": {
+        "base": 150,
+        "scale": 1,
+        "inner": 100
+      },
+      "rangeType": "donut",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        2
+      ]
+    },
+    "spinarak": {
+      "id": 25,
+      "name": "spinarak",
+      "color": "#9fce6f",
+      "ability": "poison",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1900,
+        "scale": -1
+      },
+      "power": {
+        "base": 9,
+        "scale": 1.5
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 100,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        2
+      ],
+      "evolution": {
+        "pokemon": "ariados",
+        "level": 22
+      }
+    },
+    "ariados": {
+      "id": 25,
+      "name": "ariados",
+      "color": "#d73f01",
+      "ability": "poison",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1150,
+        "scale": -4
+      },
+      "power": {
+        "base": 13,
+        "scale": 2.7
+      },
+      "critical": {
+        "base": 10,
+        "scale": 0.2
+      },
+      "range": {
+        "base": 110,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        2
+      ]
+    },
+    "maractus": {
+      "id": 26,
+      "name": "maractus",
+      "color": "#5ff051",
+      "ability": "ambusher",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 3450,
+        "scale": -23
+      },
+      "power": {
+        "base": 6,
+        "scale": 3
+      },
+      "critical": {
+        "base": 0.1,
+        "scale": 0
+      },
+      "range": {
+        "base": 110,
+        "scale": 0.6,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "area",
+      "costScale": "high",
+      "tiles": [
+        1,
+        2
+      ]
+    },
+    "shroomish": {
+      "id": 27,
+      "name": "shroomish",
+      "color": "#fee79f",
+      "ability": "heal",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1930,
+        "scale": -2
+      },
+      "power": {
+        "base": 12,
+        "scale": 5
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 100,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        2
+      ],
+      "evolution": {
+        "pokemon": "breloom",
+        "level": 23
+      }
+    },
+    "breloom": {
+      "id": 27,
+      "name": "breloom",
+      "color": "#8fff67",
+      "ability": "heal",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1850,
+        "scale": -3
+      },
+      "power": {
+        "base": 48,
+        "scale": 7.8
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 110,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        2
+      ]
+    },
+    "barboach": {
+      "id": 28,
+      "name": "barboach",
+      "color": "#1f9ee7",
+      "ability": "slow",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 3000,
+        "scale": -2
+      },
+      "power": {
+        "base": 27,
+        "scale": 3.1
+      },
+      "critical": {
+        "base": 1,
+        "scale": 0
+      },
+      "range": {
+        "base": 180,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        3
+      ],
+      "evolution": {
+        "pokemon": "whiscash",
+        "level": 30
+      }
+    },
+    "whiscash": {
+      "id": 28,
+      "name": "whiscash",
+      "color": "#4f5f97",
+      "ability": "slowSplash",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2800,
+        "scale": -4
+      },
+      "power": {
+        "base": 53,
+        "scale": 5
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0
+      },
+      "range": {
+        "base": 280,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        3
+      ]
+    },
+    "clauncher": {
+      "id": 29,
+      "name": "clauncher",
+      "color": "#81e1ff",
+      "ability": "superCritical",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 6000,
+        "scale": 0
+      },
+      "power": {
+        "base": 50,
+        "scale": 25
+      },
+      "critical": {
+        "base": 25,
+        "scale": 0
+      },
+      "range": {
+        "base": 265,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "cross",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1,
+        3
+      ],
+      "evolution": {
+        "pokemon": "clawitzer",
+        "level": 37
+      }
+    },
+    "clawitzer": {
+      "id": 29,
+      "name": "clawitzer",
+      "color": "#4090f9",
+      "ability": "superCritical",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 6000,
+        "scale": 0
+      },
+      "power": {
+        "base": 100,
+        "scale": 50
+      },
+      "critical": {
+        "base": 50,
+        "scale": 0
+      },
+      "range": {
+        "base": 300,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "cross",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1,
+        3
+      ]
+    },
+    "remoraid": {
+      "id": 30,
+      "name": "remoraid",
+      "color": "#afb7bf",
+      "ability": "splash",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 3600,
+        "scale": -1
+      },
+      "power": {
+        "base": 23,
+        "scale": 2.6
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 280,
+        "scale": 1,
+        "inner": 200
+      },
+      "rangeType": "donut",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        3
+      ],
+      "evolution": {
+        "pokemon": "octillery",
+        "level": 25
+      }
+    },
+    "octillery": {
+      "id": 30,
+      "name": "octillery",
+      "color": "#fe875e",
+      "ability": "splash",
+      "projectileSpeed": 10,
+      "speed": {
+        "base": 3100,
+        "scale": -6
+      },
+      "power": {
+        "base": 150,
+        "scale": 7.1
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0.3
+      },
+      "range": {
+        "base": 280,
+        "scale": 2,
+        "inner": 200
+      },
+      "rangeType": "donut",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        3
+      ]
+    },
+    "oshawott": {
+      "id": 31,
+      "name": "oshawott",
+      "color": "#70d8f0",
+      "ability": "focus",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1200,
+        "scale": -1
+      },
+      "power": {
+        "base": 12,
+        "scale": 2.5
+      },
+      "critical": {
+        "base": 1.5,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 115,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        3
+      ],
+      "evolution": {
+        "pokemon": "dewott",
+        "level": 17
+      }
+    },
+    "dewott": {
+      "id": 31,
+      "name": "dewott",
+      "color": "#84d6ee",
+      "ability": "focus",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1100,
+        "scale": -1
+      },
+      "power": {
+        "base": 20,
+        "scale": 2.7
+      },
+      "critical": {
+        "base": 2,
+        "scale": 0.2
+      },
+      "range": {
+        "base": 130,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        3
+      ],
+      "evolution": {
+        "pokemon": "samurott",
+        "level": 36
+      }
+    },
+    "samurott": {
+      "id": 31,
+      "name": "samurott",
+      "color": "#20adbc",
+      "ability": "focus",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 840,
+        "scale": -3
+      },
+      "power": {
+        "base": 80,
+        "scale": 4.5
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0.3
+      },
+      "range": {
+        "base": 140,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        3
+      ]
+    },
+    "staryu": {
+      "id": 32,
+      "name": "staryu",
+      "color": "#de7318",
+      "ability": "swimmer",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 800,
+        "scale": -2
+      },
+      "power": {
+        "base": 13,
+        "scale": 1
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0
+      },
+      "range": {
+        "base": 165,
+        "scale": 0.2,
+        "inner": 0
+      },
+      "rangeType": "xShape",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        3
+      ],
+      "evolution": {
+        "pokemon": "starmie",
+        "level": 33
+      }
+    },
+    "starmie": {
+      "id": 32,
+      "name": "starmie",
+      "color": "#8d62bd",
+      "ability": "swimmer",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 700,
+        "scale": -2
+      },
+      "power": {
+        "base": 55,
+        "scale": 3
+      },
+      "critical": {
+        "base": 10,
+        "scale": 0
+      },
+      "range": {
+        "base": 200,
+        "scale": 0.4,
+        "inner": 0
+      },
+      "rangeType": "xShape",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        3
+      ]
+    },
+    "lapras": {
+      "id": 33,
+      "name": "lapras",
+      "color": "#7acfff",
+      "ability": "stunArea",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 6300,
+        "scale": -5.8
+      },
+      "power": {
+        "base": 10,
+        "scale": 6.6
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0
+      },
+      "range": {
+        "base": 150,
+        "scale": 0.5,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "area",
+      "costScale": "high",
+      "tiles": [
+        1,
+        3
+      ]
+    },
+    "seel": {
+      "id": 34,
+      "name": "seel",
+      "color": "#d7dfde",
+      "ability": "stunMono",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1550,
+        "scale": -1
+      },
+      "power": {
+        "base": 15,
+        "scale": 5
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0
+      },
+      "range": {
+        "base": 260,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "cross",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        3
+      ],
+      "evolution": {
+        "pokemon": "dewgong",
+        "level": 34
+      }
+    },
+    "dewgong": {
+      "id": 34,
+      "name": "dewgong",
+      "color": "#adb4bd",
+      "ability": "stunMono",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1350,
+        "scale": -2
+      },
+      "power": {
+        "base": 60,
+        "scale": 7.5
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0
+      },
+      "range": {
+        "base": 400,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "cross",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        3
+      ]
+    },
+    "psyduck": {
+      "id": 35,
+      "name": "psyduck",
+      "color": "#dfb501",
+      "ability": "swimmer",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1850,
+        "scale": -2
+      },
+      "power": {
+        "base": 14,
+        "scale": 2
+      },
+      "critical": {
+        "base": 1,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 130,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        3
+      ],
+      "evolution": {
+        "pokemon": "golduck",
+        "level": 33
+      }
+    },
+    "golduck": {
+      "id": 35,
+      "name": "golduck",
+      "color": "#199de7",
+      "ability": "swimmer",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1350,
+        "scale": -5
+      },
+      "power": {
+        "base": 42,
+        "scale": 3.6
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 155,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        3
+      ]
+    },
+    "murkrow": {
+      "id": 36,
+      "name": "murkrow",
+      "color": "#deb600",
+      "ability": "frisk",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 950,
+        "scale": -1
+      },
+      "power": {
+        "base": 10,
+        "scale": 2.5
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0.2
+      },
+      "range": {
+        "base": 160,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "honchkrow",
+        "level": 40
+      }
+    },
+    "honchkrow": {
+      "id": 36,
+      "name": "honchkrow",
+      "color": "#d7d7de",
+      "ability": "frisk",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 890,
+        "scale": -2
+      },
+      "power": {
+        "base": 35,
+        "scale": 3.3
+      },
+      "critical": {
+        "base": 10,
+        "scale": 0.2
+      },
+      "range": {
+        "base": 190,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "sandshrew": {
+      "id": 37,
+      "name": "sandshrew",
+      "color": "#dfb500",
+      "ability": "doubleShot",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1550,
+        "scale": -1
+      },
+      "power": {
+        "base": 8,
+        "scale": 4
+      },
+      "critical": {
+        "base": 15,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 105,
+        "scale": 0.3,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "sandslash",
+        "level": 22
+      }
+    },
+    "sandslash": {
+      "id": 37,
+      "name": "sandslash",
+      "color": "#de7318",
+      "ability": "doubleShot",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1050,
+        "scale": -1
+      },
+      "power": {
+        "base": 30,
+        "scale": 5.7
+      },
+      "critical": {
+        "base": 15,
+        "scale": 0.3
+      },
+      "range": {
+        "base": 115,
+        "scale": 0.3,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "trapinch": {
+      "id": 38,
+      "name": "trapinch",
+      "color": "#ff9746",
+      "ability": "vigilant",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2000,
+        "scale": -1
+      },
+      "power": {
+        "base": 12,
+        "scale": 1
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 90,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "vibrava",
+        "level": 35
+      }
+    },
+    "vibrava": {
+      "id": 38,
+      "name": "vibrava",
+      "color": "#deb700",
+      "ability": "vigilant",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1700,
+        "scale": -1
+      },
+      "power": {
+        "base": 50,
+        "scale": 3.6
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0.2
+      },
+      "range": {
+        "base": 140,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "flygon",
+        "level": 45
+      }
+    },
+    "flygon": {
+      "id": 38,
+      "name": "flygon",
+      "color": "#5fb726",
+      "ability": "vigilant",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1320,
+        "scale": -3.2
+      },
+      "power": {
+        "base": 55,
+        "scale": 7
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0.3
+      },
+      "range": {
+        "base": 180,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "noibat": {
+      "id": 39,
+      "name": "noibat",
+      "color": "#863f86",
+      "ability": "focus",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1850,
+        "scale": 0
+      },
+      "power": {
+        "base": 14,
+        "scale": 3
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0
+      },
+      "range": {
+        "base": 300,
+        "scale": 0.5,
+        "inner": 200
+      },
+      "rangeType": "donut",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "noivern",
+        "level": 48
+      }
+    },
+    "noivern": {
+      "id": 39,
+      "name": "noivern",
+      "color": "#6cc5bb",
+      "ability": "focus",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1600,
+        "scale": -1.8
+      },
+      "power": {
+        "base": 60,
+        "scale": 11.5
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0
+      },
+      "range": {
+        "base": 300,
+        "scale": 1,
+        "inner": 200
+      },
+      "rangeType": "donut",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "sneasel": {
+      "id": 40,
+      "name": "sneasel",
+      "color": "#4f5f96",
+      "ability": "superCritical",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 900,
+        "scale": -3
+      },
+      "power": {
+        "base": 7,
+        "scale": 1.8
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0.5
+      },
+      "range": {
+        "base": 100,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "weavile",
+        "level": 25
+      }
+    },
+    "weavile": {
+      "id": 40,
+      "name": "weavile",
+      "color": "#d73f01",
+      "ability": "superCritical",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 700,
+        "scale": -3
+      },
+      "power": {
+        "base": 25,
+        "scale": 4
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0.8
+      },
+      "range": {
+        "base": 115,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "drilbur": {
+      "id": 41,
+      "name": "drilbur",
+      "color": "#8d7b6d",
+      "ability": "armorBreak",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2600,
+        "scale": -2
+      },
+      "power": {
+        "base": 8,
+        "scale": 1
+      },
+      "critical": {
+        "base": 1,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 110,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "area",
+      "costScale": "high",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "excadrill",
+        "level": 31
+      }
+    },
+    "excadrill": {
+      "id": 41,
+      "name": "excadrill",
+      "color": "#bc4342",
+      "ability": "armorBreak",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1100,
+        "scale": -6
+      },
+      "power": {
+        "base": 20,
+        "scale": 1.6
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 130,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "area",
+      "costScale": "high",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "shuckle": {
+      "id": 42,
+      "name": "shuckle",
+      "color": "#d73f00",
+      "ability": "slow",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 7000,
+        "scale": -50
+      },
+      "power": {
+        "base": 50,
+        "scale": 1
+      },
+      "critical": {
+        "base": 1,
+        "scale": 0
+      },
+      "range": {
+        "base": 140,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "area",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "hawlucha": {
+      "id": 43,
+      "name": "hawlucha",
+      "color": "#01bd93",
+      "ability": "armorBreak",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1630,
+        "scale": -8
+      },
+      "power": {
+        "base": 12,
+        "scale": 6.3
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0
+      },
+      "range": {
+        "base": 135,
+        "scale": 1,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "aron": {
+      "id": 44,
+      "name": "aron",
+      "color": "#afb6bf",
+      "ability": "vigilant",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2500,
+        "scale": 0
+      },
+      "power": {
+        "base": 14,
+        "scale": 0.7
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0
+      },
+      "range": {
+        "base": 90,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "area",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "lairon",
+        "level": 32
+      }
+    },
+    "lairon": {
+      "id": 44,
+      "name": "lairon",
+      "color": "#7f8e97",
+      "ability": "vigilant",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2400,
+        "scale": 0
+      },
+      "power": {
+        "base": 18,
+        "scale": 1.7
+      },
+      "critical": {
+        "base": 4,
+        "scale": 0
+      },
+      "range": {
+        "base": 120,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "area",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "aggron",
+        "level": 42
+      }
+    },
+    "aggron": {
+      "id": 44,
+      "name": "aggron",
+      "color": "#c7cfd2",
+      "ability": "vigilant",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2250,
+        "scale": 0
+      },
+      "power": {
+        "base": 35,
+        "scale": 3.3
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0
+      },
+      "range": {
+        "base": 145,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "area",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "cubone": {
+      "id": 45,
+      "name": "cubone",
+      "color": "#ac6218",
+      "ability": "ninja",
+      "projectileSpeed": 7,
+      "ricochet": 2,
+      "speed": {
+        "base": 2700,
+        "scale": -1
+      },
+      "power": {
+        "base": 18,
+        "scale": 4
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 270,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "cross",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "marowak",
+        "level": 28
+      }
+    },
+    "marowak": {
+      "id": 45,
+      "name": "marowak",
+      "color": "#de7319",
+      "ability": "ninja",
+      "projectileSpeed": 7,
+      "ricochet": 4,
+      "speed": {
+        "base": 2700,
+        "scale": -11
+      },
+      "power": {
+        "base": 60,
+        "scale": 5.7
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 350,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "cross",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "pidgey": {
+      "id": 46,
+      "name": "pidgey",
+      "color": "#e63963",
+      "ability": "vigilant",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1250,
+        "scale": -1
+      },
+      "power": {
+        "base": 9,
+        "scale": 2
+      },
+      "critical": {
+        "base": 1,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 125,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "pidgeotto",
+        "level": 18
+      }
+    },
+    "pidgeotto": {
+      "id": 46,
+      "name": "pidgeotto",
+      "color": "#fe8dad",
+      "ability": "vigilant",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1100,
+        "scale": -1
+      },
+      "power": {
+        "base": 28,
+        "scale": 2.1
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 140,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "pidgeot",
+        "level": 36
+      }
+    },
+    "pidgeot": {
+      "id": 46,
+      "name": "pidgeot",
+      "color": "#fe9542",
+      "ability": "vigilant",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1000,
+        "scale": -3
+      },
+      "power": {
+        "base": 60,
+        "scale": 3.8
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0.2
+      },
+      "range": {
+        "base": 180,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "binacle": {
+      "id": 47,
+      "name": "binacle",
+      "color": "#9b7547",
+      "ability": "doubleShot",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2400,
+        "scale": -4
+      },
+      "power": {
+        "base": 13,
+        "scale": 2.8
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0
+      },
+      "range": {
+        "base": 110,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        3,
+        4
+      ],
+      "evolution": {
+        "pokemon": "barbaracle",
+        "level": 39
+      }
+    },
+    "barbaracle": {
+      "id": 47,
+      "name": "barbaracle",
+      "color": "#c8cbda",
+      "ability": "quadraShot",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2300,
+        "scale": -5.7
+      },
+      "power": {
+        "base": 20,
+        "scale": 4.4
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0
+      },
+      "range": {
+        "base": 140,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        3,
+        4
+      ]
+    },
+    "surskit": {
+      "id": 48,
+      "name": "surskit",
+      "color": "#1e9ee7",
+      "ability": "swimmer",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1000,
+        "scale": -5
+      },
+      "power": {
+        "base": 12,
+        "scale": 1
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0
+      },
+      "range": {
+        "base": 115,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        2,
+        3
+      ],
+      "evolution": {
+        "pokemon": "masquerain",
+        "level": 22
+      }
+    },
+    "masquerain": {
+      "id": 48,
+      "name": "masquerain",
+      "color": "#ff875f",
+      "ability": "swimmer",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1000,
+        "scale": -6.3
+      },
+      "power": {
+        "base": 20,
+        "scale": 1.7
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0
+      },
+      "range": {
+        "base": 130,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        2,
+        3
+      ]
+    },
+    "ferroseed": {
+      "id": 49,
+      "name": "ferroseed",
+      "color": "#5eb727",
+      "ability": "slow",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2800,
+        "scale": -2
+      },
+      "power": {
+        "base": 9,
+        "scale": 2.2
+      },
+      "critical": {
+        "base": 1,
+        "scale": 0
+      },
+      "range": {
+        "base": 100,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "area",
+      "costScale": "high",
+      "tiles": [
+        1,
+        2,
+        4
+      ],
+      "evolution": {
+        "pokemon": "ferrothorn",
+        "level": 40
+      }
+    },
+    "ferrothorn": {
+      "id": 49,
+      "name": "ferrothorn",
+      "color": "#208c52",
+      "ability": "slow",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2450,
+        "scale": -2.8
+      },
+      "power": {
+        "base": 12,
+        "scale": 3
+      },
+      "critical": {
+        "base": 2,
+        "scale": 0
+      },
+      "range": {
+        "base": 130,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "area",
+      "costScale": "high",
+      "tiles": [
+        1,
+        2,
+        4
+      ]
+    },
+    "absol": {
+      "id": 50,
+      "name": "absol",
+      "color": "#d7dedf",
+      "ability": "focus",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1270,
+        "scale": -9
+      },
+      "power": {
+        "base": 5,
+        "scale": 3.3
+      },
+      "critical": {
+        "base": 0,
+        "scale": 1
+      },
+      "range": {
+        "base": 100,
+        "scale": 0.3,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1,
+        2,
+        4
+      ]
+    },
+    "girafarig": {
+      "id": 51,
+      "name": "girafarig",
+      "color": "#dfb700",
+      "ability": "curseDoubleShot",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2200,
+        "scale": -2
+      },
+      "power": {
+        "base": 3,
+        "scale": 1
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0
+      },
+      "range": {
+        "base": 110,
+        "scale": 0.25,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1
+      ]
+    },
+    "torkoal": {
+      "id": 52,
+      "name": "torkoal",
+      "color": "#df761e",
+      "ability": "burnNerf",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 5200,
+        "scale": -22
+      },
+      "power": {
+        "base": 7,
+        "scale": 6
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0
+      },
+      "range": {
+        "base": 160,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "area",
+      "costScale": "high",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "spinda": {
+      "id": 53,
+      "name": "spinda",
+      "color": "#ff875f",
+      "ability": "spinda",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 200,
+        "scale": 0
+      },
+      "power": {
+        "base": 1,
+        "scale": 1
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0.2
+      },
+      "range": {
+        "base": 300,
+        "scale": 1,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "dunsparce": {
+      "id": 54,
+      "name": "dunsparce",
+      "color": "#1f9fe7",
+      "ability": "slowSplash",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2900,
+        "scale": -12
+      },
+      "power": {
+        "base": 15,
+        "scale": 7
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0.2
+      },
+      "range": {
+        "base": 200,
+        "scale": 3,
+        "inner": 0
+      },
+      "rangeType": "cross",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "ralts": {
+      "id": 55,
+      "name": "ralts",
+      "color": "#5ec636",
+      "ability": "synchronySplash",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2200,
+        "scale": -1
+      },
+      "power": {
+        "base": 1,
+        "scale": 1
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 90,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1
+      ],
+      "evolution": {
+        "pokemon": "kirlia",
+        "level": 20
+      }
+    },
+    "kirlia": {
+      "id": 55,
+      "name": "kirlia",
+      "color": "#e63f67",
+      "ability": "synchronySplash",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2200,
+        "scale": -2
+      },
+      "power": {
+        "base": 10,
+        "scale": 3
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 100,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1
+      ],
+      "evolution": {
+        "pokemon": "gardevoir",
+        "level": 30
+      }
+    },
+    "gardevoir": {
+      "id": 55,
+      "name": "gardevoir",
+      "color": "#8fff66",
+      "ability": "synchronySplash",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2200,
+        "scale": -6
+      },
+      "power": {
+        "base": 40,
+        "scale": 8.6
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 120,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1
+      ]
+    },
+    "koffing": {
+      "id": 56,
+      "name": "koffing",
+      "color": "#b595df",
+      "ability": "poison",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2700,
+        "scale": -2
+      },
+      "power": {
+        "base": 16,
+        "scale": 4
+      },
+      "critical": {
+        "base": 2,
+        "scale": 0
+      },
+      "range": {
+        "base": 125,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "weezing",
+        "level": 35
+      }
+    },
+    "weezing": {
+      "id": 56,
+      "name": "weezing",
+      "color": "#ad6bb4",
+      "ability": "poisonDoubleShot",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2320,
+        "scale": -5
+      },
+      "power": {
+        "base": 50,
+        "scale": 8.1
+      },
+      "critical": {
+        "base": 4,
+        "scale": 0
+      },
+      "range": {
+        "base": 140,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "farfetchd": {
+      "id": 57,
+      "name": "farfetch’d",
+      "color": "#ad621b",
+      "ability": "criticalAura",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2000,
+        "scale": -10
+      },
+      "power": {
+        "base": 7,
+        "scale": 2
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0.5
+      },
+      "range": {
+        "base": 110,
+        "scale": 0.2,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        2,
+        4
+      ]
+    },
+    "omanyte": {
+      "id": 58,
+      "name": "omanyte",
+      "color": "#8cdffe",
+      "ability": "swimmer",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 5700,
+        "scale": -10
+      },
+      "power": {
+        "base": 26,
+        "scale": 4
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0
+      },
+      "range": {
+        "base": 130,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "area",
+      "costScale": "high",
+      "tiles": [
+        1,
+        3,
+        4
+      ],
+      "evolution": {
+        "pokemon": "omastar",
+        "level": 40
+      }
+    },
+    "omastar": {
+      "id": 58,
+      "name": "omastar",
+      "color": "#189ce6",
+      "ability": "swimmer",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 4000,
+        "scale": -10
+      },
+      "power": {
+        "base": 40,
+        "scale": 8.5
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0
+      },
+      "range": {
+        "base": 155,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "area",
+      "costScale": "high",
+      "tiles": [
+        1,
+        3,
+        4
+      ]
+    },
+    "kabuto": {
+      "id": 59,
+      "name": "kabuto",
+      "color": "#de7318",
+      "ability": "doubleShot",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1500,
+        "scale": -2
+      },
+      "power": {
+        "base": 10,
+        "scale": 2.5
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0.3
+      },
+      "range": {
+        "base": 100,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1,
+        3,
+        4
+      ],
+      "evolution": {
+        "pokemon": "kabutops",
+        "level": 40
+      }
+    },
+    "kabutops": {
+      "id": 59,
+      "name": "kabutops",
+      "color": "#a55b19",
+      "ability": "doubleShot",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1120,
+        "scale": -4
+      },
+      "power": {
+        "base": 25,
+        "scale": 4.3
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0.6
+      },
+      "range": {
+        "base": 100,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1,
+        3,
+        4
+      ]
+    },
+    "corsola": {
+      "id": 60,
+      "name": "corsola",
+      "color": "#ff8faf",
+      "ability": "slowSplash",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1500,
+        "scale": -2
+      },
+      "power": {
+        "base": 10,
+        "scale": 4.5
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0
+      },
+      "range": {
+        "base": 200,
+        "scale": 1,
+        "inner": 125
+      },
+      "rangeType": "donut",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        3,
+        4
+      ]
+    },
+    "castform": {
+      "id": 61,
+      "name": "castform",
+      "color": "#aeb7bf",
+      "ability": "castform",
+      "projectileSpeed": 7,
+      "projectileGrass": {},
+      "projectileWater": {},
+      "projectileMountain": {},
+      "speed": {
+        "base": 2100,
+        "scale": -12
+      },
+      "power": {
+        "base": 1,
+        "scale": 5
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0
+      },
+      "range": {
+        "base": 120,
+        "scale": 0.3,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    "clefairy": {
+      "id": 62,
+      "name": "clefairy",
+      "color": "#ffc7d7",
+      "ability": "star",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1200,
+        "scale": -2
+      },
+      "power": {
+        "base": 5,
+        "scale": 1
+      },
+      "critical": {
+        "base": 1,
+        "scale": 0
+      },
+      "range": {
+        "base": 120,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "clefable",
+        "level": 25
+      }
+    },
+    "clefable": {
+      "id": 62,
+      "name": "clefable",
+      "color": "#fe8dad",
+      "ability": "star",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1200,
+        "scale": -3
+      },
+      "power": {
+        "base": 25,
+        "scale": 4.3
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0
+      },
+      "range": {
+        "base": 140,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "anorith": {
+      "id": 63,
+      "name": "anorith",
+      "color": "#47676f",
+      "ability": "armaldo",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1600,
+        "scale": -2
+      },
+      "power": {
+        "base": 8,
+        "scale": 2
+      },
+      "critical": {
+        "base": 25,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 100,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1,
+        2,
+        4
+      ],
+      "evolution": {
+        "pokemon": "armaldo",
+        "level": 40
+      }
+    },
+    "armaldo": {
+      "id": 63,
+      "name": "armaldo",
+      "color": "#1f9fe7",
+      "ability": "armaldo",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1600,
+        "scale": -7
+      },
+      "power": {
+        "base": 20,
+        "scale": 4
+      },
+      "critical": {
+        "base": 50,
+        "scale": 0.2
+      },
+      "range": {
+        "base": 115,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1,
+        2,
+        4
+      ]
+    },
+    "lileep": {
+      "id": 64,
+      "name": "lileep",
+      "color": "#c697de",
+      "ability": "cradily",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2500,
+        "scale": -2
+      },
+      "power": {
+        "base": 10,
+        "scale": 2.3
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0
+      },
+      "range": {
+        "base": 130,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1,
+        2,
+        4
+      ],
+      "evolution": {
+        "pokemon": "cradily",
+        "level": 40
+      }
+    },
+    "cradily": {
+      "id": 64,
+      "name": "cradily",
+      "color": "#a75e67",
+      "ability": "cradily",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2320,
+        "scale": -4
+      },
+      "power": {
+        "base": 40,
+        "scale": 3.7
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0
+      },
+      "range": {
+        "base": 160,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1,
+        2,
+        4
+      ]
+    },
+    "shieldon": {
+      "id": 65,
+      "name": "shieldon",
+      "color": "#efbe36",
+      "ability": "bastiodon",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 10000,
+        "scale": -10
+      },
+      "power": {
+        "base": 50,
+        "scale": 5
+      },
+      "critical": {
+        "base": 1,
+        "scale": 0
+      },
+      "range": {
+        "base": 110,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "area",
+      "costScale": "high",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "bastiodon",
+        "level": 30
+      }
+    },
+    "bastiodon": {
+      "id": 65,
+      "name": "bastiodon",
+      "color": "#c7971f",
+      "ability": "bastiodon",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 8000,
+        "scale": -15
+      },
+      "power": {
+        "base": 200,
+        "scale": 12
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0
+      },
+      "range": {
+        "base": 140,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "area",
+      "costScale": "high",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "cranidos": {
+      "id": 66,
+      "name": "cranidos",
+      "color": "#1f9fe7",
+      "ability": "rampardos",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 3000,
+        "scale": -5
+      },
+      "power": {
+        "base": 10,
+        "scale": 5
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 95,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "rampardos",
+        "level": 30
+      }
+    },
+    "rampardos": {
+      "id": 66,
+      "name": "rampardos",
+      "color": "#d72701",
+      "ability": "rampardos",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2600,
+        "scale": -7
+      },
+      "power": {
+        "base": 50,
+        "scale": 11
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0.15
+      },
+      "range": {
+        "base": 110,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "starly": {
+      "id": 67,
+      "name": "starly",
+      "color": "#7e6f6e",
+      "ability": "doubleShot",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1250,
+        "scale": -1
+      },
+      "power": {
+        "base": 4,
+        "scale": 1
+      },
+      "critical": {
+        "base": 1,
+        "scale": 0.2
+      },
+      "range": {
+        "base": 175,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "staravia",
+        "level": 14
+      }
+    },
+    "staravia": {
+      "id": 67,
+      "name": "staravia",
+      "color": "#b7bfc7",
+      "ability": "doubleShot",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1100,
+        "scale": -1
+      },
+      "power": {
+        "base": 12,
+        "scale": 1.8
+      },
+      "critical": {
+        "base": 3,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 210,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        4
+      ],
+      "evolution": {
+        "pokemon": "staraptor",
+        "level": 31
+      }
+    },
+    "staraptor": {
+      "id": 67,
+      "name": "staraptor",
+      "color": "#df6c56",
+      "ability": "doubleShot",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 1000,
+        "scale": -3
+      },
+      "power": {
+        "base": 30,
+        "scale": 2.2
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0.1
+      },
+      "range": {
+        "base": 280,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "low",
+      "tiles": [
+        1,
+        4
+      ]
+    },
+    "abra": {
+      "id": 68,
+      "name": "abra",
+      "color": "#deb500",
+      "ability": "teleport",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 850,
+        "scale": 0
+      },
+      "power": {
+        "base": 1,
+        "scale": 1
+      },
+      "critical": {
+        "base": 1,
+        "scale": 0
+      },
+      "range": {
+        "base": 90,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "mid",
+      "tiles": [
+        1,
+        2,
+        4
+      ],
+      "evolution": {
+        "pokemon": "kadabra",
+        "level": 16
+      }
+    },
+    "kadabra": {
+      "id": 68,
+      "name": "kadabra",
+      "color": "#a55a19",
+      "ability": "teleport",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 800,
+        "scale": 0
+      },
+      "power": {
+        "base": 15,
+        "scale": 3
+      },
+      "critical": {
+        "base": 5,
+        "scale": 0
+      },
+      "range": {
+        "base": 100,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1,
+        2,
+        4
+      ],
+      "evolution": {
+        "pokemon": "alakazam",
+        "level": 50
+      }
+    },
+    "alakazam": {
+      "id": 68,
+      "name": "alakazam",
+      "color": "#dfb401",
+      "ability": "teleport",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 700,
+        "scale": 0
+      },
+      "power": {
+        "base": 30,
+        "scale": 4
+      },
+      "critical": {
+        "base": 20,
+        "scale": 0
+      },
+      "range": {
+        "base": 110,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1,
+        2,
+        4
+      ]
+    },
+    "gastly": {
+      "id": 69,
+      "name": "gastly",
+      "color": "#b595de",
+      "ability": "nightmare",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2200,
+        "scale": -1
+      },
+      "power": {
+        "base": 9,
+        "scale": 1
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0
+      },
+      "range": {
+        "base": 110,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1
+      ],
+      "evolution": {
+        "pokemon": "haunter",
+        "level": 25
+      }
+    },
+    "haunter": {
+      "id": 69,
+      "name": "haunter",
+      "color": "#8c62bc",
+      "ability": "nightmare",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2200,
+        "scale": -4
+      },
+      "power": {
+        "base": 30,
+        "scale": 2
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0
+      },
+      "range": {
+        "base": 120,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1
+      ],
+      "evolution": {
+        "pokemon": "gengar",
+        "level": 50
+      }
+    },
+    "gengar": {
+      "id": 69,
+      "name": "gengar",
+      "color": "#b494de",
+      "ability": "nightmare",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 2200,
+        "scale": -8
+      },
+      "power": {
+        "base": 40,
+        "scale": 6.6
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0
+      },
+      "range": {
+        "base": 130,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "high",
+      "tiles": [
+        1
+      ]
+    },
+    "ditto": {
+      "id": 70,
+      "name": "ditto",
+      "color": "#d794de",
+      "ability": "transform",
+      "projectileSpeed": 7,
+      "speed": {
+        "base": 0,
+        "scale": 0
+      },
+      "power": {
+        "base": 0,
+        "scale": 0
+      },
+      "critical": {
+        "base": 0,
+        "scale": 0
+      },
+      "range": {
+        "base": 100,
+        "scale": 0,
+        "inner": 0
+      },
+      "rangeType": "circle",
+      "attackType": "single",
+      "costScale": "veryHigh",
+      "tiles": [
+        1,
+        2
+      ]
+    }
+  },
+  "ability": {
+    "ambusher": {
+      "id": "ambusher",
+      "name": "Ambusher",
+      "description": "It doubles its power if it is in tall grass."
+    },
+    "swimmer": {
+      "id": "swimmer",
+      "name": "Swift Swim",
+      "description": "It doubles its speed if it is in water."
+    },
+    "vigilant": {
+      "id": "vigilant",
+      "name": "Vigilant",
+      "description": "It doubles its range if it is in the mountains."
+    },
+    "burn": {
+      "id": "burn",
+      "name": "Burn",
+      "description": "The attacks burn the target for 10 seconds, causing them to lose 0.5% of their life per second."
+    },
+    "burnNerf": {
+      "id": "burnNerf",
+      "name": "Burn",
+      "description": "Attacks have a 50% chance to burn the target for 10 seconds, causing it to lose 0.5% HP per second."
+    },
+    "poison": {
+      "id": "poison",
+      "name": "Poison",
+      "description": "The attacks apply 1 stack of poison.\n\t\t\tThe target loses 0.1% of life per second for each charge."
+    },
+    "frisk": {
+      "id": "frisk",
+      "name": "Frisk",
+      "description": "Can hit invisible enemies"
+    },
+    "slow": {
+      "id": "slow",
+      "name": "Slow",
+      "description": "The attacks slow the target for 2 seconds."
+    },
+    "stunMono": {
+      "id": "stunMono",
+      "name": "Stun",
+      "description": "The attacks have a 30% chance of paralyzing the target for 2 seconds."
+    },
+    "stunMonoNerf": {
+      "id": "stunMonoNerf",
+      "name": "Stun",
+      "description": "The attacks have a 5% chance of paralyzing the target for 1.5 seconds."
+    },
+    "stunArea": {
+      "id": "stunArea",
+      "name": "Stun",
+      "description": "The attacks have a 30% chance of paralyzing the target for 1.5 seconds."
+    },
+    "armorBreak": {
+      "id": "armorBreak",
+      "name": "Armor Break",
+      "description": "Causes double damage to armor."
+    },
+    "ninja": {
+      "id": "ninja",
+      "name": "Ninja",
+      "description": "The attacks ricochet between enemies with reduced damage."
+    },
+    "heal": {
+      "id": "heal",
+      "name": "Heal",
+      "description": "Attacks have a small chance of restoring 1 heart."
+    },
+    "greed": {
+      "id": "greed",
+      "name": "Greed",
+      "description": "Attacks grant $ equal to 10% of the target’s gold."
+    },
+    "focus": {
+      "id": "focus",
+      "name": "Focus",
+      "description": "Each attack on the same target causes additional damage."
+    },
+    "curse": {
+      "id": "curse",
+      "name": "Curse",
+      "description": "Curse an enemy and deal damage to all cursed enemies"
+    },
+    "doubleShot": {
+      "id": "doubleShot",
+      "name": "Double Shot",
+      "description": "Fires projectiles at up to 2 enemies at once."
+    },
+    "tripleShot": {
+      "id": "tripleShot",
+      "name": "Triple Shot",
+      "description": "Fires projectiles at up to 3 enemies at once."
+    },
+    "quadraShot": {
+      "id": "quadraShot",
+      "name": "Quadra Shot",
+      "description": "Fires projectiles at up to 4 enemies at once."
+    },
+    "splash": {
+      "id": "splash",
+      "name": "Splash",
+      "description": "The projectiles explode in an area, causing half damage to nearby enemies."
+    },
+    "superCritical": {
+      "id": "superCritical",
+      "name": "Super Critical",
+      "description": "Criticals do twice the damage."
+    },
+    "powerAura": {
+      "id": "powerAura",
+      "name": "Power Aura",
+      "description": "Increases damage dealt by Pokémon within range by 20%."
+    },
+    "criticalAura": {
+      "id": "criticalAura",
+      "name": "Critical Aura",
+      "description": "Increases the critical damage of Pokémon within range by 33%."
+    },
+    "curseDoubleShot": {
+      "id": "curseDoubleShot",
+      "name": "Curse DoubleShot",
+      "description": "Shoots projectiles at up to 2 enemies at once and curses them. Deals damage to all cursed enemies."
+    },
+    "poisonDoubleShot": {
+      "id": "poisonDoubleShot",
+      "name": "Poison DoubleShot",
+      "description": "Shoots projectiles at up to 2 enemies at once and applies 1 stack of poison. The target loses 0.1% health per second per stack."
+    },
+    "spinda": {
+      "id": "spinda",
+      "name": "Own Tempo",
+      "description": "Has trouble focusing."
+    },
+    "slowSplash": {
+      "id": "slowSplash",
+      "name": "Slow Splash",
+      "description": "Projectiles explode in an area, dealing half damage to nearby enemies and slowing them for 2 seconds."
+    },
+    "synchronySplash": {
+      "id": "synchronySplash",
+      "name": "Synchrony",
+      "description": "Projectiles explode in an area, dealing half damage to nearby enemies and spreading the main target’s prejudices."
+    },
+    "castform": {
+      "id": "castform",
+      "name": "Forecast",
+      "description": "Multiplies its damage by 2 in tall grass, its speed by 2 in water, and its range by 2 in mountains."
+    },
+    "star": {
+      "id": "star",
+      "name": "star",
+      "description": "Attacks deal 1 additional damage for each star."
+    },
+    "teleport": {
+      "id": "teleport",
+      "name": "teleport",
+      "description": "Teleports periodically whenever possible. Each teleport grants 100% stackable damage to the next attack."
+    },
+    "nightmare": {
+      "id": "nightmare",
+      "name": "nightmare",
+      "description": "Attacks apply 1 nightmare stack. Each stack deals damage equal to 20% of this Pokémon’s power per second."
+    },
+    "bastiodon": {
+      "id": "bastiodon",
+      "name": "Fossil Speed",
+      "description": "Reduces recharge time by 0.5s for each Fossil Pokémon on the team."
+    },
+    "rampardos": {
+      "id": "rampardos",
+      "name": "Rock Head",
+      "description": "Increases damage by 5% for each missing heart."
+    },
+    "armaldo": {
+      "id": "armaldo",
+      "name": "Critical Ricochet",
+      "description": "Critical projectiles ricochet between enemies and keep ricocheting as long as they remain critical."
+    },
+    "cradily": {
+      "id": "cradily",
+      "name": "Fossil Projectile",
+      "description": "Shoots one projectile for each Fossil Pokémon on the team. Attacks slow the target for 2 seconds."
+    },
+    "transform": {
+      "id": "transform",
+      "name": "Transform",
+      "description": "Transforms into the first Pokémon in the party, copying its stats and ability adjusted to Ditto’s level."
+    }
+  }
+}

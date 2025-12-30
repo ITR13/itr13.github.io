@@ -1,0 +1,298 @@
+---
+layout: default
+---
+<div class="search-container">
+    <input type="text" id="searchInput" placeholder="Search Pokémon...">
+</div>
+
+<div class="info-boxes horizontal">
+    <div class="info-box">
+        <div class="title">Level</div>
+        <input type="number" id="level" min="1" max="100" value="100">
+    </div>
+    <div class="info-box">
+        <div class="title">Stars</div>
+        <input type="number" id="stars" min="0" max="900" value="900">
+    </div>
+    <div class="info-box">
+        <div class="title">Hearts</div>
+        <input type="number" id="hearts" min="1" max="14" value="1">
+    </div>
+    <div class="info-box">
+        <div class="title">Fossils</div>
+        <input type="number" id="fossils" min="0" max="7" value="6">
+    </div>
+</div>
+
+<div id="loadingBar">Loading Pokémon...</div>
+<div id="rankTableContainer"></div>
+
+<style>
+    .info-boxes.horizontal {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .info-box {
+        background: #f2f2f2;
+        padding: 8px 12px;
+        border-radius: 8px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .info-box .title {
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th,
+    td {
+        border: 1px solid #ccc;
+        padding: 4px 8px;
+    }
+
+    th {
+        cursor: pointer;
+        background: #222;
+        color: #fff;
+        position: relative;
+    }
+
+    th .sort-arrow {
+        font-size: 0.8em;
+        margin-left: 4px;
+    }
+
+    td.num {
+        text-align: right;
+    }
+
+    #loadingBar {
+        margin: 12px 0;
+        font-weight: bold;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const container = document.getElementById('rankTableContainer');
+        const searchInput = document.getElementById('searchInput');
+        const levelInput = document.getElementById('level');
+        const starsInput = document.getElementById('stars');
+        const heartsInput = document.getElementById('hearts');
+        const fossilsInput = document.getElementById('fossils');
+        const loadingBar = document.getElementById('loadingBar');
+
+        let sortKey = 'name';
+        let sortAsc = true;
+
+        loadingBar.style.display = 'block';
+        const data = await fetch('data.json').then(r => r.json());
+        loadingBar.style.display = 'none';
+
+        function stat(obj, key, level) {
+            const base = obj?.[key]?.base ?? 0;
+            const scale = obj?.[key]?.scale ?? 0;
+            return Math.floor(base + scale * level);
+        }
+
+        function spawnVariants(p) {
+            const variants = [{ name: p.name, mods: {} }];
+
+            if (['ambusher', 'castform'].includes(p.ability))
+                variants.push({ name: p.name + ' (grass)', mods: { power: 2 } });
+            if (['swimmer', 'castform'].includes(p.ability))
+                variants.push({ name: p.name + ' (grass)', mods: { speed: 0.5 } });
+            if (['vigilant', 'castform'].includes(p.ability))
+                variants.push({ name: p.name + ' (grass)', mods: { range: 2 } });
+
+            return variants.map(v => ({ base: p, ...v }));
+        }
+
+        function buildRows() {
+            const rows = [];
+            for (const [id, p] of Object.entries(data.pokemon)) {
+                spawnVariants(p).forEach(v => rows.push(v));
+            }
+            return rows;
+        }
+
+        function compute(row) {
+            const level = +levelInput.value;
+            const stars = +starsInput.value;
+            const hearts = +heartsInput.value;
+            const fossils = +fossilsInput.value;
+
+            let speed = stat(row.base, 'speed', level) / 1000;
+            let power = stat(row.base, 'power', level);
+            let range = stat(row.base, 'range', level);
+            let critical = stat(row.base, 'critical', level) / 100;
+            const abilityKey = row.base.ability;
+            const ability = data.ability[abilityKey];
+
+            if (row.base.ability === 'star') power += stars;
+            if (row.base.ability === 'bastiodon') speed -= 0.5 * fossils;
+            if (row.base.ability === 'rampardos')
+                power *= (1 + 0.05 * (14 - hearts));
+
+            if (row.mods.power) power *= row.mods.power;
+            if (row.mods.speed) speed *= row.mods.speed;
+            if (row.mods.range) range *= row.mods.range;
+
+            const critBase = row.base.ability === 'superCritical' ? 2 : 1.5;
+
+            const dps = Math.ceil(
+                power * ((1 - critical) + critical * critBase)
+            ) / speed;
+
+            const dpsCrit = Math.ceil(
+                power * ((1 - critical) + critical * (critBase * 1.33))
+            ) / speed;
+
+            let stunChance = 0;
+            if (['stunMono', 'stunArea'].includes(row.base.ability)) stunChance = 0.3;
+            if (row.base.ability === 'stunMonoNerf') stunChance = 0.05;
+
+            const sps = stunChance ? speed / stunChance : null;
+
+            const evoLevel = row.base.evolution?.level ?? 101;
+
+            return {
+                name: row.name,
+                ability: ability.name,
+                abilityDesc: ability.description,
+                speed,
+                power,
+                range,
+                critical,
+                dps,
+                dpsCrit,
+                sps,
+                id: row.base.id,
+                evoLevel
+            };
+        }
+
+        function filterEvolutionLines(rows) {
+            const level = +levelInput.value;
+            const grouped = {};
+            for (const r of rows) {
+                if (!grouped[r.id]) grouped[r.id] = [];
+                grouped[r.id].push(r);
+            }
+
+            const filtered = [];
+            // Filter to just show one pokemon per evolution line
+            for (const group of Object.values(grouped)) {
+                const candidates = group.filter(r => r.evoLevel > level);
+                if (!candidates.length) continue;
+
+                const chosen = candidates.reduce((a, b) =>
+                    a.evoLevel < b.evoLevel ? a : b
+                );
+
+                filtered.push(chosen);
+            }
+
+
+            return filtered;
+        }
+
+        function render() {
+            const query = searchInput.value.toLowerCase();
+            let rows = buildRows()
+                .map(compute)
+                .filter(r =>
+                    r.name.toLowerCase().includes(query) ||
+                    r.ability.toLowerCase().includes(query) ||
+                    r.abilityDesc.toLowerCase().includes(query)
+                );
+
+            rows = filterEvolutionLines(rows);
+
+            rows.sort((a, b) => {
+                const av = a[sortKey];
+                const bv = b[sortKey];
+
+
+                const isEmpty = v =>
+                    v === null ||
+                    v === undefined ||
+                    v === '' ||
+                    (typeof v === 'number' && Number.isNaN(v));
+
+                const aEmpty = isEmpty(av);
+                const bEmpty = isEmpty(bv);
+
+                if (aEmpty && bEmpty) return 0;
+                if (aEmpty) return 1;
+                if (bEmpty) return -1;
+
+                if (typeof av === 'number' && typeof bv === 'number') {
+                    return sortAsc ? av - bv : bv - av;
+                }
+
+                return sortAsc
+                    ? String(av).localeCompare(String(bv))
+                    : String(bv).localeCompare(String(av));
+            });
+
+
+            let html = `<table>
+<thead><tr>`;
+            const headers = [
+                { key: 'name', label: 'Name' },
+                { key: 'ability', label: 'Ability' },
+                { key: 'speed', label: 'Speed (s)' },
+                { key: 'power', label: 'Power' },
+                { key: 'range', label: 'Range' },
+                { key: 'critical', label: 'Crit %' },
+                { key: 'dps', label: 'DPS', title: 'Damage per second' },
+                { key: 'sps', label: 'SPS', title: 'Seconds per Stun' },
+                { key: 'dpsCrit', label: 'DPS Crit+', title: 'DPS inside Critical Aura' }
+            ];
+            headers.forEach(h => {
+                html += `<th onclick="sort('${h.key}')" title="${h.title ?? ''}">${h.label}${sortKey === h.key ? ` <span class="sort-arrow">${sortAsc ? '▲' : '▼'}</span>` : ''}</th>`;
+            });
+            html += `</tr></thead><tbody>`;
+
+            rows.forEach(r => {
+                html += `<tr>
+<td>${r.name}</td>
+<td title="${r.abilityDesc}">${r.ability}</td>
+<td class="num">${r.speed.toFixed(2)}</td>
+<td class="num">${r.power.toFixed(0)}</td>
+<td class="num">${r.range.toFixed(0)}</td>
+<td class="num">${(r.critical * 100).toFixed(0)}%</td>
+<td class="num">${r.dps.toFixed(2)}</td>
+<td class="num">${r.sps ? r.sps.toFixed(2) : ''}</td>
+<td class="num">${r.dpsCrit.toFixed(2)}</td>
+</tr>`;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        window.sort = key => {
+            sortAsc = sortKey === key ? !sortAsc : true;
+            sortKey = key;
+            render();
+        };
+
+        [searchInput, levelInput, starsInput, heartsInput, fossilsInput].forEach(e =>
+            e.addEventListener('input', render)
+        );
+
+        render();
+    });
+</script>

@@ -109,11 +109,11 @@ layout: default
             const variants = [{ name: p.name, mods: {} }];
 
             if (['ambusher', 'castform'].includes(p.ability))
-                variants.push({ name: p.name + ' (grass)', mods: { power: 2 } });
+                variants.push({ name: p.name + ' (grass)', mods: { id: -1, power: 2 } });
             if (['swimmer', 'castform'].includes(p.ability))
-                variants.push({ name: p.name + ' (water)', mods: { speed: 0.5 } });
+                variants.push({ name: p.name + ' (water)', mods: { id: -2, speed: 0.5 } });
             if (['vigilant', 'castform'].includes(p.ability))
-                variants.push({ name: p.name + ' (mountain)', mods: { range: 2 } });
+                variants.push({ name: p.name + ' (mountain)', mods: { id: -3, range: 2 } });
 
             return variants.map(v => ({ base: p, ...v }));
         }
@@ -168,6 +168,12 @@ layout: default
 
             const rangeType = row.base.attackType == "area" ? "area" : row.base.rangeType;
 
+            let id = row.base.id;
+            if (row.mods.id != null) {
+                id *= -64
+                id += row.mods.id;
+            }
+
             return {
                 name: row.name,
                 ability: ability.name,
@@ -179,7 +185,7 @@ layout: default
                 dps,
                 dpsCrit,
                 sps,
-                id: row.base.id,
+                id: id,
                 evoLevel,
                 rangeType: rangeType,
             };

@@ -111,9 +111,9 @@ layout: default
             if (['ambusher', 'castform'].includes(p.ability))
                 variants.push({ name: p.name + ' (grass)', mods: { power: 2 } });
             if (['swimmer', 'castform'].includes(p.ability))
-                variants.push({ name: p.name + ' (grass)', mods: { speed: 0.5 } });
+                variants.push({ name: p.name + ' (water)', mods: { speed: 0.5 } });
             if (['vigilant', 'castform'].includes(p.ability))
-                variants.push({ name: p.name + ' (grass)', mods: { range: 2 } });
+                variants.push({ name: p.name + ' (mountain)', mods: { range: 2 } });
 
             return variants.map(v => ({ base: p, ...v }));
         }

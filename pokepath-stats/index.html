@@ -166,6 +166,8 @@ layout: default
 
             const evoLevel = row.base.evolution?.level ?? 101;
 
+            const rangeType = row.attackType = "area" ? "area" : row.rangeType;
+
             return {
                 name: row.name,
                 ability: ability.name,
@@ -178,7 +180,8 @@ layout: default
                 dpsCrit,
                 sps,
                 id: row.base.id,
-                evoLevel
+                evoLevel,
+                rangeType: rangeType,
             };
         }
 
@@ -214,7 +217,8 @@ layout: default
                 .filter(r =>
                     r.name.toLowerCase().includes(query) ||
                     r.ability.toLowerCase().includes(query) ||
-                    r.abilityDesc.toLowerCase().includes(query)
+                    r.abilityDesc.toLowerCase().includes(query) ||
+                    r.rangeType.toLowerCase().includes(query)
                 );
 
             rows = filterEvolutionLines(rows);
@@ -271,7 +275,7 @@ layout: default
 <td title="${r.abilityDesc}">${r.ability}</td>
 <td class="num">${r.speed.toFixed(2)}</td>
 <td class="num">${r.power.toFixed(0)}</td>
-<td class="num">${r.range.toFixed(0)}</td>
+<td class="num">${r.range.toFixed(0)} (${r.rangeType})</td>
 <td class="num">${(r.critical * 100).toFixed(0)}%</td>
 <td class="num">${r.dps.toFixed(2)}</td>
 <td class="num">${r.sps ? r.sps.toFixed(2) : ''}</td>

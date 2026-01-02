@@ -233,18 +233,13 @@ layout: default
                 variants.push({ name: p.name + ' (grass)', mods: { id: offsetId--, critical_add: 1 } });
             }
             else if (p.ability === 'toughClawsDay') {
-                variants.push({ name: p.name + ' (day)', mods: { id: offsetId-- } });
-                variants.push({ name: p.name + ' (mountain, day)', mods: { id: offsetId--, power: 1.5, critical_set: 1 } });
-                // hack: Leave room for toughclaws night
-                offsetId--;
-                offsetId--;
+                variants.push({ name: p.name + ' (day)', mods: { id: offsetId--, specialVariant: 1 } });
+                variants.push({ name: p.name + ' (mountain, day)', mods: { id: offsetId--, specialVariant: 1, power: 1.5, critical_set: 1 } });
             }
             else if (p.ability === 'toughClawsNight') {
                 // hack: Leave room for toughclaws day
-                offsetId--;
-                offsetId--;
-                variants.push({ name: p.name + ' (night)', mods: { id: offsetId-- } });
-                variants.push({ name: p.name + ' (grass, night)', mods: { id: offsetId--, power: 1.5, critical_set: 1 } });
+                variants.push({ name: p.name + ' (night)', mods: { id: offsetId--, specialVariant: 2 } });
+                variants.push({ name: p.name + ' (grass, night)', mods: { id: offsetId--, specialVariant: 2, power: 1.5, critical_set: 1 } });
             }
             else if (['doubleShotSand', 'quadtrraShotSand'].includes(p.ability))
                 variants.push({ name: p.name + ' (route 2)', mods: { id: offsetId--, range: 2 } });
@@ -653,6 +648,7 @@ layout: default
                 dpsCrit,
                 sps,
                 id: id,
+                specialVariant: row.mods.specialVariant,
                 baseId: row.base.id,
                 evoLevel,
                 rangeType: rangeType,
@@ -663,8 +659,9 @@ layout: default
             const level = +levelInput.value;
             const grouped = {};
             for (const r of rows) {
-                if (!grouped[r.id]) grouped[r.id] = [];
-                grouped[r.id].push(r);
+                const key = `${r.id}-${r.specialVariant ?? 'default'}`;
+                if (!grouped[key]) grouped[key] = [];
+                grouped[key].push(r);
             }
 
             const filtered = [];

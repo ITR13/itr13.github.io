@@ -203,16 +203,17 @@ layout: default
                     });
                 }
 
-                for (const v of existingVariants) {
-                    variants.push({
-                        name: v.name + ' (heart scale)',
-                        mods: {
-                            ...v.mods,
-                            id: offsetId--,
-                            power: (v.mods.power ?? 1) * 0.5,
-                            speed: (v.mods.speed ?? 1) * 0.5
-                        }
-                    });
+                if (hearts < 14) {
+                    for (const v of existingVariants) {
+                        variants.push({
+                            name: v.name + ' (heart scale)',
+                            mods: {
+                                ...v.mods,
+                                id: offsetId--,
+                                speed: (v.mods.speed ?? 1) * 0.5
+                            }
+                        });
+                    }
                 }
 
                 for (const v of existingVariants) {

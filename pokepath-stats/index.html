@@ -235,12 +235,12 @@ layout: default
             else if (p.ability === 'toughClawsDay') {
                 variants.push({ name: p.name + ' (day)', mods: { id: offsetId-- } });
                 variants.push({ name: p.name + ' (mountain, day)', mods: { id: offsetId--, power: 1.5, critical_set: 1 } });
-// hack: Leave room for toughclaws night
+                // hack: Leave room for toughclaws night
                 offsetId--;
                 offsetId--;
             }
             else if (p.ability === 'toughClawsNight') {
-// hack: Leave room for toughclaws day
+                // hack: Leave room for toughclaws day
                 offsetId--;
                 offsetId--;
                 variants.push({ name: p.name + ' (night)', mods: { id: offsetId-- } });
@@ -641,7 +641,7 @@ layout: default
             }
 
             return {
-                name: `${row.name} (${row.item})`,
+                name: row.item ? `${row.name} (${row.item})` : row.name,
                 item: row.item,
                 ability: ability.name,
                 abilityDesc: ability.description,

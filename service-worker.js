@@ -1,4 +1,4 @@
-const CACHE_NAME = "dynamic-cache-v8";
+const CACHE_NAME = "dynamic-cache-v9";
 
 const ALLOWED_ORIGINS = [
     self.location.origin,

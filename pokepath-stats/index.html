@@ -356,8 +356,7 @@ layout: default
                     critical = p.critical.base + p.critical.scale * level;
                     critical = critical * (v.critical ?? 1) + (v.critical_add ?? 0);
                     if (v.critical_set) critical = v.critical_set;
-                    if (critical) {
-
+                    if (critical > 0) {
                         variants.push({
                             name: v.name,
                             item: 'blue bandana',
@@ -595,22 +594,23 @@ layout: default
                 }
             }
 
-            if (row.mods.power_add) power += row.mods.power_add;
-            if (row.mods.speed_add) speed += row.mods.speed_add;
-            if (row.mods.range_add) range += row.mods.range_add;
-            if (row.mods.critical_add) critical += row.mods.critical_add;
+            if (typeof row.mods.power_add !== 'undefined') power += row.mods.power_add;
+            if (typeof row.mods.speed_add !== 'undefined') speed += row.mods.speed_add;
+            if (typeof row.mods.range_add !== 'undefined') range += row.mods.range_add;
+            if (typeof row.mods.critical_add !== 'undefined') critical += row.mods.critical_add;
 
-            if (row.mods.critical_set) critical = row.mods.critical_set;
+            if (typeof row.mods.critical_set !== 'undefined') critical = row.mods.critical_set;
 
-            if (row.mods.power) power *= row.mods.power;
-            if (row.mods.speed) speed *= row.mods.speed;
-            if (row.mods.range) range *= row.mods.range;
-            if (row.mods.critical) critical *= row.mods.critical;
+            if (typeof row.mods.power !== 'undefined') power *= row.mods.power;
+            if (typeof row.mods.speed !== 'undefined') speed *= row.mods.speed;
+            if (typeof row.mods.range !== 'undefined') range *= row.mods.range;
+            if (typeof row.mods.critical !== 'undefined') critical *= row.mods.critical;
+
 
             critical = Math.max(0, Math.min(1, critical));
 
             let critBase = row.base.ability === 'superCritical' ? 2 : 1.5;
-            if (row.mods.critical_power) critBase *= row.mods.critical_power;
+            if (typeof row.mods.critical_power !== 'undefined') critBase *= row.mods.critical_power;
 
             const dps = Math.ceil(
                 power * ((1 - critical) + critical * critBase)
@@ -619,6 +619,10 @@ layout: default
             const dpsCrit = Math.ceil(
                 power * ((1 - critical) + critical * (critBase * 1.33))
             ) / speed;
+
+            if (row.item === "blue bandana") {
+                console.log(critical, dps, dpsCrit, row.mods);
+            }
 
             let stunChance = 0;
             if (['stunMono', 'stunArea'].includes(row.base.ability)) stunChance = 0.3;

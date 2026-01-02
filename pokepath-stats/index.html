@@ -612,8 +612,8 @@ layout: default
 
             rows.forEach(r => {
                 html += `<tr>
-<td>${r.name}</td>
-<td title="${r.abilityDesc}">${r.ability}</td>
+<td style="text-transform: capitalize;">${r.name}</td>
+<td style="text-transform: capitalize;" title="${r.abilityDesc}">${r.ability}</td>
 <td class="num">${r.speed.toFixed(2)}</td>
 <td class="num">${r.power.toFixed(0)}</td>
 <td class="num">${r.range.toFixed(0)} (${r.rangeType})</td>

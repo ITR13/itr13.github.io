@@ -106,6 +106,11 @@ layout: default
         }
 
         function spawnVariants(p) {
+            const level = +levelInput.value;
+            const stars = +starsInput.value;
+            const hearts = +heartsInput.value;
+            const fossils = +fossilsInput.value;
+
             const variants = p.name != "Lycanroc" ? [{ name: p.name, mods: {} }] : [];
 
             let offsetId = -1;
@@ -269,7 +274,7 @@ layout: default
                         mods: {
                             ...v.mods,
                             id: offsetId--,
-                            power: (v.mods.power ?? 1) * (1 + stars * 0.01),
+                            power: (v.mods.power ?? 1) * (1 + stars / (3000)),
                         }
                     });
                 }

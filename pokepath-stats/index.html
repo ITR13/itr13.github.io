@@ -1,6 +1,7 @@
 ---
 layout: default
 ---
+<div class="team-builder" id="teamBuilder"></div>
 <div class="search-container">
     <input type="text" id="searchInput" placeholder="Search / Filter..">
 </div>
@@ -80,6 +81,75 @@ layout: default
         margin: 12px 0;
         font-weight: bold;
     }
+
+    .team-builder {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 12px;
+        justify-content: flex-start;
+    }
+
+    .team-slot {
+        flex: 1 0 18%;
+        position: relative;
+        min-height: 20px;
+        text-transform: capitalize;
+    }
+
+    .team-slot .remove-btn {
+        position: absolute;
+        left: 10;
+        top: 50%;
+        transform: translateY(-50%);
+        background: red;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        cursor: pointer;
+        padding: 2px 6px;
+        font-weight: bold;
+        font-size: 12px;
+        z-index: 1;
+    }
+
+    .team-slot span {
+        display: block;
+        text-align: center;
+        width: 100%;
+        padding-left: 24px;
+        box-sizing: border-box;
+    }
+
+    th.compact:first-child,
+    td.compact:first-child {
+        width: 20px;
+        min-width: 20px;
+        max-width: 20px;
+        padding: 2px 4px;
+        text-align: center;
+    }
+
+    .add-btn.compact {
+        width: 24px;
+        height: 24px;
+        padding: 0;
+        margin: 0;
+        font-size: 12px;
+        line-height: 1;
+        border: none;
+        background: #4CAF50;
+        color: white;
+        border-radius: 3px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .add-btn.compact:hover {
+        background: #45a049;
+    }
 </style>
 
 <script>
@@ -91,9 +161,45 @@ layout: default
         const heartsInput = document.getElementById('hearts');
         const fossilsInput = document.getElementById('fossils');
         const loadingBar = document.getElementById('loadingBar');
+        const teamBuilderEl = document.getElementById('teamBuilder');
+
+        const TEAM_SIZE = 10;
+        let team = JSON.parse(localStorage.getItem('team')) || [];
 
         let sortKey = 'name';
         let sortAsc = true;
+
+        function saveTeam() {
+            localStorage.setItem('team', JSON.stringify(team));
+        }
+
+        function renderTeam() {
+            teamBuilderEl.innerHTML = '';
+
+            for (let i = 0; i < TEAM_SIZE; i++) {
+                const member = team[i];
+                const slot = document.createElement('div');
+                slot.className = 'info-box team-slot';
+
+                if (member) {
+                    slot.innerHTML = `<button class="remove-btn">-</button><span>${member.name}</span>`;
+                    slot.querySelector('.remove-btn').addEventListener('click', () => {
+                        team.splice(i, 1);
+                        renderTeam();
+                        saveTeam();
+                        render();
+                    });
+                }
+
+                teamBuilderEl.appendChild(slot);
+            }
+        }
+
+        function filterTeam(rows) {
+            const teamIds = team.map(t => t.name.includes("ditto") ? 70 : t.baseId);
+            const teamItems = team.filter(t => t.item).map(t => t.item);
+            return rows.filter(r => !teamIds.includes(r.name.includes("ditto") ? 70 : r.baseId) && !teamItems.includes(r.item));
+        }
 
         loadingBar.style.display = 'block';
         const data = await fetch('data.json').then(r => r.json());
@@ -167,11 +273,11 @@ layout: default
             }
 
             const existingVariants = [...variants];
-
             if (![19, 70, 83].includes(p.id)) {
                 for (const v of existingVariants) {
                     variants.push({
-                        name: v.name + ' (protein)',
+                        name: v.name,
+                        item: 'protein',
                         mods: {
                             ...v.mods,
                             id: offsetId--,
@@ -182,7 +288,8 @@ layout: default
 
                 for (const v of existingVariants) {
                     variants.push({
-                        name: v.name + ' (carbos)',
+                        name: v.name,
+                        item: 'carbos',
                         mods: {
                             ...v.mods,
                             id: offsetId--,
@@ -193,7 +300,8 @@ layout: default
 
                 for (const v of existingVariants) {
                     variants.push({
-                        name: v.name + ' (quick claw)',
+                        name: v.name,
+                        item: 'quick claw',
                         mods: {
                             ...v.mods,
                             id: offsetId--,
@@ -206,7 +314,8 @@ layout: default
                 if (hearts < 14) {
                     for (const v of existingVariants) {
                         variants.push({
-                            name: v.name + ' (heart scale)',
+                            name: v.name,
+                            item: 'heart scale',
                             mods: {
                                 ...v.mods,
                                 id: offsetId--,
@@ -218,7 +327,8 @@ layout: default
 
                 for (const v of existingVariants) {
                     variants.push({
-                        name: v.name + ' (ditto, quick powder)',
+                        name: v.name,
+                        item: 'ditto, quick powder',
                         mods: {
                             ...v.mods,
                             id: offsetId--,
@@ -230,7 +340,8 @@ layout: default
 
                 for (const v of existingVariants) {
                     variants.push({
-                        name: v.name + ' (ditto, metal powder)',
+                        name: v.name,
+                        item: 'ditto, metal powder',
                         mods: {
                             ...v.mods,
                             id: offsetId--,
@@ -246,7 +357,8 @@ layout: default
                         if (v.critical_set) critical = v.critical_set;
 
                         variants.push({
-                            name: v.name + ' (blue bandana)',
+                            name: v.name,
+                            item: 'blue bandana',
                             mods: {
                                 ...v.mods,
                                 id: offsetId--,
@@ -260,7 +372,8 @@ layout: default
                 if (heartsInput <= 7) {
                     for (const v of existingVariants) {
                         variants.push({
-                            name: v.name + ' (adrenaline orb)',
+                            name: v.name,
+                            item: 'adrenaline orb',
                             mods: {
                                 ...v.mods,
                                 id: offsetId--,
@@ -272,29 +385,28 @@ layout: default
 
                 for (const v of existingVariants) {
                     variants.push({
-                        name: v.name + ' (badge of honor)',
+                        name: v.name,
+                        item: 'badge of honor',
                         mods: {
                             ...v.mods,
                             id: offsetId--,
-                            power: (v.mods.power ?? 1) * (1 + stars / (3000)),
+                            power: (v.mods.power ?? 1) * (1 + stars / 3000),
                         }
                     });
                 }
             }
 
             if (p.id === 57) {
-                variants.push({ name: p.name + ' (leek)', mods: { id: offsetId--, power: 2, crit_power: 2 } });
-            }
-            else if (p.id === 45) {
-                variants.push({ name: p.name + ' (club)', mods: { id: offsetId--, power: 1.5 } });
-            }
-            else if (p.id === 72) {
-                variants.push({ name: p.name + ' (light ball)', mods: { id: offsetId--, power: 1.5 } });
-            }
-            else if (p.id === 29) {
+                variants.push({ name: p.name, item: 'leek', mods: { id: offsetId--, power: 2, crit_power: 2 } });
+            } else if (p.id === 45) {
+                variants.push({ name: p.name, item: 'club', mods: { id: offsetId--, power: 1.5 } });
+            } else if (p.id === 72) {
+                variants.push({ name: p.name, item: 'light ball', mods: { id: offsetId--, power: 1.5 } });
+            } else if (p.id === 29) {
                 for (const v of existingVariants) {
                     variants.push({
-                        name: v.name + ' (bullet)',
+                        name: v.name,
+                        item: 'bullet',
                         mods: {
                             ...v.mods,
                             id: offsetId--,
@@ -302,11 +414,11 @@ layout: default
                         }
                     });
                 }
-            }
-            else if (p.id === 63) {
+            } else if (p.id === 63) {
                 for (const v of existingVariants) {
                     variants.push({
-                        name: v.name + ' (claw fossil)',
+                        name: v.name,
+                        item: 'claw fossil',
                         mods: {
                             ...v.mods,
                             id: offsetId--,
@@ -314,11 +426,11 @@ layout: default
                         }
                     });
                 }
-            }
-            else if ([21, 23, 27, 88].includes(p.id)) {
+            } else if ([21, 23, 27, 88].includes(p.id)) {
                 for (const v of existingVariants) {
                     variants.push({
-                        name: v.name + ' (life orb)',
+                        name: v.name,
+                        item: 'life orb',
                         mods: {
                             ...v.mods,
                             id: offsetId--,
@@ -327,11 +439,11 @@ layout: default
                         }
                     });
                 }
-            }
-            else if (p.id === 59) {
+            } else if (p.id === 59) {
                 for (const v of existingVariants) {
                     variants.push({
-                        name: v.name + ' (dome fossil)',
+                        name: v.name,
+                        item: 'dome fossil',
                         mods: {
                             ...v.mods,
                             id: offsetId--,
@@ -339,16 +451,16 @@ layout: default
                         }
                     });
                 }
-            }
-            else if (p.id === 66) {
+            } else if (p.id === 66) {
                 // Handled in damage calc
-                variants.push({ name: p.name + ' (rocky helmet)', mods: {} });
+                variants.push({ name: p.name, item: 'rocky helmet', mods: {} });
             }
 
             if ([58, 59, 63, 64, 65, 66].includes(p.id)) {
                 for (const v of existingVariants) {
                     variants.push({
-                        name: v.name + ' (hard stone)',
+                        name: v.name,
+                        item: 'hard stone',
                         mods: {
                             ...v.mods,
                             id: offsetId--,
@@ -357,17 +469,19 @@ layout: default
                     });
                 }
             }
+
             if ([24, 37, 47, 51, 56, 59, 67, 75, 85].includes(p.id)) {
                 let speedMult = 0.8;
                 if (p.ability === 'quadraShot' || p.ability === 'quadraShotSand') speedMult = 0.4;
                 else if (p.ability === 'tripleShot') speedMult = 0.6;
-                variants.push({ name: p.name + ' (club)', mods: { id: offsetId--, speed: speedMult } });
+                variants.push({ name: p.name, item: 'club', mods: { id: offsetId--, speed: speedMult } });
             }
 
             if (p.attackType === 'area') {
                 for (const v of existingVariants) {
                     variants.push({
-                        name: v.name + ' (soft sand)',
+                        name: v.name,
+                        item: 'soft sand',
                         mods: {
                             ...v.mods,
                             id: offsetId--,
@@ -375,11 +489,11 @@ layout: default
                         }
                     });
                 }
-            }
-            else if (p.attackType === 'single') {
+            } else if (p.attackType === 'single') {
                 for (const v of existingVariants) {
                     variants.push({
-                        name: v.name + ' (sniper scope)',
+                        name: v.name,
+                        item: 'sniper scope',
                         mods: {
                             ...v.mods,
                             id: offsetId--,
@@ -392,7 +506,8 @@ layout: default
             if (p.ricochet > 0) {
                 for (const v of existingVariants) {
                     variants.push({
-                        name: v.name + ' (loaded dice)',
+                        name: v.name,
+                        item: 'loaded dice',
                         mods: {
                             ...v.mods,
                             id: offsetId--,
@@ -405,7 +520,8 @@ layout: default
             if (p.ricochet > 0 && [2, 45, 63, 72].includes(p.id)) {
                 for (const v of existingVariants) {
                     variants.push({
-                        name: v.name + ' (metronome)',
+                        name: v.name,
+                        item: 'metronome',
                         mods: {
                             ...v.mods,
                             id: offsetId--,
@@ -418,7 +534,8 @@ layout: default
             if ([10, 16, 51, 73, 86].includes(p.id)) {
                 for (const v of existingVariants) {
                     variants.push({
-                        name: v.name + ' (strange idol)',
+                        name: v.name,
+                        item: 'strange idol',
                         mods: {
                             ...v.mods,
                             id: offsetId--,
@@ -431,7 +548,8 @@ layout: default
             if ([6, 14, 25, 56].includes(p.id)) {
                 for (const v of existingVariants) {
                     variants.push({
-                        name: v.name + ' (poison barb)',
+                        name: v.name,
+                        item: 'poison barb',
                         mods: {
                             ...v.mods,
                             id: offsetId--,
@@ -517,7 +635,8 @@ layout: default
             }
 
             return {
-                name: row.name,
+                name: `${row.name} (${row.item})`,
+                item: row.item,
                 ability: ability.name,
                 abilityDesc: ability.description,
                 speed,
@@ -528,6 +647,7 @@ layout: default
                 dpsCrit,
                 sps,
                 id: id,
+                baseId: row.base.id,
                 evoLevel,
                 rangeType: rangeType,
             };
@@ -569,6 +689,7 @@ layout: default
                     r.rangeType.toLowerCase().includes(query)
                 );
 
+            rows = filterTeam(rows);
             rows = filterEvolutionLines(rows);
 
             rows.sort((a, b) => {
@@ -602,6 +723,7 @@ layout: default
             let html = `<table>
 <thead><tr>`;
             const headers = [
+                { key: 'add', label: 'Add', title: 'Add to Team' },
                 { key: 'name', label: 'Name' },
                 { key: 'ability', label: 'Ability' },
                 { key: 'speed', label: 'Recharge (s)' },
@@ -613,12 +735,17 @@ layout: default
                 { key: 'sps', label: 'SPS', title: 'Seconds per Stun' },
             ];
             headers.forEach(h => {
-                html += `<th onclick="sort('${h.key}')" title="${h.title ?? ''}">${h.label}${sortKey === h.key ? ` <span class="sort-arrow">${sortAsc ? '▲' : '▼'}</span>` : ''}</th>`;
+                const isAddColumn = h.key === 'add';
+                const classes = isAddColumn ? 'class="compact"' : '';
+                const onclick = isAddColumn ? '' : `onclick="sort('${h.key}')"`;
+
+                html += `<th ${classes} ${onclick} title="${h.title ?? ''}">${h.label}${sortKey === h.key ? ` <span class="sort-arrow">${sortAsc ? '▲' : '▼'}</span>` : ''}</th>`;
             });
             html += `</tr></thead><tbody>`;
 
             rows.forEach(r => {
                 html += `<tr>
+<td><button class="add-btn compact">+</button></td>
 <td style="text-transform: capitalize;">${r.name}</td>
 <td style="text-transform: capitalize;" title="${r.abilityDesc}">${r.ability}</td>
 <td class="num">${r.speed.toFixed(2)}</td>
@@ -633,6 +760,16 @@ layout: default
 
             html += '</tbody></table>';
             container.innerHTML = html;
+
+            document.querySelectorAll('.add-btn').forEach((btn, index) => {
+                btn.addEventListener('click', () => {
+                    if (team.length >= TEAM_SIZE) return alert('Team is full!');
+                    team.push(rows[index]);
+                    renderTeam();
+                    saveTeam();
+                    render();
+                });
+            });
         }
 
         window.sort = key => {
@@ -645,6 +782,7 @@ layout: default
             e.addEventListener('input', render)
         );
 
+        renderTeam();
         render();
     });
 </script>

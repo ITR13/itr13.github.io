@@ -140,7 +140,8 @@ layout: default
                 variants.push({ name: p.name + ' (max boost)', mods: { id: offsetId--, speed_add: -3 } });
             }
             else if (p.ability === 'sniper') {
-                variants.push({ name: p.name + ' (max dist)', mods: { id: offsetId--, power: 2 ** (Math.floor(p.range / 120)) * 2 } });
+                let range = p.range.base + p.range.scale * level;
+                variants.push({ name: p.name + ' (max dist)', mods: { id: offsetId--, power: 2 ** (Math.floor(range / 120)) * 2 } });
             }
             else if (p.ability === 'moxie') {
                 variants.push({ name: p.name + ' (10 moxies)', mods: { id: offsetId--, power: 1.3 } });

@@ -235,9 +235,15 @@ layout: default
             else if (p.ability === 'toughClawsDay') {
                 variants.push({ name: p.name + ' (day)', mods: { id: offsetId-- } });
                 variants.push({ name: p.name + ' (mountain, day)', mods: { id: offsetId--, power: 1.5, critical_set: 1 } });
+// hack: Leave room for toughclaws night
+                offsetId--;
+                offsetId--;
             }
             else if (p.ability === 'toughClawsNight') {
-                variants.push({ name: p.name + ' (night)', mods: { id: -8 } });
+// hack: Leave room for toughclaws day
+                offsetId--;
+                offsetId--;
+                variants.push({ name: p.name + ' (night)', mods: { id: offsetId-- } });
                 variants.push({ name: p.name + ' (grass, night)', mods: { id: offsetId--, power: 1.5, critical_set: 1 } });
             }
             else if (['doubleShotSand', 'quadtrraShotSand'].includes(p.ability))
